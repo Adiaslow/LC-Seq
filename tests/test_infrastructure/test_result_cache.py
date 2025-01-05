@@ -1,7 +1,7 @@
 # tests/test_infrastructure/test_result_cache.py
 
 import pytest
-from src.chromatographicpeakpicking.infrastructure.caching.result_cache import ResultCache
+from src.chromatographicpeakpicking.implementations.caches.result_cache import ResultCache
 
 def test_result_cache_initialization():
     cache = ResultCache()

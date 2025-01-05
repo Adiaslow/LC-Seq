@@ -1,4 +1,4 @@
-# src/chromatographicpeakpicking/analysis/baseline/aals.py
+# src/chromatographicpeakpicking/implementations/correctors/aals.py
 """
 A module for implementing the Asymmetric Least Squares (AALS) baseline correction algorithm.
 """
@@ -14,7 +14,7 @@ from src.chromatographicpeakpicking.core.types.config import (
     ConfigValidation
 )
 from src.chromatographicpeakpicking.core.types.validation import ValidationResult
-from src.chromatographicpeakpicking.core.domain.chromatogram import Chromatogram
+from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
 
 @dataclass
 class AALSConfig(BaseConfig):

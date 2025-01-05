@@ -22,7 +22,7 @@ Rationale:
 
 from typing import Dict, Any
 from ..prototypes.building_block import BuildingBlock
-from ...implementations.singletons.building_block_cache import BuildingBlockCache
+from ...implementations.caches.building_block_cache import BuildingBlockCache
 
 class BuildingBlockFactory:
     """

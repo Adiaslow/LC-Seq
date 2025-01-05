@@ -2,7 +2,7 @@
 import pytest
 import tempfile
 from pathlib import Path
-from src.chromatographicpeakpicking.infrastructure.logging.analysis_logger import AnalysisLogger
+from src.chromatographicpeakpicking.implementations.loggers.analysis_logger import AnalysisLogger
 
 @pytest.fixture
 def temp_log_file():

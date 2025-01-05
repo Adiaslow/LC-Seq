@@ -1,7 +1,7 @@
 # tests/test_core/test_peptide.py
 import pytest
-from src.chromatographicpeakpicking.core.domain.peptide import Peptide
-from src.chromatographicpeakpicking.core.domain.building_block import BuildingBlock
+from src.chromatographicpeakpicking.core.prototypes.peptide import Peptide
+from src.chromatographicpeakpicking.core.prototypes.building_block import BuildingBlock
 
 def test_peptide_initialization():
     sequence = [BuildingBlock('A', 89.09), BuildingBlock('C', 121.15)]

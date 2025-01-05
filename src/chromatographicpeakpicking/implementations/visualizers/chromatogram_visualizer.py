@@ -1,12 +1,10 @@
-# External imports
 from dataclasses import dataclass, field
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import numpy as np
 
-# Internal imports
 from configs.chromatogram_visualizer_config import ChromatogramVisualizerConfig
-from core.chromatogram import Chromatogram
+from core.prototypes.chromatogram import Chromatogram
 from visualizers.Ivisualizer import IVisualizer
 
 

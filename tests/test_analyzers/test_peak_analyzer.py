@@ -1,7 +1,7 @@
 # tests/test_analyzers/test_peak_analyzer.py
 import pytest
 import numpy as np
-from src.chromatographicpeakpicking.core.domain.chromatogram import Chromatogram
+from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
 
 def test_analyze_peak():
     time = np.array([0, 1, 2, 3, 4])

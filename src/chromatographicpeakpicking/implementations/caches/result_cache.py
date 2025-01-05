@@ -1,4 +1,4 @@
-# src/chromatographicpeakpicking/infrastructure/caching/result_cache.py
+# src/chromatographicpeakpicking/infrastructure/caches/result_cache.py
 
 """
 Cache for storing analysis results.

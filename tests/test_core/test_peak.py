@@ -1,6 +1,6 @@
 # tests/test_core/test_peak.py
 import pytest
-from src.chromatographicpeakpicking.core.domain.peak import Peak
+from src.chromatographicpeakpicking.core.prototypes.peak import Peak
 import numpy as np
 
 def test_peak_initialization():

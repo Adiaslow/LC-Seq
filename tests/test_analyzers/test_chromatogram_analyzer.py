@@ -1,9 +1,8 @@
 # tests/test_analyzers/test_chromatogram_analyzer.py
 import pytest
 import numpy as np
-from src.chromatographicpeakpicking.analyzers.chromatogram_analyzer import ChromatogramAnalyzer, ChromatogramAnalyzerConfig
-from src.chromatographicpeakpicking.core.domain.chromatogram import Chromatogram
-
+from src.chromatographicpeakpicking.implementations.analyzers.chromatogram_analyzer import ChromatogramAnalyzer, ChromatogramAnalyzerConfig
+from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
 @pytest.fixture
 def chroma_config():
     return ChromatogramAnalyzerConfig()

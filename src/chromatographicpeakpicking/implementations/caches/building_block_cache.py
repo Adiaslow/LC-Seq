@@ -1,4 +1,4 @@
-# src/chromatographicpeakpicking/implementations/singletons/building_block_cache.py
+# src/chromatographicpeakpicking/implementations/caches/building_block_cache.py
 """
 Module: building_block_cache
 

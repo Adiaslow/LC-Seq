@@ -1,7 +1,7 @@
 # tests/test_core/test_chromatogram.py
 import pytest
 import numpy as np
-from src.chromatographicpeakpicking.core.domain.chromatogram import Chromatogram
+from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
 
 def test_chromatogram_initialization():
     time = np.array([0, 1, 2, 3, 4])

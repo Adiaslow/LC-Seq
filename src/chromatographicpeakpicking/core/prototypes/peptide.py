@@ -18,7 +18,7 @@ Rationale:
         slight variations, reducing the need for multiple constructors or factory methods.
 """
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from uuid import uuid4
 import copy
 from .building_block import BuildingBlock
@@ -36,7 +36,6 @@ class Peptide:
         metadata (Dict[str, Any]): Additional metadata about the peptide.
         id (str): A unique identifier for the peptide.
     """
-
     sequence: List[BuildingBlock] = field(default_factory=list)
     chromatograms: List[Chromatogram] = field(default_factory=list)
     properties: Dict[str, Any] = field(default_factory=dict)
@@ -47,8 +46,8 @@ class Peptide:
         """Validate peptide data."""
         if not self.sequence:
             raise ValueError("Peptide must have at least one building block")
-        if 'retention_time' in self.properties and self.properties['retention_time'] < 0:
-            raise ValueError("Retention time must be non-negative")
+        if not isinstance(self.sequence, list):
+            object.__setattr__(self, 'sequence', list(self.sequence))
 
     @property
     def length(self) -> int:
@@ -110,13 +109,28 @@ class Peptide:
         return separator.join(block.name for block in sequence)
 
     def __eq__(self, other: object) -> bool:
-        """Check if two peptides are equal."""
+        """
+        Compare peptides for equality based on their sequences.
+        Only compare the names of the building blocks in the sequence.
+        """
         if not isinstance(other, Peptide):
             return NotImplemented
-        return self.sequence == other.sequence
+        return self.get_sequence_tuple() == other.get_sequence_tuple()
 
     def __hash__(self) -> int:
-        return hash(tuple(self.sequence))
+        """
+        Generate a hash based on the sequence of building block names.
+        This ensures that peptides with the same sequence of building blocks
+        hash to the same value, regardless of their other attributes.
+        """
+        return hash(self.get_sequence_tuple())
+
+    def get_sequence_tuple(self) -> Tuple[str, ...]:
+        """
+        Get the sequence as a tuple of building block names.
+        This provides an immutable representation of the sequence for hashing and comparison.
+        """
+        return tuple(bb.name for bb in self.sequence)
 
     def __str__(self) -> str:
         """Get string representation of peptide."""

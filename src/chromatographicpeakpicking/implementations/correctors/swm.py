@@ -1,4 +1,4 @@
-# src/chromatographicpeakpicking/analysis/baseline/swm.py
+# src/chromatographicpeakpicking/implementations/correctors/swm.py
 """
 This module implements the Sliding Window Minimum (SWM) baseline correction algorithm.
 """
@@ -10,7 +10,7 @@ from src.chromatographicpeakpicking.core.types.config import (
     BaseConfig, ConfigMetadata, ConfigValidation
 )
 from src.chromatographicpeakpicking.core.types.validation import ValidationResult
-from src.chromatographicpeakpicking.core.domain.chromatogram import Chromatogram
+from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
 
 @dataclass
 class SWMConfig(BaseConfig):
@@ -26,7 +26,7 @@ class SWMConfig(BaseConfig):
         ), parameters={"window_length": window_length, "padding_mode": padding_mode})
 
 @dataclass
-class SWM(Configurable[SWMConfig]):
+class SWMCorrector(Configurable[SWMConfig]):
     """Sliding Window Minimum baseline correction algorithm.
 
     This algorithm identifies the baseline of a chromatogram by calculating local

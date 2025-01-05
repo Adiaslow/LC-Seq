@@ -1,8 +1,8 @@
 # tests/test_baseline_correctors/test_aals.py
 import pytest
 import numpy as np
-from src.chromatographicpeakpicking.analysis.baseline.aals import AALSCorrector
-from src.chromatographicpeakpicking.core.domain.chromatogram import Chromatogram
+from src.chromatographicpeakpicking.implementations.correctors.aals import AALSCorrector
+from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
 
 def test_aals_correction():
     time = np.array([0, 1, 2, 3, 4])
