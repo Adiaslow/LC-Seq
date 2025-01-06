@@ -1,9 +1,9 @@
-# src/chromatographicpeakpicking/analysis/peak/peak_integrator.py
+# src/chromatographicpeakpicking/implementations/analyzers/peak/peak_interogrator.py
 from typing import Dict, Any, Tuple
 import numpy as np
 from scipy import integrate
-from ..protocols.analyzer import Analyzer, AnalysisResult
-from ...core.domain.peak import Peak
+from src.chromatographicpeakpicking.core.interfaces.analyzer import Analyzer, AnalysisResult
+from src.chromatographicpeakpicking.core.prototypes.peak import Peak
 
 class PeakIntegrationResult:
     """Results from peak integration."""

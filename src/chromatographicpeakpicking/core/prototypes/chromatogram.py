@@ -1,323 +1,131 @@
-# src/chromatographicpeakpicking/core/prototypes/chromatogram.py
-"""
-Module: chromatogram
-
-This module defines the Chromatogram class, which represents a chromatogram
-with its time series data and associated peaks. The Chromatogram class follows the
-Prototype Pattern to allow for efficient cloning of instances with optional modifications.
-
-Design Patterns:
-    - Prototype Pattern: Used to create new objects by copying an existing object (the prototype).
-
-Rationale:
-    - Efficiency: Cloning an existing object can be more efficient than creating a new one from
-        scratch, especially when the object has already been initialized with a complex state.
-    - Simplicity: The Prototype Pattern simplifies object creation by allowing for the reuse of
-        existing objects with optional modifications.
-    - Flexibility: Provides flexibility in creating new objects based on an existing prototype with
-        slight variations, reducing the need for multiple constructors or factory methods.
-"""
 from dataclasses import dataclass, field
-from typing import List, Dict, Any, Optional
-from uuid import uuid4
+from typing import Dict, List, Any, Optional, Set
 import numpy as np
-import copy
-from .peak import Peak
 
-@dataclass(frozen=True)
-class Chromatogram:
+from src.chromatographicpeakpicking.core.interfaces.prototype import Prototype
+from src.chromatographicpeakpicking.core.prototypes.peak import Peak prototype
+
+@dataclass
+class Chromatogram(Prototype['Chromatogram']):
     """
-    Represents a chromatogram with its time series data and associated peaks.
+    Represents a chromatographic signal with time and intensity data.
 
-    This class encapsulates all information about a chromatogram, including
-    raw data, detected peaks, baseline, and metadata.
-
-    Attributes:
-        time (np.ndarray): The time points of the chromatogram.
-        intensity (np.ndarray): The intensity values of the chromatogram.
-        peaks (List[Peak]): The list of detected peaks in the chromatogram.
-        baseline (Optional[np.ndarray]): The baseline values of the chromatogram.
-        noise_level (Optional[float]): The noise level of the chromatogram.
-        y_corrected (Optional[np.ndarray]): The baseline-corrected intensity values.
-        search_mask (Optional[np.ndarray]): The search mask for peak detection.
-        properties (Dict[str, Any]): Additional properties of the chromatogram.
-        picked_peak (Optional[Peak]): The selected peak of interest.
-        metadata (Dict[str, Any]): Additional metadata about the chromatogram.
-        id (str): A unique identifier for the chromatogram.
+    Includes support for peaks, baseline, and corrected signals along with
+    metadata for analysis results.
     """
-
-    # Core data
     time: np.ndarray
     intensity: np.ndarray
-
-    # Processing results
-    peaks: List[Peak] = field(default_factory=list)
+    peaks: Set[Peak] = field(default_factory=set)
     baseline: Optional[np.ndarray] = None
-    noise_level: Optional[float] = None
-    y_corrected: Optional[np.ndarray] = None
-    search_mask: Optional[np.ndarray] = None
+    corrected_intensity: Optional[np.ndarray] = None
     properties: Dict[str, Any] = field(default_factory=dict)
-    picked_peak: Optional[Peak] = None
-
-    # Metadata
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-    id: str = field(default_factory=lambda: str(uuid4()))
-
     def __post_init__(self):
-        """Validate chromatogram data after initialization."""
-        if len(self.time) != len(self.intensity):
-            raise ValueError("Time and intensity arrays must have the same length")
-        if len(self.time) < 2:
-            raise ValueError("Chromatogram must have at least 2 points")
+        """Validate inputs after initialization."""
         if not isinstance(self.time, np.ndarray):
-            object.__setattr__(self, 'time', np.array(self.time))
+            self.time = np.array(self.time)
         if not isinstance(self.intensity, np.ndarray):
-            object.__setattr__(self, 'intensity', np.array(self.intensity))
-        if self.baseline is not None and len(self.baseline) != len(self.time):
-            raise ValueError("Baseline must have the same length as time array")
-
-    @property
-    def length(self) -> int:
-        """Get the number of data points."""
-        return len(self.time)
-
-    @property
-    def duration(self) -> float:
-        """Get the total chromatogram duration."""
-        return self.time[-1] - self.time[0]
-
-    @property
-    def num_peaks(self) -> int:
-        """Get the number of detected peaks."""
-        return len(self.peaks)
-
-    def get_intensity_range(self) -> tuple[float, float]:
-        """Get the intensity range."""
-        return float(np.min(self.intensity)), float(np.max(self.intensity))
-
-    def get_time_range(self) -> tuple[float, float]:
-        """Get the time range."""
-        return float(self.time[0]), float(self.time[-1])
-
-    def get_signal_at_time(self, t: float) -> Optional[float]:
-        """Get the intensity value at a specific time point."""
-        idx = np.searchsorted(self.time, t)
-        if idx >= len(self.time):
-            return None
-        return float(self.intensity[idx])
-
-    def get_peaks_in_range(self, start_time: float, end_time: float) -> List[Peak]:
-        """Get peaks within the specified time range."""
-        return [
-            peak for peak in self.peaks
-            if start_time <= peak.time <= end_time
-        ]
+            self.intensity = np.array(self.intensity)
 
     def clone(self, **kwargs: Any) -> 'Chromatogram':
-        """
-        Clone the current chromatogram, allowing for optional overrides.
-
-        Args:
-            kwargs (Any): Attributes to override in the cloned instance.
-
-        Returns:
-            Chromatogram: A new Chromatogram instance with a new unique ID.
-        """
-        new_instance = copy.deepcopy(self)
-        # Set a new unique ID unless explicitly provided in kwargs
-        new_instance_id = kwargs.get('id', str(uuid4()))
-        object.__setattr__(new_instance, 'id', new_instance_id)
-        for key, value in kwargs.items():
-            object.__setattr__(new_instance, key, value)
-        return new_instance
-
-    def with_peaks(self, peaks: List[Peak]) -> 'Chromatogram':
-        """Create a new chromatogram instance with updated peaks."""
-        return self.clone(peaks=peaks)
-
-    def with_baseline(self, baseline: np.ndarray) -> 'Chromatogram':
-        """Create a new chromatogram instance with baseline."""
-        if len(baseline) != len(self.time):
-            raise ValueError("Baseline must have the same length as the time array")
-        return self.clone(baseline=baseline)
+        """Create a copy of the chromatogram with optional overrides."""
+        return Chromatogram(
+            time=kwargs.get('time', self.time.copy()),
+            intensity=kwargs.get('intensity', self.intensity.copy()),
+            peaks=kwargs.get('peaks', {p.clone() for p in self.peaks}),
+            baseline=kwargs.get('baseline', self.baseline.copy() if self.baseline is not None else None),
+            corrected_intensity=kwargs.get('corrected_intensity',
+                self.corrected_intensity.copy() if self.corrected_intensity is not None else None),
+            properties=kwargs.get('properties', self.properties.copy()),
+            metadata=kwargs.get('metadata', self.metadata.copy())
+        )
 
     def with_properties(self, **kwargs: Any) -> 'Chromatogram':
-        """Create a new chromatogram instance with updated properties."""
+        """Create a new chromatogram with updated properties."""
         new_properties = self.properties.copy()
         new_properties.update(kwargs)
         return self.clone(properties=new_properties)
 
-    def with_metadata(self, **kwargs) -> 'Chromatogram':
-        """Create a new chromatogram instance with updated metadata."""
+    def with_metadata(self, **kwargs: Any) -> 'Chromatogram':
+        """Create a new chromatogram with updated metadata."""
         new_metadata = self.metadata.copy()
         new_metadata.update(kwargs)
         return self.clone(metadata=new_metadata)
 
-    def get_corrected_intensity(self) -> np.ndarray:
-        """Get baseline-corrected intensity values."""
-        if self.baseline is None:
-            return self.intensity
-        return self.intensity - self.baseline
+    def validate(self) -> List[str]:
+        """Validate the chromatogram and return any errors."""
+        errors = []
 
-    def slice(self, start_time: float, end_time: float) -> 'Chromatogram':
-        """Create a new chromatogram containing only data within the specified time range."""
-        if start_time >= end_time:
-            raise ValueError("Start time must be less than end time")
+        # Check data existence
+        if len(self.time) == 0 or len(self.intensity) == 0:
+            errors.append("Time and intensity arrays cannot be empty")
 
-        mask = (self.time >= start_time) & (self.time <= end_time)
-        if not np.any(mask):
-            raise ValueError("No data points in the specified time range")
+        # Check array lengths match
+        if len(self.time) != len(self.intensity):
+            errors.append("Time and intensity arrays must have the same length")
 
-        # Slice time and intensity arrays
-        new_time = self.time[mask]
-        new_intensity = self.intensity[mask]
-        new_baseline = self.baseline[mask] if self.baseline is not None else None
+        # Check data types
+        if not isinstance(self.time, np.ndarray):
+            errors.append("Time must be a numpy array")
+        if not isinstance(self.intensity, np.ndarray):
+            errors.append("Intensity must be a numpy array")
 
-        # Filter peaks within range
-        new_peaks = self.get_peaks_in_range(start_time, end_time)
+        # Check for NaN/infinite values
+        if np.any(~np.isfinite(self.time)):
+            errors.append("Time array contains NaN or infinite values")
+        if np.any(~np.isfinite(self.intensity)):
+            errors.append("Intensity array contains NaN or infinite values")
 
-        return Chromatogram(
-            time=new_time,
-            intensity=new_intensity,
-            peaks=new_peaks,
-            baseline=new_baseline,
-            noise_level=self.noise_level,
-            y_corrected=self.y_corrected,
-            search_mask=self.search_mask,
-            properties=self.properties,
-            picked_peak=self.picked_peak,
-            metadata=self.metadata
-        )
-
-    def resample(self, num_points: int) -> 'Chromatogram':
-        """Create a new chromatogram with resampled data points."""
-        if num_points < 2:
-            raise ValueError("Number of points must be at least 2")
-
-        # Create new time points
-        start, end = self.time[0], self.time[-1]
-        new_time = np.linspace(start, end, num_points)
-
-        # Resample intensity and baseline
-        new_intensity = np.interp(new_time, self.time, self.intensity)
-        new_baseline = None
+        # Validate baseline if present
         if self.baseline is not None:
-            new_baseline = np.interp(new_time, self.time, self.baseline)
+            if len(self.baseline) != len(self.intensity):
+                errors.append("Baseline array length must match intensity array")
+            if np.any(~np.isfinite(self.baseline)):
+                errors.append("Baseline contains NaN or infinite values")
 
-        return Chromatogram(
-            time=new_time,
-            intensity=new_intensity,
-            peaks=self.peaks,  # Peaks are preserved as they store absolute times
-            baseline=new_baseline,
-            noise_level=self.noise_level,
-            y_corrected=self.y_corrected,
-            search_mask=self.search_mask,
-            properties=self.properties,
-            picked_peak=self.picked_peak,
-            metadata=self.metadata
-        )
+        # Validate corrected intensity if present
+        if self.corrected_intensity is not None:
+            if len(self.corrected_intensity) != len(self.intensity):
+                errors.append("Corrected intensity array length must match intensity array")
+            if np.any(~np.isfinite(self.corrected_intensity)):
+                errors.append("Corrected intensity contains NaN or infinite values")
 
-    def smooth(self, window_length: int = 5, polyorder: int = 2) -> 'Chromatogram':
-        """Create a new chromatogram with smoothed intensity values using Savitzky-Golay filter."""
-        from scipy.signal import savgol_filter
+        # Validate peaks
+        for peak in self.peaks:
+            peak_errors = peak.validate()
+            errors.extend(f"Peak validation error: {error}" for error in peak_errors)
+            if peak.retention_time < np.min(self.time) or peak.retention_time > np.max(self.time):
+                errors.append(f"Peak at {peak.retention_time} is outside chromatogram time range")
 
-        if window_length >= len(self.time):
-            raise ValueError("Window length must be less than chromatogram length")
-        if window_length % 2 == 0:
-            raise ValueError("Window length must be odd")
-        if polyorder >= window_length:
-            raise ValueError("Polynomial order must be less than window length")
+        return errors
 
-        smoothed_intensity = savgol_filter(
-            self.intensity,
-            window_length=window_length,
-            polyorder=polyorder
-        )
+    def with_peaks(self, peaks: Set[Peak]) -> 'Chromatogram':
+        """Create a new chromatogram with updated peaks."""
+        return self.clone(peaks=peaks)
 
-        return Chromatogram(
-            time=self.time,
-            intensity=smoothed_intensity,
-            peaks=self.peaks,
-            baseline=self.baseline,
-            noise_level=self.noise_level,
-            y_corrected=self.y_corrected,
-            search_mask=self.search_mask,
-            properties=self.properties,
-            picked_peak=self.picked_peak,
-            metadata=self.metadata
-        )
+    def with_baseline(self, baseline: np.ndarray) -> 'Chromatogram':
+        """Create a new chromatogram with updated baseline."""
+        return self.clone(baseline=baseline)
 
-    def normalize(self, method: str = 'max') -> 'Chromatogram':
-        """Create a new chromatogram with normalized intensity values."""
-        if method not in ['max', 'area', 'sum']:
-            raise ValueError("Normalization method must be 'max', 'area', or 'sum'")
+    def with_corrected_intensity(self, corrected: np.ndarray) -> 'Chromatogram':
+        """Create a new chromatogram with updated corrected intensity."""
+        return self.clone(corrected_intensity=corrected)
 
-        if method == 'max':
-            factor = np.max(np.abs(self.intensity))
-        elif method == 'area':
-            factor = np.trapezoid(np.abs(self.intensity), self.time)
-        else:  # sum
-            factor = np.sum(np.abs(self.intensity))
+    def get_intensity_at(self, time: float) -> float:
+        """Get intensity value at a specific time point (interpolated)."""
+        return float(np.interp(time, self.time, self.intensity))
 
-        if factor == 0:
-            raise ValueError("Cannot normalize: all intensity values are zero")
+    def get_baseline_at(self, time: float) -> Optional[float]:
+        """Get baseline value at a specific time point (interpolated)."""
+        if self.baseline is None:
+            return None
+        return float(np.interp(time, self.time, self.baseline))
 
-        normalized_intensity = self.intensity / factor
-        normalized_baseline = self.baseline / factor if self.baseline is not None else None
+    def get_time_range(self) -> tuple[float, float]:
+        """Get the time range of the chromatogram."""
+        return float(np.min(self.time)), float(np.max(self.time))
 
-        # Adjust peak intensities
-        normalized_peaks = [
-            Peak(
-                time=peak.time,
-                index=peak.index,
-                intensity=float(peak.intensity / factor),
-                properties=peak.properties,
-                metadata=peak.metadata,
-                id=peak.id
-            ) for peak in self.peaks
-        ]
-
-        return Chromatogram(
-            time=self.time,
-            intensity=normalized_intensity,
-            peaks=normalized_peaks,
-            baseline=normalized_baseline,
-            noise_level=float(self.noise_level / factor) if self.noise_level is not None else None,
-            y_corrected=self.y_corrected,
-            search_mask=self.search_mask,
-            properties=self.properties,
-            picked_peak=self.picked_peak,
-            metadata=self.metadata
-        )
-
-    def __len__(self) -> int:
-        """Get the number of data points."""
-        return len(self.time)
-
-    def __eq__(self, other: object) -> bool:
-        """Compare chromatograms for equality."""
-        if not isinstance(other, Chromatogram):
-            return NotImplemented
-        return (
-            np.array_equal(self.time, other.time) and
-            np.array_equal(self.intensity, other.intensity)
-        )
-
-    def __str__(self) -> str:
-        """String representation of chromatogram."""
-        return (
-            f"Chromatogram(points={len(self)}, "
-            f"peaks={len(self.peaks)}, "
-            f"time_range={self.get_time_range()})"
-        )
-
-    def __repr__(self) -> str:
-        """Detailed string representation of chromatogram."""
-        return (
-            f"Chromatogram(id='{self.id}', "
-            f"points={len(self)}, "
-            f"peaks={len(self.peaks)}, "
-            f"time_range={self.get_time_range()}, "
-            f"intensity_range={self.get_intensity_range()})"
-        )
+    def get_intensity_range(self) -> tuple[float, float]:
+        """Get the intensity range of the chromatogram."""
+        return float(np.min(self.intensity)), float(np.max(self.intensity))

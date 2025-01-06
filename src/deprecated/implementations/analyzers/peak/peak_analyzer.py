@@ -1,4 +1,4 @@
-# src/chromatographicpeakpicking/analysis/peak/peak_analyzer.py
+# src/chromatographicpeakpicking/implementations/analyzers/peak/peak_analyzer.py
 from typing import Dict, Any, Optional
 import numpy as np
 from scipy.optimize import curve_fit

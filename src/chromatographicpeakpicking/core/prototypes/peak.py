@@ -1,122 +1,113 @@
-# src/chromatographicpeakpicking/core/domain/peak.py
-"""
-Module: peak
-
-This module defines the Peak class, which represents a chromatographic peak
-with its basic attributes. The Peak class follows the Prototype Pattern
-to allow for efficient cloning of instances with optional modifications.
-
-Design Patterns:
-    - Prototype Pattern: Used to create new objects by copying an existing object (the prototype).
-
-Rationale:
-    - Efficiency: Cloning an existing object can be more efficient than creating a new one from
-        scratch, especially when the object has already been initialized with a complex state.
-    - Simplicity: The Prototype Pattern simplifies object creation by allowing for the reuse of
-        existing objects with optional modifications.
-    - Flexibility: Provides flexibility in creating new objects based on an existing prototype with
-        slight variations, reducing the need for multiple constructors or factory methods.
-"""
 from dataclasses import dataclass, field
-from typing import Dict, Any
-from uuid import uuid4
-import copy
+from typing import Dict, List, Any, Optional
 
-@dataclass(frozen=True)
-class Peak:
+from src.chromatographicpeakpicking.core.interfaces.prototype import Prototype
+
+@dataclass
+class Peak(Prototype['Peak']):
     """
-    Represents a chromatographic peak with its basic attributes.
+    Represents a chromatographic peak with its characteristics.
 
-    Attributes:
-        time (float): The time at which the peak occurs.
-        index (int): The index of the peak in the dataset.
-        intensity (float): The intensity of the peak.
-        properties (Dict[str, Any]): Additional properties of the peak.
-        metadata (Dict[str, Any]): Additional metadata about the peak.
-        id (str): A unique identifier for the peak.
+    Stores peak attributes like retention time, height, area, and associated
+    metadata such as integration parameters, quality metrics, etc.
     """
-
-    time: float
-    index: int
-    intensity: float
+    retention_time: float
+    height: float
+    area: Optional[float] = None
+    start_time: Optional[float] = None
+    end_time: Optional[float] = None
     properties: Dict[str, Any] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
-    id: str = field(default_factory=lambda: str(uuid4()))
 
     def clone(self, **kwargs: Any) -> 'Peak':
-        """
-        Clone the current peak, allowing for optional overrides.
-
-        Args:
-            kwargs (Any): Attributes to override in the cloned instance.
-
-        Returns:
-            Peak: A new Peak instance with a new unique ID.
-        """
-        new_instance = copy.deepcopy(self)
-        # Set a new unique ID unless explicitly provided in kwargs
-        new_instance_id = kwargs.get('id', str(uuid4()))
-        object.__setattr__(new_instance, 'id', new_instance_id)
-        for key, value in kwargs.items():
-            object.__setattr__(new_instance, key, value)
-        return new_instance
+        """Create a copy of the peak with optional overrides."""
+        return Peak(
+            retention_time=kwargs.get('retention_time', self.retention_time),
+            height=kwargs.get('height', self.height),
+            area=kwargs.get('area', self.area),
+            start_time=kwargs.get('start_time', self.start_time),
+            end_time=kwargs.get('end_time', self.end_time),
+            properties=kwargs.get('properties', self.properties.copy()),
+            metadata=kwargs.get('metadata', self.metadata.copy())
+        )
 
     def with_properties(self, **kwargs: Any) -> 'Peak':
-        """Create new peak instance with updated properties."""
+        """Create a new peak with updated properties."""
         new_properties = self.properties.copy()
         new_properties.update(kwargs)
         return self.clone(properties=new_properties)
 
-    def with_metadata(self, **kwargs) -> 'Peak':
-        """Create new peak instance with updated metadata."""
+    def with_metadata(self, **kwargs: Any) -> 'Peak':
+        """Create a new peak with updated metadata."""
         new_metadata = self.metadata.copy()
         new_metadata.update(kwargs)
         return self.clone(metadata=new_metadata)
 
-    def __eq__(self, other: object) -> bool:
-        """Compare peaks for equality based on time."""
-        if not isinstance(other, Peak):
-            return NotImplemented
-        return self.time == other.time
+    def validate(self) -> List[str]:
+        """Validate the peak and return any errors."""
+        errors = []
 
-    def __ne__(self, other: object) -> bool:
-        """Compare peaks for inequality based on time."""
-        if not isinstance(other, Peak):
-            return NotImplemented
-        return self.time != other.time
+        # Validate basic attributes
+        if not isinstance(self.retention_time, (int, float)):
+            errors.append("Retention time must be a number")
+        if self.retention_time < 0:
+            errors.append("Retention time must be non-negative")
 
-    def __lt__(self, other: object) -> bool:
-        """Compare peaks for less than based on time."""
-        if not isinstance(other, Peak):
-            return NotImplemented
-        return self.time < other.time
+        if not isinstance(self.height, (int, float)):
+            errors.append("Height must be a number")
+        if self.height <= 0:
+            errors.append("Height must be positive")
 
-    def __gt__(self, other: object) -> bool:
-        """Compare peaks for greater than based on time."""
-        if not isinstance(other, Peak):
-            return NotImplemented
-        return self.time > other.time
+        # Validate optional attributes
+        if self.area is not None:
+            if not isinstance(self.area, (int, float)):
+                errors.append("Area must be a number")
+            if self.area <= 0:
+                errors.append("Area must be positive")
 
-    def __le__(self, other: object) -> bool:
-        """Compare peaks for less than or equal based on time."""
-        if not isinstance(other, Peak):
-            return NotImplemented
-        return self.time <= other.time
+        if self.start_time is not None:
+            if not isinstance(self.start_time, (int, float)):
+                errors.append("Start time must be a number")
+            if self.start_time < 0:
+                errors.append("Start time must be non-negative")
+            if self.start_time >= self.retention_time:
+                errors.append("Start time must be before retention time")
 
-    def __ge__(self, other: object) -> bool:
-        """Compare peaks for greater than or equal based on time."""
-        if not isinstance(other, Peak):
-            return NotImplemented
-        return self.time >= other.time
+        if self.end_time is not None:
+            if not isinstance(self.end_time, (int, float)):
+                errors.append("End time must be a number")
+            if self.end_time <= self.retention_time:
+                errors.append("End time must be after retention time")
 
-    def __hash__(self) -> int:
-        """Hash the peak based on its UUID id."""
-        return hash(self.id)
+        if self.start_time is not None and self.end_time is not None:
+            if self.start_time >= self.end_time:
+                errors.append("Start time must be before end time")
 
-    def __str__(self) -> str:
-        """Return a string representation of the peak."""
-        return f"Peak(time={self.time}, index={self.index}, intensity={self.intensity})"
+        return errors
 
-    def __repr__(self) -> str:
-        """Return a string representation of the peak."""
-        return str(self)
+    def width(self) -> Optional[float]:
+        """Calculate peak width if start and end times are available."""
+        if self.start_time is not None and self.end_time is not None:
+            return self.end_time - self.start_time
+        return None
+
+    def with_integration_bounds(self, start_time: float, end_time: float) -> 'Peak':
+        """Create a new peak with updated integration bounds."""
+        return self.clone(start_time=start_time, end_time=end_time)
+
+    def with_area(self, area: float) -> 'Peak':
+        """Create a new peak with updated area."""
+        return self.clone(area=area)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert peak to dictionary representation."""
+        return {
+            'retention_time': self.retention_time,
+            'height': self.height,
+            'area': self.area,
+            'start_time': self.start_time,
+            'end_time': self.end_time,
+            'width': self.width(),
+            'properties': self.properties,
+            'metadata': self.metadata
+        }
