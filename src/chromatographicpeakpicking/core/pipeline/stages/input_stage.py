@@ -1,0 +1,17 @@
+from typing import Any
+from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import PipelineStage, PipelineStageResult
+from src.chromatographicpeakpicking.core.pipeline.pipeline_config import PipelineConfig
+
+class InputStage(PipelineStage[PipelineConfig]):
+    """Handle input data parsing."""
+    def process(self, data: str) -> PipelineStageResult:
+        try:
+            # Implement your input parsing logic here
+            parsed_data = self._parse_input(data)
+            return PipelineStageResult(True, parsed_data, {})
+        except Exception as e:
+            return PipelineStageResult(False, None, {}, str(e))
+
+    def _parse_input(self, input_path: str) -> Any:
+        # Implement parsing logic
+        pass

@@ -3,7 +3,7 @@ from typing import Dict, List, Any, Optional, Set
 import numpy as np
 
 from src.chromatographicpeakpicking.core.interfaces.prototype import Prototype
-from src.chromatographicpeakpicking.core.prototypes.peak import Peak prototype
+from src.chromatographicpeakpicking.core.prototypes.peak import Peak
 
 @dataclass
 class Chromatogram(Prototype['Chromatogram']):

@@ -1,3 +1,10 @@
+# src/chromatographicpeakpicking/correction/implementations/aals_correction.py
+"""This module implements the Asymmetric Least Squares (AALS) baseline correction algorithm.
+
+Classes:
+    AALSConfig: Configuration for the AALS baseline corrector.
+    AALSCorrector: Asymmetric Least Squares (AALS) baseline corrector implementation.
+"""
 from dataclasses import dataclass, field
 import numpy as np
 from scipy import sparse
@@ -11,13 +18,35 @@ from src.chromatographicpeakpicking.core.types.validation import ValidationResul
 
 @dataclass
 class AALSConfig(BaseConfig):
-    """Configuration for the AALS baseline correction."""
+    """Configuration for the AALS baseline correction.
+
+    Attributes:
+        lambda_value: Regularization parameter for baseline correction.
+        p_value: Weighting factor for baseline correction.
+        max_iterations: Maximum number of iterations for optimization.
+
+    Methods:
+        __init__: Initialize configuration with default values
+    """
     def __init__(
         self,
         lambda_value: float = 1e4,
         p_value: float = 0.001,
         max_iterations: int = 10
     ):
+        """Initialize configuration with default values.
+
+        Args:
+            lambda_value: Regularization parameter for baseline correction.
+            p_value: Weighting factor for baseline correction.
+            max_iterations: Maximum number of iterations for optimization.
+
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         super().__init__(metadata=ConfigMetadata(
             name="AALSConfig",
             version="1.0",
@@ -37,10 +66,31 @@ class AALSConfig(BaseConfig):
 
 @dataclass
 class AALSCorrector(Corrector[AALSConfig]):
-    """Asymmetric Least Squares (AALS) baseline correction algorithm."""
+    """Asymmetric Least Squares (AALS) baseline correction algorithm.
+
+    Attributes:
+        config: Configuration for the AALS baseline corrector.
+
+    Methods:
+        configure: Configure the baseline corrector with given parameters.
+        validate_config: Validate the configuration parameters.
+        correct: Apply AALS baseline correction to a chromatogram.
+        _validate_inputs: Validate the input chromatogram for processing.
+    """
     config: AALSConfig = field(default_factory=AALSConfig)
 
     def configure(self, config: AALSConfig) -> ValidationResult:
+        """Configure the baseline corrector with given parameters.
+
+        Args:
+            config: Configuration parameters for the AALS baseline corrector
+
+        Returns:
+            ValidationResult: Result of configuration validation
+
+        Raises:
+            None
+        """
         validation_result = self.validate_config(config)
         if validation_result.is_valid:
             self.config = config
@@ -57,7 +107,17 @@ class AALSCorrector(Corrector[AALSConfig]):
         return ValidationResult(is_valid=len(errors) == 0, messages=errors)
 
     def correct(self, chromatogram: Chromatogram) -> Chromatogram:
-        """Apply AALS baseline correction."""
+        """Apply AALS baseline correction.
+
+        Args:
+            chromatogram: Input chromatogram to correct
+
+        Returns:
+            Chromatogram: Corrected chromatogram with baseline removed
+
+        Raises:
+            None
+        """
         # Input validation
         self._validate_inputs(chromatogram)
 
@@ -65,7 +125,7 @@ class AALSCorrector(Corrector[AALSConfig]):
         length = len(y)
 
         # Create difference matrix
-        diff_matrix = sparse.diags([1, -2, 1], [0, 1, 2], shape=(length, length))
+        diff_matrix = sparse.diags([1, -2, 1], [0, 1, 2], shape=(length, length)) # type: ignore
 
         # Initialize weights and baseline
         weights = np.ones(length)
@@ -98,7 +158,18 @@ class AALSCorrector(Corrector[AALSConfig]):
         )
 
     def _validate_inputs(self, chromatogram: Chromatogram) -> None:
-        """Validate chromatogram can be processed."""
+        """Validate chromatogram can be processed.
+
+        Args:
+            chromatogram: Input chromatogram to validate
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If input chromatogram is invalid
+            ValueError: If input signal contains NaN or infinite values
+        """
         if len(chromatogram.intensity) < 3:
             raise ValueError("Chromatogram too short for baseline correction")
         if not np.all(np.isfinite(chromatogram.intensity)):
