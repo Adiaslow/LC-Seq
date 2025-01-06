@@ -1,7 +1,11 @@
+# src/chromatographicpeakpicking/core/prototypes/hierarchy.py
+"""This module defines the Hierarchy prototype.
+
+"""
+
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Set, Optional
 from collections import defaultdict
-from itertools import combinations
 import copy
 from src.chromatographicpeakpicking.core.interfaces.prototype import Prototype
 from src.chromatographicpeakpicking.core.prototypes.building_block import BuildingBlock
@@ -14,6 +18,31 @@ class Hierarchy(Prototype['Hierarchy']):
 
     Manages relationships between peptides at different levels, where each level
     represents the number of non-null building blocks in the peptides.
+
+    Attributes:
+        null_block (BuildingBlock): The null building block used for truncations.
+        levels (Dict[int, Set[Peptide]]): Peptides grouped by number of non-null blocks.
+        descendants (Dict[Peptide, Set[Peptide]]): Direct descendants of each peptide.
+        ancestors (Dict[Peptide, Set[Peptide]]): Direct ancestors of each peptide.
+        properties (Dict[str, Any]): Additional properties for the hierarchy.
+        metadata (Dict[str, Any]): Additional metadata for the hierarchy.
+
+    Methods:
+        clone: Create a copy of the hierarchy with optional overrides.
+        with_properties: Create a new hierarchy with updated properties.
+        with_metadata: Create a new hierarchy with updated metadata.
+        validate: Validate the hierarchy and return any errors.
+        count_non_null_blocks: Count number of non-null building blocks in a peptide.
+        add_peptide: Add a peptide to the hierarchy and compute its relationships.
+        _get_direct_descendants: Generate direct descendants by replacing one non-null block with
+            null.
+        _find_canonical_form: Find existing functionally equivalent peptide at given level.
+        _are_functionally_equivalent: Check if two peptides have the same non-null blocks in the
+            same order.
+        get_level: Get the level (number of non-null blocks) of a peptide.
+        get_peptides_at_level: Get all peptides at a specific level.
+        get_ancestors: Get all ancestors of a peptide.
+        get_descendants: Get all descendants of a peptide.
     """
     null_block: BuildingBlock
     levels: Dict[int, Set[Peptide]] = field(default_factory=lambda: defaultdict(set))
@@ -23,14 +52,39 @@ class Hierarchy(Prototype['Hierarchy']):
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     def clone(self, **kwargs: Any) -> 'Hierarchy':
-        """Create a copy of the hierarchy with optional overrides."""
+        """Create a copy of the hierarchy with optional overrides.
+
+        Args:
+            **kwargs (Any): Optional overrides for the hierarchy attributes.
+
+        Returns:
+            Hierarchy: A new hierarchy instance with the specified overrides.
+
+        Raises:
+            None
+        """
         return Hierarchy(
             null_block=kwargs.get('null_block', self.null_block),
-            levels=kwargs.get('levels', defaultdict(set, {k: s.copy() for k, s in self.levels.items()})),
-            descendants=kwargs.get('descendants', defaultdict(set, {k: s.copy() for k, s in self.descendants.items()})),
-            ancestors=kwargs.get('ancestors', defaultdict(set, {k: s.copy() for k, s in self.ancestors.items()})),
-            properties=kwargs.get('properties', self.properties.copy()),
-            metadata=kwargs.get('metadata', self.metadata.copy())
+            levels=kwargs.get(
+                'levels',
+                defaultdict(set, {k: s.copy() for k, s in self.levels.items()})
+            ),
+            descendants=kwargs.get(
+                'descendants',
+                defaultdict(set, {k: s.copy() for k, s in self.descendants.items()})
+            ),
+            ancestors=kwargs.get(
+                'ancestors',
+                defaultdict(set, {k: s.copy() for k, s in self.ancestors.items()})
+            ),
+            properties=kwargs.get(
+                'properties',
+                self.properties.copy()
+            ),
+            metadata=kwargs.get(
+                'metadata',
+                self.metadata.copy()
+            )
         )
 
     def with_properties(self, **kwargs: Any) -> 'Hierarchy':

@@ -1,3 +1,9 @@
+# src/chromatographicpeakpicking/core/pipeline/stages/input_stage.py
+"""This module implements the InputStage class, which handles input data parsing.
+
+    Classes:
+        InputStage: Handle input data parsing.
+"""
 from typing import Any
 from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import PipelineStage, PipelineStageResult
 from src.chromatographicpeakpicking.core.pipeline.pipeline_config import PipelineConfig

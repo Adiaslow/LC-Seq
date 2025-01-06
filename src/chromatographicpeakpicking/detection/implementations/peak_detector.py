@@ -1,3 +1,10 @@
+# src/chromatographicpeakpicking/detection/implementations/peak_detector.py
+"""This module implements a peak detector for chromatographic peak detection.
+
+Classes:
+    PeakDetectorConfig: Configuration for peak detection.
+    PeakDetector: Detects peaks in chromatogram data.
+"""
 from dataclasses import dataclass, field
 from typing import List, Dict, Any
 import numpy as np

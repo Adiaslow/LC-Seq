@@ -1,6 +1,15 @@
+# src/chromatographicpeakpicking/core/pipeline/stages/selection_stage.py
+"""This module implements the SelectionStage class, which handles peak selection.
+
+    Classes:
+        SelectionStage: Handle peak selection.
+"""
 from typing import List
 from src.chromatographicpeakpicking.core.interfaces.selector import Selector
-from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import PipelineStage, PipelineStageResult
+from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import (
+    PipelineStage,
+    PipelineStageResult
+)
 from src.chromatographicpeakpicking.core.pipeline.pipeline_config import PipelineConfig
 from src.chromatographicpeakpicking.core.prototypes.peak import Peak
 

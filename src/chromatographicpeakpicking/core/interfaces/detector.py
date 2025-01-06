@@ -1,3 +1,10 @@
+# src/chromatographicpeakpicking/core/interfaces/detector.py
+"""This module defines the base interface for peak detection algorithms.
+
+Classes:
+    DetectionResult: Base class for detection results.
+    Detector: Base interface for peak detection algorithms.
+"""
 from abc import ABC, abstractmethod
 from typing import Dict, Generic, List, TypeVar
 from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import PipelineStage
@@ -20,14 +27,14 @@ class Detector(Generic[C], ABC):
     @abstractmethod
     def configure(self, config: C) -> ValidationResult:
         """Configure the detector with given parameters."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def validate_config(self, config: C) -> ValidationResult:
         """Validate the configuration."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def detect(self, chromatogram: Chromatogram) -> DetectionResult:
         """Detect peaks in the chromatogram."""
-        pass
+        raise NotImplementedError

@@ -1,4 +1,9 @@
+# src/chromatographicpeakpicking/core/pipeline/stages/chromatogram_analysis_stage.py
+"""This module implements the ChromatogramAnalysisStage class, which handles chromatogram analysis.
 
+    Classes:
+        ChromatogramAnalysisStage: Handle chromatogram analysis.
+"""
 from src.chromatographicpeakpicking.core.interfaces.analyzer import Analyzer
 from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import (
     PipelineStage,

@@ -1,3 +1,9 @@
+# src/chromatographicpeakpicking/core/prototypes/peak.py
+"""This module defines the peak prototype.
+
+    Classes:
+        Peak: Represents a chromatographic peak.
+"""
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional
 
@@ -111,3 +117,17 @@ class Peak(Prototype['Peak']):
             'properties': self.properties,
             'metadata': self.metadata
         }
+
+    def __hash__(self) -> int:
+        """Calculate hash based on retention time and height.
+
+        Args:
+            None
+
+        Returns:
+            int: Hash value
+
+        Raises:
+            None
+        """
+        return hash((self.retention_time, self.height))

@@ -1,23 +1,11 @@
-from dataclasses import dataclass, field
-import numpy as np
-from scipy.optimize import curve_fit
-from typing import Dict, Any, Optional
-from src.chromatographicpeakpicking.core.interfaces.analyzer import (
-    Analyzer,
-    AnalysisResult
-)
-from src.chromatographicpeakpicking.core.types.config import (
-    BaseConfig,
-    ConfigMetadata,
-    ConfigValidation
-)
-from src.chromatographicpeakpicking.core.types.validation import ValidationResult
-from src.chromatographicpeakpicking.core.prototypes.peak import Peak
+# src/chromatographicpeakpicking/analysis/implementations/peak_analyzer.py
+"""This module implements a peak analyzer for individual peak analysis.
 
+"""
 from dataclasses import dataclass, field
 import numpy as np
 from scipy.optimize import curve_fit
-from typing import Dict, Any, Optional
+from typing import Dict
 from src.chromatographicpeakpicking.core.interfaces.analyzer import (
     Analyzer,
     AnalysisResult
@@ -113,7 +101,8 @@ class PeakAnalyzer(Analyzer[PeakAnalyzerConfig, Peak, PeakAnalysisResult]):
             raise ValueError("Time points and intensities must be set before analysis")
         if len(self.time_points) != len(self.intensities):
             raise ValueError("Time points and intensities must have same length")
-        if peak.retention_time < min(self.time_points) or peak.retention_time > max(self.time_points):
+        if peak.retention_time < min(self.time_points) \
+            or peak.retention_time > max(self.time_points):
             raise ValueError("Peak retention time outside of data range")
 
     def _fit_gaussian(self, peak: Peak) -> Dict[str, float]:

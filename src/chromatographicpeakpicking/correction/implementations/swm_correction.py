@@ -1,3 +1,11 @@
+# src/chromatographicpeakpicking/correction/implementations/swm_correction.py
+"""This module implements a baseline corrector using sliding window minima.
+
+
+Classes:
+    SWMConfig: Configuration for SWM baseline corrector.
+    SWMCorrector: Sliding Window Minimum baseline corrector.
+"""
 from dataclasses import dataclass, field
 import numpy as np
 

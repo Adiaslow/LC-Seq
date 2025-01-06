@@ -1,3 +1,9 @@
+# src/chromatographicpeakpicking/core/prototypes/chromatogram.py
+"""This module implements the Chromatogram prototype, which represents a chromatographic signal.
+
+    Classes:
+        Chromatogram: Represents a chromatographic signal with time and intensity data.
+"""
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional, Set
 import numpy as np

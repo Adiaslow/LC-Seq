@@ -1,3 +1,9 @@
+# src/chromatographicpeakpicking/core/pipeline/stages/output_stage.py
+"""This module implements the OutputStage class, which handles output generation.
+
+    Classes:
+        OutputStage: Handle output generation.
+"""
 from typing import List
 from src.chromatographicpeakpicking.core.prototypes.peak import Peak
 from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import (

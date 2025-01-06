@@ -1,12 +1,17 @@
 # src/chromatographicpeakpicking/core/types/config.py
 """
 This module defines configuration-related classes and enums for managing configurable components.
+
+    Classes:
+        ConfigValidation: Configuration validation levels.
+        ConfigMetadata: Metadata about a configurable component.
+        BaseConfig: Base configuration container.
+        GlobalConfig: Global configuration settings.
 """
 from dataclasses import dataclass, field
 from typing import Dict, Any
 from enum import Enum
-
-from ..prototypes.building_block import BuildingBlock
+from src.chromatographicpeakpicking.core.prototypes.building_block import BuildingBlock
 
 class ConfigValidation(Enum):
     """Configuration validation levels."""

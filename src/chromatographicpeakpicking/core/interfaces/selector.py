@@ -1,4 +1,10 @@
 # src/chromatographicpeakpicking/core/interfaces/selector.py
+"""This module defines the base interface for peak selection algorithms.
+
+    Classes:
+        SelectionResult: Base class for selection results.
+        Selector: Base interface for peak selection algorithms.
+"""
 from abc import ABC, abstractmethod
 from typing import Dict, Generic, List, TypeVar
 from src.chromatographicpeakpicking.core.prototypes.peak import Peak
@@ -26,12 +32,12 @@ class Selector(Generic[C], ABC):
     @abstractmethod
     def configure(self, config: C) -> ValidationResult:
         """Configure the selector with given parameters."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def validate_config(self, config: C) -> ValidationResult:
         """Validate the configuration."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def select(self, peaks: List[Peak]) -> SelectionResult:
@@ -43,4 +49,4 @@ class Selector(Generic[C], ABC):
         Returns:
             SelectionResult containing filtered peaks and selection metrics
         """
-        pass
+        raise NotImplementedError

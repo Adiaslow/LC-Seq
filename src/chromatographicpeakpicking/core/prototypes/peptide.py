@@ -1,4 +1,9 @@
 # src/chromatographicpeakpicking/core/prototypes/peptide.py
+"""This module defines the peptide prototype.
+
+    Classes:
+        Peptide: Represents a peptide sequence.
+"""
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 from src.chromatographicpeakpicking.core.prototypes.building_block import BuildingBlock
@@ -40,3 +45,17 @@ class Peptide(Prototype['Peptide']):
                 block_errors = block.validate()
                 errors.extend(f"Block {i}: {error}" for error in block_errors)
         return errors
+
+    def __hash__(self) -> int:
+        """Calculate a hash value for the peptide.
+
+        Args:
+            None
+
+        Returns:
+            int: The hash value for
+
+        Raises:
+            None
+        """
+        return hash(tuple(hash(block) for block in self.sequence))

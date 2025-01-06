@@ -1,4 +1,10 @@
 # src/chromatographicpeakpicking/core/pipeline/base.py
+"""This module defines the base classes for pipeline stages.
+
+Classes:
+    PipelineStageResult: Base class for pipeline stage results.
+    PipelineStage: Base class for pipeline stages.
+"""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, Generic, List, TypeVar, Any
@@ -27,12 +33,12 @@ class PipelineStage(Generic[C], ABC):
     @abstractmethod
     def configure(self, config: C) -> ValidationResult:
         """Configure the pipeline stage."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def process(self, data: Any) -> PipelineStageResult:
         """Process input data and return result."""
-        pass
+        raise NotImplementedError
 
     def set_next(self, stage: 'PipelineStage') -> 'PipelineStage':
         """Set the next stage in the pipeline."""

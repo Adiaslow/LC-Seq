@@ -1,3 +1,9 @@
+# src/chromatographicpeakpicking/core/interfaces/corrector.py
+"""This module defines the interface for chromatographic correction algorithms.
+
+    Classes:
+        Corrector: Base interface for chromatographic correction algorithms.
+"""
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import PipelineStage
@@ -13,14 +19,14 @@ class Corrector(Generic[C], ABC):
     @abstractmethod
     def configure(self, config: C) -> ValidationResult:
         """Configure the corrector with given parameters."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def validate_config(self, config: C) -> ValidationResult:
         """Validate the configuration."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def correct(self, chromatogram: Chromatogram) -> Chromatogram:
         """Apply correction to the chromatogram."""
-        pass
+        raise NotImplementedError

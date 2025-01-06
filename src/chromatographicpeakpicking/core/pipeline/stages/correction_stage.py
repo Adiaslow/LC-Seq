@@ -1,3 +1,9 @@
+# src/chromatographicpeakpicking/core/pipeline/stages/correction_stage.py
+"""This module implements the CorrectionStage class, which handles chromatogram correction.
+
+    Classes:
+        CorrectionStage: Handle chromatogram correction.
+"""
 from src.chromatographicpeakpicking.core.interfaces.corrector import Corrector
 from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import (
     PipelineStage,

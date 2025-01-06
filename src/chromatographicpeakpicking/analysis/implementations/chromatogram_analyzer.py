@@ -1,8 +1,12 @@
+# src/chromatographicpeakpicking/analysis/implementations/chromatogram_analyzer.py
+"""This module implements a chromatogram analyzer for quality metrics extraction.
+
+"""
 from dataclasses import dataclass, field
+from typing import List, Tuple, Dict
 import logging
 import numpy as np
 from scipy import stats, signal
-from typing import List, Tuple, Dict
 from src.chromatographicpeakpicking.core.interfaces.analyzer import (
     Analyzer,
     AnalysisResult
@@ -18,23 +22,7 @@ from src.chromatographicpeakpicking.core.types.validation import ValidationResul
 @dataclass
 class ChromatogramAnalyzerConfig(BaseConfig):
     """Configuration for chromatogram analysis."""
-    def __init__(
-        self,
-        window_width: int = 15,
-        window_overlap: float = 0.5,
-        min_window_points: int = 5,
-        variation_threshold: float = 1.5,
-        min_region_width: int = 5,
-        max_region_gap: int = 20,
-        noise_percentile: float = 50.0,
-        min_regions_required: int = 3,
-        max_noise_variance: float = 2.0,
-        edge_exclusion: float = 0.05,
-        baseline_percentile: float = 10.0,
-        drift_window: int = 100,
-        smoothing_window: int = 5,
-        outlier_threshold: float = 3.0
-    ):
+    def __init__(self, **kwargs):
         super().__init__(metadata=ConfigMetadata(
             name="ChromatogramAnalyzerConfig",
             version="1.0",
@@ -214,7 +202,8 @@ class ChromatogramAnalyzer(Analyzer[ChromatogramAnalyzerConfig, Chromatogram, Ch
         pad_width = self.config.parameters["window_width"] // 2
         intensity_padded = np.pad(intensity, pad_width, mode='edge')
 
-        window = np.ones(self.config.parameters["window_width"]) / self.config.parameters["window_width"]
+        window = np.ones(self.config.parameters["window_width"]) / \
+            self.config.parameters["window_width"]
         moving_mean = signal.convolve(intensity_padded, window, mode='valid')
 
         intensity_squared = intensity_padded ** 2
@@ -245,7 +234,8 @@ class ChromatogramAnalyzer(Analyzer[ChromatogramAnalyzerConfig, Chromatogram, Ch
                     regions.append((current_start, i))
                 current_start = None
 
-        if current_start is not None and end_idx - current_start >= self.config.parameters["min_region_width"]:
+        if current_start is not None and \
+            end_idx - current_start >= self.config.parameters["min_region_width"]:
             regions.append((current_start, end_idx))
 
         # Merge nearby regions

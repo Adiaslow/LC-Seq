@@ -1,3 +1,9 @@
+# src/chromatographicpeakpicking/core/pipeline/stages/peak_analysis_stage.py
+"""This module implements the PeakAnalysisStage class, which handles peak analysis.
+
+    Classes:
+        PeakAnalysisStage: Handle peak analysis.
+"""
 from typing import List
 from src.chromatographicpeakpicking.core.interfaces.analyzer import Analyzer
 from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import (

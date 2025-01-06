@@ -1,6 +1,12 @@
 # src/chromatographicpeakpicking/core/interfaces/visualizer.py
+"""This module defines the base interface for chromatogram and peak visualization.
+
+    Classes:
+        VisualizationResult: Base class for visualization results.
+        Visualizer: Base interface for chromatogram and peak visualization.
+"""
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, TypeVar
 from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
 from src.chromatographicpeakpicking.core.prototypes.peak import Peak
 from src.chromatographicpeakpicking.core.types.config import BaseConfig
@@ -27,12 +33,12 @@ class Visualizer(Generic[C], ABC):
     @abstractmethod
     def configure(self, config: C) -> ValidationResult:
         """Configure the visualizer with given parameters."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def validate_config(self, config: C) -> ValidationResult:
         """Validate the configuration."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def visualize(
@@ -49,7 +55,7 @@ class Visualizer(Generic[C], ABC):
         Returns:
             VisualizationResult containing figure data and visualization metadata
         """
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def save(self, result: VisualizationResult, path: str) -> bool:
@@ -62,4 +68,4 @@ class Visualizer(Generic[C], ABC):
         Returns:
             True if save was successful, False otherwise
         """
-        pass
+        raise NotImplementedError

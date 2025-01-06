@@ -1,3 +1,9 @@
+# src/chromatographicpeakpicking/core/pipeline/stages/preprocess_stage.py
+"""This module implements the PreprocessStage class, which handles data preprocessing.
+
+    Classes:
+        PreprocessStage: Handle data preprocessing.
+"""
 from typing import Any
 from chromatographicpeakpicking.core.interfaces.pipeline_stage import PipelineStage, PipelineStageResult
 from chromatographicpeakpicking.core.pipeline.pipeline_config import PipelineConfig

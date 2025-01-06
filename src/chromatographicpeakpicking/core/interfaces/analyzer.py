@@ -1,4 +1,10 @@
 # src/chromatographicpeakpicking/core/interfaces/analyzer.py
+"""This module defines the generic interface for analysis algorithms.
+
+    Classes:
+        AnalysisResult: Base class for analysis results.
+        Analyzer: Generic interface for analysis algorithms.
+"""
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar, Dict
 from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
@@ -28,14 +34,14 @@ class Analyzer(Generic[C, D, R], ABC):
     @abstractmethod
     def configure(self, config: C) -> ValidationResult:
         """Configure the analyzer with given parameters."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def validate_config(self, config: C) -> ValidationResult:
         """Validate the configuration."""
-        pass
+        raise NotImplementedError
 
     @abstractmethod
     def analyze(self, data: D) -> AnalysisResult[R]:
         """Analyze the input data and return results with metrics."""
-        pass
+        raise NotImplementedError
