@@ -1,5 +1,12 @@
+# src/chromatographicpeakpicking/core/pipeline/pipeline.py
+"""This
+
+    Classes:
+        PipelineConfig: Configuration for chromatogram pipeline.
+        Pipeline: Pipeline for chromatogram peak picking.
+"""
 from dataclasses import dataclass
-from typing import Any, Dict
+from typing import Any, List
 from src.chromatographicpeakpicking.core.types.config import BaseConfig
 
 @dataclass
@@ -15,3 +22,9 @@ class PipelineConfig(BaseConfig):
         detection_params: Dict[str, Any]
         selection_params: Dict[str, Any]
     """
+
+@dataclass
+class Pipeline:
+    """Pipeline
+    """
+    steps: List[Any]

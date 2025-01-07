@@ -6,10 +6,24 @@
 """
 from typing import Any
 from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import PipelineStage, PipelineStageResult
-from src.chromatographicpeakpicking.core.pipeline.pipeline_config import PipelineConfig
+from src.chromatographicpeakpicking.core.pipeline.pipeline import PipelineConfig
 
 class InputStage(PipelineStage[PipelineConfig]):
     """Handle input data parsing."""
+    def __init__(self, name: str="Input Stage"):
+        """Initialize the InputStage
+
+        Args:
+            name: The name of the stage
+
+        Returns:
+            The InputStage instance
+
+        Raises:
+            None
+        """
+        super().__init__(name)
+
     def process(self, data: str) -> PipelineStageResult:
         try:
             # Implement your input parsing logic here

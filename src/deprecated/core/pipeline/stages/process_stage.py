@@ -8,11 +8,16 @@ from typing import Any
 from chromatographicpeakpicking.core.interfaces.pipeline_stage import (
     PipelineStage, PipelineStageResult
 )
-from chromatographicpeakpicking.core.pipeline.pipeline_config import PipelineConfig
+from src.chromatographicpeakpicking.core.pipeline.pipeline import PipelineConfig
 
 class ProcessStage(PipelineStage[PipelineConfig]):
     """Handle data processing."""
     def process(self, data: Any) -> PipelineStageResult:
+        """Process the input data.
+
+        Args:
+            data: The input data.
+        """
         try:
             # Implement processing logic
             processed_data = self._process(data)

@@ -6,7 +6,7 @@
 """
 from typing import Any
 from chromatographicpeakpicking.core.interfaces.pipeline_stage import PipelineStage, PipelineStageResult
-from chromatographicpeakpicking.core.pipeline.pipeline_config import PipelineConfig
+from src.chromatographicpeakpicking.core.pipeline.pipeline import PipelineConfig
 
 class PreprocessStage(PipelineStage[PipelineConfig]):
     """Handle data preprocessing."""

@@ -9,7 +9,7 @@ from src.chromatographicpeakpicking.core.interfaces.pipeline_stage import (
     PipelineStage,
     PipelineStageResult
 )
-from src.chromatographicpeakpicking.core.pipeline.pipeline_config import PipelineConfig
+from src.chromatographicpeakpicking.core.pipeline.pipeline import PipelineConfig
 from src.chromatographicpeakpicking.core.prototypes import chromatogram
 from src.chromatographicpeakpicking.core.prototypes.chromatogram import Chromatogram
 
