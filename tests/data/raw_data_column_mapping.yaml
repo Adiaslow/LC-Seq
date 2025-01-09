@@ -1,0 +1,19 @@
+building_block_columns:
+  name: ['BB1 Name', 'BB2 Name', 'BB3 Name']
+  smiles: ['bb1_smiles', 'bb2_smiles', 'bb3_smiles']
+  stereochem: ['BB1 Stereochem', 'BB2 Stereochem', 'BB3 Stereochem']
+peptide_property_columns:
+  - 'Exact Mass (COOH)'
+  - 'Exact Mass (DMA)'
+  - 'AlogP'
+  - 'NumHDonors'
+  - 'NumHAcceptors'
+  - 'NumAromaticRings'
+  - 'TPSA'
+  - 'SUM Nsub'
+  - 'Peptide Size'
+  - 'max_count'
+  - 'total_fractions'
+chromatogram_column: 'all_datapoints'
+identifier_column: 'Common_Name (N-->C)'
+num_building_blocks: 3
