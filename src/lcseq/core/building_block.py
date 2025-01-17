@@ -9,6 +9,20 @@ class BuildingBlock:
     identifier: str
     properties: Dict[str, Any]
 
+    def __post_init__(self):
+        """Validate building block attributes after initialization."""
+        if not self.identifier:
+            raise ValueError("Building block identifier cannot be empty")
+
+        if self.properties is None:
+            raise ValueError("Building block properties cannot be None")
+
+        if not isinstance(self.properties, dict):
+            raise ValueError("Building block properties must be a dictionary")
+
+        if not self.properties:
+            raise ValueError("Building block properties cannot be empty")
+
     def __eq__(self, other):
         if not isinstance(other, BuildingBlock):
             return False
@@ -24,7 +38,6 @@ class BuildingBlockRegistry:
     @classmethod
     def register(cls, block: BuildingBlock) -> None:
         """Register a new building block type.
-
         Args:
             block (BuildingBlock): The building block to register.
         """
@@ -33,13 +46,10 @@ class BuildingBlockRegistry:
     @classmethod
     def get(cls, identifier: str) -> BuildingBlock:
         """Retrieve a copy of a registered building block.
-
         Args:
             identifier (str): The identifier of the building block to retrieve.
-
         Returns:
             BuildingBlock: A copy of the requested building block.
-
         Raises:
             KeyError: If the building block is not found.
         """

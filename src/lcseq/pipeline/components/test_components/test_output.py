@@ -1,11 +1,14 @@
 # src/lcseq/pipeline/components/test_components/test_output.py
 import logging
+from typing import Optional
 from src.lcseq.pipeline.base import PipelineComponent
 from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
 
 logger = logging.getLogger(__name__)
 
 class TestOutput(PipelineComponent):
+    def __init__(self, input_file_path: Optional[str] = None):
+        pass
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
         # Output processing results for a single peptide
         logger.info(f"Outputting results for peptide: {input_data.peptide}")

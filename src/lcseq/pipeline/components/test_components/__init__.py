@@ -1,4 +1,5 @@
-from src.lcseq.pipeline.components.test_components.test_chromatogram_analyzer import TestChromatogramAnalyzer
+from src.lcseq.pipeline.components.test_components.test_chromatogram_analyzer import \
+TestChromatogramAnalyzer
 from src.lcseq.pipeline.components.test_components.test_default import TestDefault
 from src.lcseq.pipeline.components.test_components.test_input import TestInput
 from src.lcseq.pipeline.components.test_components.test_output import TestOutput

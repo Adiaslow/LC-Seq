@@ -11,6 +11,11 @@ class PeptideEncoding:
     chromatogram: Optional[Chromatogram] = None
     properties: Dict = field(default_factory=dict)
 
+    def __post_init__(self):
+        """Validate encoding blocks."""
+        if not all(isinstance(block, BuildingBlock) for block in self.blocks):
+            raise ValueError("All blocks must be BuildingBlock instances")
+
     @property
     def sequence(self) -> str:
         """Get the sequence as a string."""
@@ -36,6 +41,9 @@ class Peptide:
         if not self.sequence:
             raise ValueError("Peptide sequence cannot be empty")
 
+        if not all(isinstance(block, BuildingBlock) for block in self.sequence):
+            raise ValueError("All sequence items must be BuildingBlock instances")
+
     @property
     def sequence_str(self) -> str:
         """Get the canonical sequence as a string."""
@@ -43,7 +51,14 @@ class Peptide:
 
     def add_encoding(self, encoding: PeptideEncoding) -> None:
         """Add a new encoding to the peptide."""
+        if not isinstance(encoding, PeptideEncoding):
+            raise ValueError("Encoding must be a PeptideEncoding instance")
         self.encodings.append(encoding)
+
+    def remove_encoding(self, encoding: PeptideEncoding) -> None:
+        """Remove an encoding from the peptide."""
+        if encoding in self.encodings:
+            self.encodings.remove(encoding)
 
     def get_encoding(self, sequence: str) -> Optional[PeptideEncoding]:
         """Get a specific encoding by its sequence."""
