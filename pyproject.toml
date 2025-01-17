@@ -1,3 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lcseq"
+version = "0.1.0"
+description = "A package for LC-Seq analysis"
+requires-python = ">=3.12"
+dependencies = ["numpy", "pyyaml"]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "black", "pylint"]
+
 [tool.black]
 line-length = 88
 target-version = ["py38"]
+
+[tool.pylint]
+max-line-length = 88 # Match black's line length
+disable = [
+    "C0111", # Missing docstring
+    "R0903", # Too few public methods
+    "C0103", # Invalid name
+]
+good-names = ["i", "j", "k", "ex", "Run", "_"]
