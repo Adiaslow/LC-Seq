@@ -1,8 +1,8 @@
 # src/lcseq/pipeline/base.py
 from abc import ABC, abstractmethod
-from .input_types import ProcessableInput, SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
-from ..core.peptide import Peptide
-from ..core.hierarchy import PeptideHierarchy
+from src.lcseq.pipeline.input_types import ProcessableInput, SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
+from src.lcseq.core.peptide import Peptide
+from src.lcseq.core.hierarchy import PeptideHierarchy
 
 class PipelineComponent(ABC):
     @abstractmethod

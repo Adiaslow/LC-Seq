@@ -56,6 +56,25 @@ peptides:
     Peptide Size: 5.0
     max_count: 364.0
     total_fractions: 94.0
+    identifier: Val-Nvl-Leu
+    retention_time: 16.25
+    chromatogram_metrics:
+      noise_level: 68.47622450727322
+      signal_to_noise: 5.301110021938255
+      baseline_mean: 2.0
+      total_area: 1750.375
+      dynamic_range: 363.0
+    picked_peak_metrics:
+      apex_time: 16.25
+      end_time: 20.75
+      apex_intensity: 364.0
+      width: 1.0
+      area: 1222.25
+      symmetry: 0.7881562881562881
+      gaussian_residuals: 0.2039118885455787
+      gaussian_fit_amplitude: 338.47924607836677
+      gaussian_fit_mean: 15.87739095955043
+      gaussian_fit_sigma: 0.9999999999999999
   chromatogram:
     times:
     - 10.25
@@ -153,101 +172,6 @@ peptides:
     - 58.5
     - 59.5
     intensities:
-    - 177.0
-    - 189.0
-    - 128.0
-    - 202.0
-    - 165.0
-    - 193.0
-    - 231.0
-    - 211.0
-    - 262.0
-    - 263.0
-    - 293.0
-    - 426.0
-    - 494.0
-    - 350.0
-    - 120.0
-    - 141.0
-    - 91.0
-    - 90.0
-    - 88.0
-    - 79.0
-    - 56.0
-    - 35.0
-    - 41.0
-    - 53.0
-    - 45.0
-    - 54.0
-    - 24.0
-    - 25.0
-    - 19.0
-    - 22.0
-    - 10.0
-    - 19.0
-    - 16.0
-    - 9.0
-    - 7.0
-    - 16.0
-    - 14.0
-    - 10.0
-    - 2.0
-    - 10.0
-    - 12.0
-    - 7.0
-    - 11.0
-    - 11.0
-    - 11.0
-    - 6.0
-    - 10.0
-    - 14.0
-    - 5.0
-    - 12.0
-    - 6.0
-    - 8.0
-    - 4.0
-    - 7.0
-    - 10.0
-    - 7.0
-    - 10.0
-    - 13.0
-    - 1.0
-    - 6.0
-    - 5.0
-    - 2.0
-    - 3.0
-    - 4.0
-    - 6.0
-    - 7.0
-    - 10.0
-    - 8.0
-    - 6.0
-    - 5.0
-    - 1.0
-    - 4.0
-    - 9.0
-    - 2.0
-    - 1.0
-    - 1.0
-    - 6.0
-    - 2.0
-    - 6.0
-    - 6.0
-    - 3.0
-    - 5.0
-    - 9.0
-    - 20.0
-    - 4.0
-    - 7.0
-    - 6.0
-    - 9.0
-    - 8.0
-    - 3.0
-    - 10.0
-    - 8.0
-    - 12.0
-    - 18.0
-    scaled_intensities:
     - 135.0
     - 132.0
     - 98.0
@@ -342,6 +266,17 @@ peptides:
     - 4.0
     - 5.0
     - 8.0
+    peaks:
+    - apex_time: 16.25
+      end_time: 20.75
+      apex_intensity: 364.0
+      width: 1.0
+      area: 1222.25
+      symmetry: 0.7881562881562881
+      gaussian_residuals: 0.2039118885455787
+      gaussian_fit_amplitude: 338.47924607836677
+      gaussian_fit_mean: 15.87739095955043
+      gaussian_fit_sigma: 0.9999999999999999
 - identifier: Val-Nvl-Leu
   sequence:
   - AgxNull

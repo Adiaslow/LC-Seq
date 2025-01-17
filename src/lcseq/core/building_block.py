@@ -23,12 +23,26 @@ class BuildingBlockRegistry:
 
     @classmethod
     def register(cls, block: BuildingBlock) -> None:
-        """Register a new building block type."""
+        """Register a new building block type.
+
+        Args:
+            block (BuildingBlock): The building block to register.
+        """
         cls._blocks[block.identifier] = block
 
     @classmethod
     def get(cls, identifier: str) -> BuildingBlock:
-        """Retrieve a copy of a registered building block."""
+        """Retrieve a copy of a registered building block.
+
+        Args:
+            identifier (str): The identifier of the building block to retrieve.
+
+        Returns:
+            BuildingBlock: A copy of the requested building block.
+
+        Raises:
+            KeyError: If the building block is not found.
+        """
         if identifier not in cls._blocks:
             raise KeyError(f"BuildingBlock {identifier} not found in registry")
         return deepcopy(cls._blocks[identifier])

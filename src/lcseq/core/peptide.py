@@ -4,7 +4,7 @@ from typing import List, Dict, Set, Optional
 from .building_block import BuildingBlock
 from .chromatogram import Chromatogram
 
-@dataclass
+@dataclass(eq=True)
 class PeptideEncoding:
     """Represents a specific encoding of a peptide with its associated chromatogram."""
     blocks: List[BuildingBlock]
@@ -14,7 +14,15 @@ class PeptideEncoding:
     @property
     def sequence(self) -> str:
         """Get the sequence as a string."""
-        return ''.join(block.identifier for block in self.blocks)
+        return self.sequence_str
+
+    @property
+    def sequence_str(self) -> str:
+        """Get the canonical sequence as a string."""
+        return '-'.join([block.identifier for block in self.blocks][::-1])
+
+    def __str__(self) -> str:
+        return self.sequence_str
 
 @dataclass
 class Peptide:
@@ -31,7 +39,7 @@ class Peptide:
     @property
     def sequence_str(self) -> str:
         """Get the canonical sequence as a string."""
-        return ''.join(block.identifier for block in self.sequence)
+        return '-'.join([block.identifier for block in self.sequence][::-1])
 
     def add_encoding(self, encoding: PeptideEncoding) -> None:
         """Add a new encoding to the peptide."""
@@ -43,3 +51,14 @@ class Peptide:
             if encoding.sequence == sequence:
                 return encoding
         return None
+
+    def __eq__(self, other):
+        if not isinstance(other, Peptide):
+            return False
+        return self.sequence_str == other.sequence_str
+
+    def __str__(self) -> str:
+        return self.sequence_str
+
+    def __hash__(self) -> int:
+        return hash(self.sequence_str)
