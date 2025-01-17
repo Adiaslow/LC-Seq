@@ -2,10 +2,8 @@ dataclasses
 logging
 matplotlib
 numpy
-os
 pandas
 pathlib
 scipy
-src
 typing
 pyyaml
