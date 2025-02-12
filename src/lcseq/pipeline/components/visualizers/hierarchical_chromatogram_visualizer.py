@@ -6,16 +6,19 @@ This module provides a pipeline component for visualizing hierarchical chromatog
 # Standard library imports
 import logging
 from dataclasses import dataclass
-import matplotlib.pyplot as plt
-import numpy as np
 from typing import Optional
 
+import matplotlib.pyplot as plt
+import numpy as np
+from src.lcseq.core.chromatogram import Chromatogram
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
-from src.lcseq.core.chromatogram import Chromatogram
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 @dataclass
 class HierarchicalChromatogramVisualizerConfig:
@@ -27,15 +30,16 @@ class HierarchicalChromatogramVisualizerConfig:
         line_width (float): The width of the lines.
         peak_line_style (str): The style of the peak lines.
     """
+
     figure_size: tuple = (10, 6)
     dpi: int = 100
     line_width: float = 1.5
-    peak_line_style: str = '--'
-    gaussian_line_style: str = ':'
-    width_line_style: str = '-.'
+    peak_line_style: str = "--"
+    gaussian_line_style: str = ":"
+    width_line_style: str = "-."
     save_plots: bool = True
-    output_dir: str = 'chromatogram_plots'
+    output_dir: str = "chromatogram_plots"
     plot_corrected_gaussians: bool = False  # New option to plot corrected Gaussians
 
-class HierarchicalChromatogramVisualizer(PipelineComponent):
-    ...
+
+class HierarchicalChromatogramVisualizer(PipelineComponent): ...

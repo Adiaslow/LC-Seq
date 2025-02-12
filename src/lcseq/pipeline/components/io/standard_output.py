@@ -9,18 +9,18 @@ Classes:
 # Standard library imports
 import logging
 import os
-from typing import Dict, Any, Optional
-import yaml
+from typing import Any, Dict, Optional
 
+import yaml
+from src.lcseq.core.peptide import Peptide
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (
-    SinglePeptideInput,
-    PeptideSetInput,
-    PeptideHierarchyInput
-)
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class StandardOutput(PipelineComponent):
     """StandardOutput class for handling standard output data.
@@ -40,24 +40,25 @@ class StandardOutput(PipelineComponent):
         process_peptide_set: Process a set of peptides output.
         process_hierarchy: Process a hierarchy of peptides output.
     """
-    def __init__(self, input_file_path: Optional[str] = None):
+
+    def __init__(self, input_file_path: Optional[str] = None) -> None:
         """Initialize the StandardOutput.
 
         Args:
             input_file_path (Optional[str], optional): Path to the input file.
                 Default is None.
         """
-        self.logger = logging.getLogger(__name__)
-        self.input_file_path = input_file_path
-        self.original_data = None
+        self.logger: logging.Logger = logging.getLogger(__name__)
+        self.input_file_path: Optional[str] = input_file_path
+        self.original_data: Optional[Dict[str, Any]] = None
         if input_file_path:
             try:
-                with open(input_file_path, 'r') as f:
+                with open(input_file_path, "r") as f:
                     self.original_data = yaml.safe_load(f)
             except Exception as e:
                 self.logger.error(f"Failed to load original input file: {str(e)}")
 
-    def _add_retention_time(self, peptide):
+    def _add_retention_time(self, peptide: Peptide) -> Peptide:
         """Add retention time from selected peak to peptide properties.
 
         Args:
@@ -70,44 +71,56 @@ class StandardOutput(PipelineComponent):
             if encoding.chromatogram and encoding.chromatogram.peaks:
                 if encoding.chromatogram.peaks:
                     peak = encoding.chromatogram.peaks[0]
-                    peptide.properties['retention_time'] = peak.apex_time
+                    peptide.properties["retention_time"] = peak.apex_time
 
                     # Add analysis results to properties
-                    if hasattr(encoding.chromatogram, 'properties'):
-                        peptide.properties['chromatogram_metrics'] = {
-                            'noise_level': encoding.chromatogram.properties.get('noise_level'),
-                            'signal_to_noise': encoding.chromatogram.properties.get('signal_to_noise'),
-                            'baseline_mean': encoding.chromatogram.properties.get('baseline_mean'),
-                            'total_area': encoding.chromatogram.properties.get('total_area'),
-                            'dynamic_range': encoding.chromatogram.properties.get('dynamic_range')
+                    if hasattr(encoding.chromatogram, "properties"):
+                        peptide.properties["chromatogram_metrics"] = {
+                            "noise_level": encoding.chromatogram.properties.get(
+                                "noise_level"
+                            ),
+                            "signal_to_noise": encoding.chromatogram.properties.get(
+                                "signal_to_noise"
+                            ),
+                            "baseline_mean": encoding.chromatogram.properties.get(
+                                "baseline_mean"
+                            ),
+                            "total_area": encoding.chromatogram.properties.get(
+                                "total_area"
+                            ),
+                            "dynamic_range": encoding.chromatogram.properties.get(
+                                "dynamic_range"
+                            ),
                         }
 
                     # Add peak metrics to properties
                     if encoding.chromatogram.peaks:
                         peak = encoding.chromatogram.peaks[0]
-                        peptide.properties['picked_peak_metrics'] = {
-                            'apex_time': float(peak.apex_time),
-                            'end_time': float(peak.end_time),
-                            'apex_intensity': float(peak.apex_intensity),
-                            'width': float(peak.properties.get('width', 0.0)),
-                            'area': float(peak.properties.get('area', 0.0)),
-                            'symmetry': float(peak.properties.get('symmetry', 0.0)),
-                            'gaussian_residuals':
-                                float(peak.properties.get(
-                                    'gaussian_residuals', 0.0
-                                )),
-                            'gaussian_fit_amplitude':
-                                float(peak.properties.get(
-                                    'gaussian_fit_params', {}
-                                ).get('amplitude', 0.0)),
-                            'gaussian_fit_mean':
-                                float(peak.properties.get(
-                                    'gaussian_fit_params', {}
-                                ).get('mean', 0.0)),
-                            'gaussian_fit_sigma':
-                                float(peak.properties.get(
-                                    'gaussian_fit_params', {}
-                                ).get('sigma', 0.0))
+                        peptide.properties["picked_peak_metrics"] = {
+                            "apex_time": float(peak.apex_time),
+                            "end_time": float(peak.end_time),
+                            "apex_intensity": float(peak.apex_intensity),
+                            "width": float(peak.properties.get("width", 0.0)),
+                            "area": float(peak.properties.get("area", 0.0)),
+                            "symmetry": float(peak.properties.get("symmetry", 0.0)),
+                            "gaussian_residuals": float(
+                                peak.properties.get("gaussian_residuals", 0.0)
+                            ),
+                            "gaussian_fit_amplitude": float(
+                                peak.properties.get("gaussian_fit_params", {}).get(
+                                    "amplitude", 0.0
+                                )
+                            ),
+                            "gaussian_fit_mean": float(
+                                peak.properties.get("gaussian_fit_params", {}).get(
+                                    "mean", 0.0
+                                )
+                            ),
+                            "gaussian_fit_sigma": float(
+                                peak.properties.get("gaussian_fit_params", {}).get(
+                                    "sigma", 0.0
+                                )
+                            ),
                         }
                     break
         return peptide
@@ -128,50 +141,62 @@ class StandardOutput(PipelineComponent):
         output_data = dict(self.original_data)
 
         # Update peptide information while preserving structure
-        for peptide in input_data['peptides']:
+        for peptide in input_data["peptides"]:
             # Find matching peptide in original data
-            for orig_peptide in output_data['peptides']:
-                if orig_peptide['identifier'] == peptide.sequence_str:
+            for orig_peptide in output_data["peptides"]:
+                if orig_peptide["identifier"] == peptide.sequence_str:
                     # Preserve original properties and add new ones
-                    orig_peptide['properties'].update(peptide.properties)
+                    orig_peptide["properties"].update(peptide.properties)
 
                     # Update chromatogram data if it exists
-                    if hasattr(peptide, 'encodings'):
+                    if hasattr(peptide, "encodings"):
                         for encoding in peptide.encodings:
                             if encoding.chromatogram:
                                 chrom_data = {
-                                    'times': encoding.chromatogram.times.tolist(),
-                                    'intensities':
-                                        encoding.chromatogram.intensities.tolist()
+                                    "times": encoding.chromatogram.times.tolist(),
+                                    "intensities": encoding.chromatogram.intensities.tolist(),
                                 }
                                 if encoding.chromatogram.peaks:
-                                    chrom_data['peaks'] = [{
-                                        'apex_time': float(peak.apex_time),
-                                        'end_time': float(peak.end_time),
-                                        'apex_intensity': float(peak.apex_intensity),
-                                        'width':
-                                            float(peak.properties.get('width', 0.0)),
-                                        'area': float(peak.properties.get('area', 0.0)),
-                                        'symmetry':
-                                            float(peak.properties.get('symmetry', 0.0)),
-                                        'gaussian_residuals':
-                                            float(peak.properties.get(
-                                                'gaussian_residuals', 0.0
-                                            )),
-                                        'gaussian_fit_amplitude':
-                                            float(peak.properties.get(
-                                                'gaussian_fit_params', {}
-                                            ).get('amplitude', 0.0)),
-                                        'gaussian_fit_mean':
-                                            float(peak.properties.get(
-                                                'gaussian_fit_params', {}
-                                            ).get('mean', 0.0)),
-                                        'gaussian_fit_sigma':
-                                            float(peak.properties.get(
-                                                'gaussian_fit_params', {}
-                                            ).get('sigma', 0.0))
-                                    } for peak in encoding.chromatogram.peaks]
-                                orig_peptide['chromatogram'] = chrom_data
+                                    chrom_data["peaks"] = [
+                                        {
+                                            "apex_time": float(peak.apex_time),
+                                            "end_time": float(peak.end_time),
+                                            "apex_intensity": float(
+                                                peak.apex_intensity
+                                            ),
+                                            "width": float(
+                                                peak.properties.get("width", 0.0)
+                                            ),
+                                            "area": float(
+                                                peak.properties.get("area", 0.0)
+                                            ),
+                                            "symmetry": float(
+                                                peak.properties.get("symmetry", 0.0)
+                                            ),
+                                            "gaussian_residuals": float(
+                                                peak.properties.get(
+                                                    "gaussian_residuals", 0.0
+                                                )
+                                            ),
+                                            "gaussian_fit_amplitude": float(
+                                                peak.properties.get(
+                                                    "gaussian_fit_params", {}
+                                                ).get("amplitude", 0.0)
+                                            ),
+                                            "gaussian_fit_mean": float(
+                                                peak.properties.get(
+                                                    "gaussian_fit_params", {}
+                                                ).get("mean", 0.0)
+                                            ),
+                                            "gaussian_fit_sigma": float(
+                                                peak.properties.get(
+                                                    "gaussian_fit_params", {}
+                                                ).get("sigma", 0.0)
+                                            ),
+                                        }
+                                        for peak in encoding.chromatogram.peaks
+                                    ]
+                                orig_peptide["chromatogram"] = chrom_data
                     break
 
         return output_data
@@ -186,49 +211,61 @@ class StandardOutput(PipelineComponent):
             Dict[str, Any]: The formatted output data.
         """
         return {
-            'building_blocks': {},  # Empty building blocks section
-            'peptides': [{
-                'identifier': peptide.sequence_str,
-                'sequence': [block.identifier for block in peptide.sequence],
-                'properties': peptide.properties,
-                'chromatogram': next(
-                    (
-                        {
-                            'times': encoding.chromatogram.times.tolist(),
-                            'intensities': encoding.chromatogram.intensities.tolist(),
-                            'peaks': [{
-                                'apex_time': float(peak.apex_time),
-                                'end_time': float(peak.end_time),
-                                'apex_intensity': float(peak.apex_intensity),
-                                'width':
-                                    float(peak.properties.get('width', 0.0)),
-                                'area': float(peak.properties.get('area', 0.0)),
-                                'symmetry':
-                                    float(peak.properties.get('symmetry', 0.0)),
-                                'gaussian_residuals':
-                                    float(peak.properties.get(
-                                        'gaussian_residuals', 0.0
-                                    )),
-                                'gaussian_fit_amplitude':
-                                    float(peak.properties.get(
-                                        'gaussian_fit_params', {}
-                                    ).get('amplitude', 0.0)),
-                                'gaussian_fit_mean':
-                                    float(peak.properties.get(
-                                        'gaussian_fit_params', {}
-                                    ).get('mean', 0.0)),
-                                'gaussian_fit_sigma':
-                                    float(peak.properties.get(
-                                        'gaussian_fit_params', {}
-                                    ).get('sigma', 0.0))
-                            } for peak in encoding.chromatogram.peaks]
-                        }
-                        for encoding in peptide.encodings
-                        if encoding.chromatogram and encoding.chromatogram.peaks
+            "building_blocks": {},  # Empty building blocks section
+            "peptides": [
+                {
+                    "identifier": peptide.sequence_str,
+                    "sequence": [block.identifier for block in peptide.sequence],
+                    "properties": peptide.properties,
+                    "chromatogram": next(
+                        (
+                            {
+                                "times": encoding.chromatogram.times.tolist(),
+                                "intensities": encoding.chromatogram.intensities.tolist(),
+                                "peaks": [
+                                    {
+                                        "apex_time": float(peak.apex_time),
+                                        "end_time": float(peak.end_time),
+                                        "apex_intensity": float(peak.apex_intensity),
+                                        "width": float(
+                                            peak.properties.get("width", 0.0)
+                                        ),
+                                        "area": float(peak.properties.get("area", 0.0)),
+                                        "symmetry": float(
+                                            peak.properties.get("symmetry", 0.0)
+                                        ),
+                                        "gaussian_residuals": float(
+                                            peak.properties.get(
+                                                "gaussian_residuals", 0.0
+                                            )
+                                        ),
+                                        "gaussian_fit_amplitude": float(
+                                            peak.properties.get(
+                                                "gaussian_fit_params", {}
+                                            ).get("amplitude", 0.0)
+                                        ),
+                                        "gaussian_fit_mean": float(
+                                            peak.properties.get(
+                                                "gaussian_fit_params", {}
+                                            ).get("mean", 0.0)
+                                        ),
+                                        "gaussian_fit_sigma": float(
+                                            peak.properties.get(
+                                                "gaussian_fit_params", {}
+                                            ).get("sigma", 0.0)
+                                        ),
+                                    }
+                                    for peak in encoding.chromatogram.peaks
+                                ],
+                            }
+                            for encoding in peptide.encodings
+                            if encoding.chromatogram and encoding.chromatogram.peaks
+                        ),
+                        None,
                     ),
-                    None
-                )
-            } for peptide in input_data['peptides']]
+                }
+                for peptide in input_data["peptides"]
+            ],
         }
 
     def _save_results(self, output_data: Dict[str, Any]) -> None:
@@ -246,7 +283,7 @@ class StandardOutput(PipelineComponent):
         results_file = f"{base}_results{ext}"
 
         try:
-            with open(results_file, 'w') as f:
+            with open(results_file, "w") as f:
                 yaml.dump(output_data, f, default_flow_style=False, sort_keys=False)
             self.logger.info(f"Results saved to {results_file}")
         except Exception as e:
@@ -262,11 +299,12 @@ class StandardOutput(PipelineComponent):
         Returns:
             SinglePeptideInput: The processed input data.
         """
-        self.logger.info("Outputting results for peptide:" +
-            f"{input_data.peptide.sequence_str}")
+        self.logger.info(
+            "Outputting results for peptide:" + f"{input_data.peptide.sequence_str}"
+        )
         input_data.peptide = self._add_retention_time(input_data.peptide)
 
-        output_data = self._format_output({'peptides': [input_data.peptide]})
+        output_data = self._format_output({"peptides": [input_data.peptide]})
         self._save_results(output_data)
 
         return input_data
@@ -280,8 +318,10 @@ class StandardOutput(PipelineComponent):
         Returns:
             PeptideSetInput: The processed input data.
         """
-        self.logger.info("Outputting results for peptide set:" +
-            f"{len(input_data.peptides)} peptides")
+        self.logger.info(
+            "Outputting results for peptide set:"
+            + f"{len(input_data.peptides)} peptides"
+        )
         processed_peptides = set()
         for peptide in input_data.peptides:
             processed_peptide = self._add_retention_time(peptide)
@@ -289,14 +329,13 @@ class StandardOutput(PipelineComponent):
         input_data.peptides = processed_peptides
 
         # Format and save output
-        output_data = self._format_output({'peptides': list(processed_peptides)})
+        output_data = self._format_output({"peptides": list(processed_peptides)})
         self._save_results(output_data)
 
         return input_data
 
     def process_hierarchy(
-        self,
-        input_data: PeptideHierarchyInput
+        self, input_data: PeptideHierarchyInput
     ) -> PeptideHierarchyInput:
         """Process a hierarchy of peptides output.
 
@@ -306,6 +345,7 @@ class StandardOutput(PipelineComponent):
         Returns:
             PeptideHierarchyInput: The processed input data.
         """
+
         def process_node(node):
             node.root = self._add_retention_time(node.root)
             for child in node.children:
@@ -317,13 +357,14 @@ class StandardOutput(PipelineComponent):
         # Format and save output
         # Note: For hierarchy, we flatten the structure for output
         all_peptides = []
+
         def collect_peptides(node):
             all_peptides.append(node.root)
             for child in node.children:
                 collect_peptides(child)
 
         collect_peptides(input_data.hierarchy)
-        output_data = self._format_output({'peptides': all_peptides})
+        output_data = self._format_output({"peptides": all_peptides})
         self._save_results(output_data)
 
         return input_data

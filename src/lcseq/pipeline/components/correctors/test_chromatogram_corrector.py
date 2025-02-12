@@ -12,13 +12,12 @@ import logging
 
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (
-    SinglePeptideInput,
-    PeptideSetInput,
-    PeptideHierarchyInput
-)
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class TestChromatogramCorrector(PipelineComponent):
     """
@@ -58,8 +57,7 @@ class TestChromatogramCorrector(PipelineComponent):
         return input_data
 
     def process_hierarchy(
-        self,
-        input_data: PeptideHierarchyInput
+        self, input_data: PeptideHierarchyInput
     ) -> PeptideHierarchyInput:
         """
         Correct chromatogram for a hierarchy of peptides.
@@ -71,6 +69,7 @@ class TestChromatogramCorrector(PipelineComponent):
         Returns:
             PeptideHierarchyInput: The corrected hierarchy of peptides.
         """
-        logger.info("Correcting chromatogram for peptide hierarchy:" +
-            f"{input_data.hierarchy}")
+        logger.info(
+            "Correcting chromatogram for peptide hierarchy:" + f"{input_data.hierarchy}"
+        )
         return input_data

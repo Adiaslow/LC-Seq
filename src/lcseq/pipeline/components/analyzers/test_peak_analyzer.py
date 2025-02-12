@@ -10,9 +10,12 @@ import logging
 
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class TestPeakAnalyzer(PipelineComponent):
     """Pipeline component for analyzing test peaks in peptide chromatograms.
@@ -22,6 +25,7 @@ class TestPeakAnalyzer(PipelineComponent):
         process_peptide_set: Analyze peaks for a set of peptides
         process_hierarchy: Analyze peaks for a hierarchy of peptides
     """
+
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
         """Analyze peaks for a single peptide.
 
@@ -45,7 +49,9 @@ class TestPeakAnalyzer(PipelineComponent):
         logger.info(f"Analyzing peaks for peptide set: {input_data.peptides}")
         return input_data
 
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """Analyze peaks for a hierarchy of peptides.
 
         Args:

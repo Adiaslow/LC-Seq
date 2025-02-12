@@ -13,7 +13,7 @@ from src.lcseq.core.peak import Peak
 from src.lcseq.core.peptide import Peptide, PeptideEncoding
 from src.lcseq.core.synthesis_status import SynthesisStatus
 
-__all__ = [
+__all__: list[str] = [
     "BuildingBlock",
     "BuildingBlockRegistry",
     "Chromatogram",
@@ -22,5 +22,5 @@ __all__ = [
     "PeptideEncoding",
     "PeptideHierarchy",
     "PeptideHierarchyNode",
-    "SynthesisStatus"
+    "SynthesisStatus",
 ]

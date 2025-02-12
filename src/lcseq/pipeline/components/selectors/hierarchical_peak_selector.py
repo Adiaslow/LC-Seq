@@ -4,15 +4,20 @@ This module provides a pipeline component for selecting peaks from chromatograms
 It includes a class for hierarchical peak selection.
 """
 
+import logging
 # Standard library imports
 from dataclasses import dataclass
-import logging
 
-# Local application imports
-from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
 from src.lcseq.core.chromatogram import Peak
 from src.lcseq.core.hierarchy import PeptideHierarchyNode
+# Local application imports
+from src.lcseq.pipeline.base import PipelineComponent
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
+
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 @dataclass
 class HierarchicalPeakSelectorConfig:
@@ -23,14 +28,18 @@ class HierarchicalPeakSelectorConfig:
         min_duration (float): The minimum duration for peak selection.
         min_retention_time_difference (float): The minimum retention time difference from truncation times.
     """
+
     intensity_threshold: float = 0.0
     min_duration: float = 0.0
-    min_retention_time_difference: float = 0.5  # Minimum difference from truncation times
+    min_retention_time_difference: float = (
+        0.5  # Minimum difference from truncation times
+    )
+
 
 class HierarchicalPeakSelector(PipelineComponent):
     """Selects peaks considering hierarchical relationships between peptides."""
 
-    def __init__(self, config: HierarchicalPeakSelectorConfig = None): # type: ignore   
+    def __init__(self, config: HierarchicalPeakSelectorConfig = None):  # type: ignore
         """Initialize the HierarchicalPeakSelector.
 
         Args:
@@ -38,7 +47,9 @@ class HierarchicalPeakSelector(PipelineComponent):
                 Defaults to None, which uses the default configuration.
         """
         super().__init__()
-        self.config = config or HierarchicalPeakSelectorConfig()
+        self.config: HierarchicalPeakSelectorConfig = (
+            config or HierarchicalPeakSelectorConfig()
+        )
 
     def select_peaks(self, peaks: list[Peak]) -> list[Peak]:
         """Select the peak with the highest time value meeting criteria.
@@ -55,8 +66,9 @@ class HierarchicalPeakSelector(PipelineComponent):
             return []
 
         # Filter peaks based on basic criteria
-        valid_peaks = [
-            peak for peak in peaks
+        valid_peaks: list[Peak] = [
+            peak
+            for peak in peaks
             if peak.apex_intensity >= self.config.intensity_threshold
             and (peak.end_time - peak.start_time) >= self.config.min_duration
         ]
@@ -66,11 +78,13 @@ class HierarchicalPeakSelector(PipelineComponent):
             return []
 
         # Find peak with highest time
-        latest_peak = max(valid_peaks, key=lambda p: p.apex_time)
+        latest_peak: Peak = max(valid_peaks, key=lambda p: p.apex_time)
         self.logger.info(f"Selected peak at {latest_peak.apex_time}")
         return [latest_peak]
 
-    def _validates_against_truncations(self, peak: Peak, node: PeptideHierarchyNode) -> bool:
+    def _validates_against_truncations(
+        self, peak: Peak, node: PeptideHierarchyNode
+    ) -> bool:
         """Check if peak retention time is valid against truncation peaks.
 
         Args:
@@ -84,7 +98,11 @@ class HierarchicalPeakSelector(PipelineComponent):
             for encoding in truncation.peptide.encodings:
                 if encoding.chromatogram and encoding.chromatogram.peaks:
                     for trunc_peak in encoding.chromatogram.peaks:
-                        if peak.apex_time <= trunc_peak.apex_time + self.config.min_retention_time_difference:
+                        if (
+                            peak.apex_time
+                            <= trunc_peak.apex_time
+                            + self.config.min_retention_time_difference
+                        ):
                             return False
         return True
 
@@ -99,7 +117,9 @@ class HierarchicalPeakSelector(PipelineComponent):
         """
         for encoding in input_data.peptide.encodings:
             if encoding.chromatogram and encoding.chromatogram.peaks:
-                encoding.chromatogram.peaks = self.select_peaks(encoding.chromatogram.peaks)
+                encoding.chromatogram.peaks = self.select_peaks(
+                    encoding.chromatogram.peaks
+                )
         return input_data
 
     def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
@@ -114,10 +134,14 @@ class HierarchicalPeakSelector(PipelineComponent):
         for peptide in input_data.peptides:
             for encoding in peptide.encodings:
                 if encoding.chromatogram and encoding.chromatogram.peaks:
-                    encoding.chromatogram.peaks = self.select_peaks(encoding.chromatogram.peaks)
+                    encoding.chromatogram.peaks = self.select_peaks(
+                        encoding.chromatogram.peaks
+                    )
         return input_data
 
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """Process hierarchy layer by layer.
 
         Args:
@@ -130,7 +154,9 @@ class HierarchicalPeakSelector(PipelineComponent):
         for node in input_data.hierarchy.layers[1]:
             for encoding in node.peptide.encodings:
                 if encoding.chromatogram and encoding.chromatogram.peaks:
-                    encoding.chromatogram.peaks = self.select_peaks(encoding.chromatogram.peaks)
+                    encoding.chromatogram.peaks = self.select_peaks(
+                        encoding.chromatogram.peaks
+                    )
 
         # Then process multi-block peptides using truncation information
         for layer in range(2, max(input_data.hierarchy.layers.keys()) + 1):
@@ -147,8 +173,9 @@ class HierarchicalPeakSelector(PipelineComponent):
         """
         for encoding in node.peptide.encodings:
             if encoding.chromatogram and encoding.chromatogram.peaks:
-                valid_peaks = [
-                    peak for peak in encoding.chromatogram.peaks
+                valid_peaks: list[Peak] = [
+                    peak
+                    for peak in encoding.chromatogram.peaks
                     if self._validates_against_truncations(peak, node)
                 ]
                 encoding.chromatogram.peaks = self.select_peaks(valid_peaks)

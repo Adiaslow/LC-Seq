@@ -1,20 +1,16 @@
 # src/lcseq/io/__init__.py
 """
-Input/Output module for LC-Seq data processing.
-
 This module provides components for reading and writing LC-Seq data in various formats.
 """
 
-from src.lcseq.pipeline.components.io import (
-    StandardInput,
-    StandardOutput,
-    TestInput,
-    TestOutput
-)
+from src.lcseq.io.readers import (ChromatogramDataParser, ColumnMapping,
+                                  PeptideDataReader)
+from src.lcseq.io.writers import CompactChromDumper, PeptideDataWriter
 
-__all__ = [
-    "StandardInput",
-    "StandardOutput",
-    "TestInput",
-    "TestOutput"
+__all__: list[str] = [
+    "ColumnMapping",
+    "ChromatogramDataParser",
+    "CompactChromDumper",
+    "PeptideDataReader",
+    "PeptideDataWriter",
 ]

@@ -3,6 +3,7 @@
 Thank you for using ChromatographicPeakPicking! If you need support or have any questions, please refer to the following resources:
 
 ## Table of Contents
+
 1. [Getting Help](#getting-help)
 2. [Reporting Issues](#reporting-issues)
 3. [Frequently Asked Questions (FAQ)](#frequently-asked-questions-faq)

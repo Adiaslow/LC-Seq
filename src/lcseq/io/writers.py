@@ -11,17 +11,18 @@ Classes:
 
 # Standard library imports
 from pathlib import Path
-import yaml
-from typing import Dict, Any, List
+from typing import Any, Dict
 
-# Local application imports
+import yaml
+
 
 class CompactChromDumper(yaml.SafeDumper):
     """Custom YAML Dumper that formats chromatogram lists in flow style.
-    
+
     Methods:
         represent_list: Force flow style (single line) for numeric lists.
     """
+
     def represent_list(self, data):
         """Force flow style (single line) for numeric lists.
 
@@ -31,18 +32,24 @@ class CompactChromDumper(yaml.SafeDumper):
         Returns:
             yaml.Node: The represented data.
         """
-        if (isinstance(data, list) and
-            len(data) > 0 and
-            all(isinstance(x, (int, float)) for x in data)):
-            return self.represent_sequence('tag:yaml.org,2002:seq', data, flow_style=True)
-        return self.represent_sequence('tag:yaml.org,2002:seq', data, flow_style=None)
+        if (
+            isinstance(data, list)
+            and len(data) > 0
+            and all(isinstance(x, (int, float)) for x in data)
+        ):
+            return self.represent_sequence(
+                "tag:yaml.org,2002:seq", data, flow_style=True
+            )
+        return self.represent_sequence("tag:yaml.org,2002:seq", data, flow_style=None)
+
 
 class PeptideDataWriter:
     """Handles writing peptide data to various formats.
-    
+
     Methods:
         write_yaml: Write data to YAML format with special handling for chromatogram data.
     """
+
     @staticmethod
     def write_yaml(data: Dict[str, Any], output_path: Path) -> None:
         """Write data to YAML format with special handling for chromatogram data.
@@ -51,5 +58,5 @@ class PeptideDataWriter:
             data (Dict[str, Any]): The data to write.
             output_path (Path): The path to the output file.
         """
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             yaml.dump(data, f, Dumper=CompactChromDumper, sort_keys=False)

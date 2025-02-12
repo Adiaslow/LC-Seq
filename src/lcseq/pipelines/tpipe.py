@@ -9,14 +9,14 @@ Classes:
     TPipe: A pipeline class that sets up a sequence of test components.
 """
 
+from ..pipeline.components.analyzers import (TestChromatogramAnalyzer,
+                                             TestPeakAnalyzer)
+from ..pipeline.components.detectors import TestPeakDetector
+from ..pipeline.components.io import TestInput, TestOutput
+from ..pipeline.components.selectors import TestPeakSelector
 # Local application imports
 from ..pipeline.pipeline import Pipeline
-from ..pipeline.components.io import TestInput
-from ..pipeline.components.analyzers import TestChromatogramAnalyzer
-from ..pipeline.components.detectors import TestPeakDetector
-from ..pipeline.components.selectors import TestPeakSelector
-from ..pipeline.components.analyzers import TestPeakAnalyzer
-from ..pipeline.components.io import TestOutput
+
 
 class TPipe(Pipeline):
     """
@@ -38,11 +38,13 @@ class TPipe(Pipeline):
             input_file_path (str): The file path for the output component to write the
             results.
         """
-        super().__init__([
-            TestInput(),
-            TestChromatogramAnalyzer(),
-            TestPeakDetector(),
-            TestPeakAnalyzer(),
-            TestPeakSelector(),
-            TestOutput(input_file_path)
-        ])
+        super().__init__(
+            [
+                TestInput(),
+                TestChromatogramAnalyzer(),
+                TestPeakDetector(),
+                TestPeakAnalyzer(),
+                TestPeakSelector(),
+                TestOutput(input_file_path),
+            ]
+        )

@@ -10,16 +10,17 @@ Classes:
 
 # Standard library imports
 from dataclasses import dataclass, field
-from typing import Set, Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 # Local application imports
 from src.lcseq.core.peptide import Peptide, PeptideEncoding
 from src.lcseq.core.synthesis_status import SynthesisStatus
 
+
 @dataclass
 class PeptideHierarchyNode:
     """Represents a node in the peptide hierarchy.
-    
+
     Attributes:
         peptide (Peptide): The peptide represented by the node.
         layer (int): The layer of the node in the hierarchy.
@@ -28,15 +29,16 @@ class PeptideHierarchyNode:
         equivalent_encodings (Set[PeptideEncoding]): The encodings that are equivalent to the current node.
         synthesis_status (SynthesisStatus): The synthesis status of the node.
         retention_time (Optional[float]): The retention time of the node.
-    
+
     Methods:
         validate_retention_times: Validate that this node's retention time is greater than all its truncations.
         update_synthesis_status: Update the synthesis status of the node based on retention time validation and truncations.
     """
+
     peptide: Peptide
     layer: int  # 1 for single-block, 2 for two-block, etc.
-    truncation_edges: Set['PeptideHierarchyNode'] = field(default_factory=set)
-    extension_edges: Set['PeptideHierarchyNode'] = field(default_factory=set)
+    truncation_edges: Set["PeptideHierarchyNode"] = field(default_factory=set)
+    extension_edges: Set["PeptideHierarchyNode"] = field(default_factory=set)
     equivalent_encodings: Set[PeptideEncoding] = field(default_factory=set)
     synthesis_status: SynthesisStatus = SynthesisStatus.UNKNOWN
     retention_time: Optional[float] = None
@@ -76,20 +78,24 @@ class PeptideHierarchyNode:
 
         self.synthesis_status = SynthesisStatus.SUCCESS
 
+
 @dataclass
 class PeptideHierarchy:
     """Represents the complete hierarchy of peptides.
-    
+
     Attributes:
         nodes (Dict[str, PeptideHierarchyNode]): A dictionary of nodes in the hierarchy.
         layers (Dict[int, Set[PeptideHierarchyNode]]): A dictionary of layers in the hierarchy.
-    
+
     Methods:
         add_node: Add a new node to the hierarchy and establish all relationships.
         _establish_truncation_relationships: Establish all truncation relationships for a node.
     """
+
     nodes: Dict[str, PeptideHierarchyNode] = field(default_factory=dict)
-    layers: Dict[int, Set[PeptideHierarchyNode]] = field(default_factory=lambda: {1: set(), 2: set(), 3: set()})
+    layers: Dict[int, Set[PeptideHierarchyNode]] = field(
+        default_factory=lambda: {1: set(), 2: set(), 3: set()}
+    )
 
     def add_node(self, peptide: Peptide) -> PeptideHierarchyNode:
         """Add a new node to the hierarchy and establish all relationships.
@@ -127,8 +133,10 @@ class PeptideHierarchy:
         # Generate all possible truncations
         for length in range(1, n):
             for i in range(n - length + 1):
-                truncation_seq = sequence[i:i+length]
-                truncation_str = '-'.join([block.identifier for block in truncation_seq][::-1])
+                truncation_seq = sequence[i : i + length]
+                truncation_str = "-".join(
+                    [block.identifier for block in truncation_seq][::-1]
+                )
 
                 if truncation_str in self.nodes:
                     truncation_node = self.nodes[truncation_str]

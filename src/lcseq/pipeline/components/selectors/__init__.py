@@ -6,18 +6,18 @@ selection, and test peak selection.
 """
 
 # Local application imports
-from src.lcseq.pipeline.components.selectors.basic_peak_selector \
-    import BasicPeakSelector
-from src.lcseq.pipeline.components.selectors.gpp_peak_selector \
-    import GPPPeakSelector
-from src.lcseq.pipeline.components.selectors.hierarchical_peak_selector \
-    import HierarchicalPeakSelector
-from src.lcseq.pipeline.components.selectors.test_peak_selector \
-    import TestPeakSelector
+from src.lcseq.pipeline.components.selectors.basic_peak_selector import \
+    BasicPeakSelector
+from src.lcseq.pipeline.components.selectors.gpp_peak_selector import \
+    GPPPeakSelector
+from src.lcseq.pipeline.components.selectors.hierarchical_peak_selector import \
+    HierarchicalPeakSelector
+from src.lcseq.pipeline.components.selectors.test_peak_selector import \
+    TestPeakSelector
 
-__all__ = [
+__all__: list[str] = [
     "BasicPeakSelector",
     "GPPPeakSelector",
     "HierarchicalPeakSelector",
-    "TestPeakSelector"
+    "TestPeakSelector",
 ]

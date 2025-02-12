@@ -8,11 +8,12 @@ Classes:
 
 # Standard library imports
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import Dict, List
 import numpy as np
 
 # Local application imports
 from src.lcseq.core.peak import Peak
+
 
 @dataclass
 class Chromatogram:
@@ -28,6 +29,7 @@ class Chromatogram:
         __post_init__: Ensure times and intensities are numpy arrays and validate inputs.
         get_slice: Get a sub-section of the chromatogram.
     """
+
     times: np.ndarray
     intensities: np.ndarray
     properties: Dict = field(default_factory=dict)
@@ -53,7 +55,7 @@ class Chromatogram:
         if len(self.times) > 0 and self.times[0] < 0:
             raise ValueError("Time values cannot be negative")
 
-    def get_slice(self, start_time: float, end_time: float) -> 'Chromatogram':
+    def get_slice(self, start_time: float, end_time: float) -> "Chromatogram":
         """Get a sub-section of the chromatogram.
 
         Args:
@@ -65,11 +67,13 @@ class Chromatogram:
         """
         mask = (self.times >= start_time) & (self.times <= end_time)
         new_properties = self.properties.copy()
-        if 'corrected_intensities' in self.properties:
-            new_properties['corrected_intensities'] = self.properties['corrected_intensities'][mask]
+        if "corrected_intensities" in self.properties:
+            new_properties["corrected_intensities"] = self.properties[
+                "corrected_intensities"
+            ][mask]
 
         return Chromatogram(
             times=self.times[mask],
             intensities=self.intensities[mask],
-            properties=new_properties
+            properties=new_properties,
         )

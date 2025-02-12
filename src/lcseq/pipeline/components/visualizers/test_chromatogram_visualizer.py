@@ -8,14 +8,14 @@ Classes:
 """
 
 import logging
-from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (
-    SinglePeptideInput,
-    PeptideSetInput,
-    PeptideHierarchyInput
-)
 
-logger = logging.getLogger(__name__)
+from src.lcseq.pipeline.base import PipelineComponent
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
+
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class TestChromatogramVisualizer(PipelineComponent):
     """
@@ -55,8 +55,7 @@ class TestChromatogramVisualizer(PipelineComponent):
         return input_data
 
     def process_hierarchy(
-        self,
-        input_data: PeptideHierarchyInput
+        self, input_data: PeptideHierarchyInput
     ) -> PeptideHierarchyInput:
         """
         Visualize chromatogram for a hierarchy of peptides.
@@ -68,6 +67,8 @@ class TestChromatogramVisualizer(PipelineComponent):
         Returns:
             PeptideHierarchyInput: The visualized hierarchy of peptides.
         """
-        logger.info("Visualizing chromatogram for peptide hierarchy:" +
-            f"{input_data.hierarchy}")
+        logger.info(
+            "Visualizing chromatogram for peptide hierarchy:"
+            + f"{input_data.hierarchy}"
+        )
         return input_data

@@ -15,12 +15,16 @@ Classes:
 import logging
 from dataclasses import dataclass
 
+from src.lcseq.core.chromatogram import Peak
+from src.lcseq.core.hierarchy import PeptideHierarchyNode
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
-from src.lcseq.core.chromatogram import Peak
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 @dataclass
 class GPPPeakSelectorConfig:
@@ -30,8 +34,10 @@ class GPPPeakSelectorConfig:
         intensity_threshold (float): The intensity threshold for peak selection.
         min_duration (float): The minimum duration for peak selection.
     """
+
     intensity_threshold: float = 0.0
     min_duration: float = 0.0
+
 
 class GPPPeakSelector(PipelineComponent):
     """Pipeline component for selecting peaks based on corrected Gaussian mean time.
@@ -46,7 +52,8 @@ class GPPPeakSelector(PipelineComponent):
         process_peptide_set: Process a set of peptides.
         process_hierarchy: Process a hierarchy of peptides.
     """
-    def __init__(self, config: GPPPeakSelectorConfig = None): # type: ignore
+
+    def __init__(self, config: GPPPeakSelectorConfig = None):  # type: ignore
         """Initialize GPPPeakSelector with the given configuration.
 
         Args:
@@ -66,7 +73,10 @@ class GPPPeakSelector(PipelineComponent):
             A list containing the selected Peak object with the highest corrected Gaussian
             mean time value. If no valid peaks are found, an empty list is returned.
         """
-        peak_info = [f"{peak.properties.get('corrected_gaussian_fit_params', {}).get('mean', 'N/A')} ({peak.apex_intensity})" for peak in peaks]
+        peak_info = [
+            f"{peak.properties.get('corrected_gaussian_fit_params', {}).get('mean', 'N/A')} ({peak.apex_intensity})"
+            for peak in peaks
+        ]
         self.logger.info(f"Selecting peaks from: {', '.join(peak_info)}")
 
         if not peaks:
@@ -75,7 +85,8 @@ class GPPPeakSelector(PipelineComponent):
 
         # Filter peaks based on basic criteria
         valid_peaks = [
-            peak for peak in peaks
+            peak
+            for peak in peaks
             if peak.apex_intensity >= self.config.intensity_threshold
             and (peak.end_time - peak.start_time) >= self.config.min_duration
         ]
@@ -85,8 +96,15 @@ class GPPPeakSelector(PipelineComponent):
             return []
 
         # Find peak with highest corrected Gaussian mean time
-        latest_peak = max(valid_peaks, key=lambda p: p.properties.get('corrected_gaussian_fit_params', {}).get('mean', float('-inf')))
-        self.logger.info(f"Selected peak at {latest_peak.properties.get('corrected_gaussian_fit_params', {}).get('mean', 'N/A')} with metrics:\n{latest_peak.properties}")
+        latest_peak = max(
+            valid_peaks,
+            key=lambda p: p.properties.get("corrected_gaussian_fit_params", {}).get(
+                "mean", float("-inf")
+            ),
+        )
+        self.logger.info(
+            f"Selected peak at {latest_peak.properties.get('corrected_gaussian_fit_params', {}).get('mean', 'N/A')} with metrics:\n{latest_peak.properties}"
+        )
         return [latest_peak]
 
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
@@ -98,10 +116,14 @@ class GPPPeakSelector(PipelineComponent):
         Returns:
             The SinglePeptideInput object with selected peaks.
         """
-        self.logger.info(f"Selecting peaks for peptide: {input_data.peptide.sequence_str}")
+        self.logger.info(
+            f"Selecting peaks for peptide: {input_data.peptide.sequence_str}"
+        )
         for encoding in input_data.peptide.encodings:
             if encoding.chromatogram is not None and encoding.chromatogram.peaks:
-                encoding.chromatogram.peaks = self.select_peaks(encoding.chromatogram.peaks)
+                encoding.chromatogram.peaks = self.select_peaks(
+                    encoding.chromatogram.peaks
+                )
         return input_data
 
     def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
@@ -113,14 +135,20 @@ class GPPPeakSelector(PipelineComponent):
         Returns:
             The PeptideSetInput object with selected peaks for each peptide.
         """
-        self.logger.info(f"Selecting peaks for peptide set: {len(input_data.peptides)} peptides")
+        self.logger.info(
+            f"Selecting peaks for peptide set: {len(input_data.peptides)} peptides"
+        )
         for peptide in input_data.peptides:
             for encoding in peptide.encodings:
                 if encoding.chromatogram is not None and encoding.chromatogram.peaks:
-                    encoding.chromatogram.peaks = self.select_peaks(encoding.chromatogram.peaks)
+                    encoding.chromatogram.peaks = self.select_peaks(
+                        encoding.chromatogram.peaks
+                    )
         return input_data
 
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """Select peaks for a hierarchy of peptides.
 
         Args:
@@ -129,13 +157,16 @@ class GPPPeakSelector(PipelineComponent):
         Returns:
             The PeptideHierarchyInput object with selected peaks for each peptide in the hierarchy.
         """
-        def process_node(node):
-            for encoding in node.root.encodings:
+
+        def process_node(node: PeptideHierarchyNode) -> None:
+            for encoding in node.peptide.encodings:
                 if encoding.chromatogram is not None and encoding.chromatogram.peaks:
-                    encoding.chromatogram.peaks = self.select_peaks(encoding.chromatogram.peaks)
+                    encoding.chromatogram.peaks = self.select_peaks(
+                        encoding.chromatogram.peaks
+                    )
             for child in node.children:
                 process_node(child)
 
         self.logger.info(f"Selecting peaks for peptide hierarchy")
-        process_node(input_data.hierarchy)
+        process_node(input_data.hierarchy.root)
         return input_data

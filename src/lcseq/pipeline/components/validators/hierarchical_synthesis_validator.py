@@ -1,17 +1,22 @@
 # src/lcseq/pipeline/components/validators/hierarchical_synthesis_validator.py
 """
 This module provides a pipeline component for validating synthesis success based on retention time hierarchy.
+
+Classes:
+    HierarchicalSynthesisValidator: Validate synthesis success based on retention time hierarchy.
 """
 
 # Standard library imports
 import logging
 
+from src.lcseq.core.hierarchy import PeptideHierarchyNode
+from src.lcseq.core.synthesis_status import SynthesisStatus
 # Local application imports
-from ... import PipelineComponent
-from ...input_types import PeptideHierarchyInput
-from ....core import PeptideHierarchyNode, SynthesisStatus
+from src.lcseq.pipeline.base import PipelineComponent
+from src.lcseq.pipeline.input_types import PeptideHierarchyInput
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class HierarchicalSynthesisValidator(PipelineComponent):
     """Validates synthesis success based on retention time hierarchy.
@@ -23,7 +28,10 @@ class HierarchicalSynthesisValidator(PipelineComponent):
         process_hierarchy: Validate synthesis across the hierarchy.
         _validate_node: Validate a single node's synthesis.
     """
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """Validate synthesis across the hierarchy.
 
         Args:

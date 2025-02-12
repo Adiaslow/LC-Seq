@@ -11,22 +11,20 @@ Classes:
 # Standard library imports
 import logging
 from dataclasses import dataclass
-from typing import Dict, Any, Set, Tuple, List, Optional, Union
-import yaml
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+
 import numpy as np
+import yaml
 
+from ....core import (BuildingBlock, BuildingBlockRegistry, Chromatogram,
+                      Peptide, PeptideEncoding, PeptideHierarchy)
+from ....pipeline import (PeptideHierarchyInput, PeptideSetInput,
+                          SinglePeptideInput)
 # Local application imports
-from ...pipeline import (
-    PipelineComponent,
-    SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
-)
-from ....core import (
-    BuildingBlock, BuildingBlockRegistry,
-    Peptide, PeptideEncoding, PeptideHierarchy,
-    Chromatogram
-)
+from ...pipeline import PipelineComponent
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class StandardInput(PipelineComponent):
     """StandardInput class for handling standard input data.
@@ -40,7 +38,8 @@ class StandardInput(PipelineComponent):
         process_peptide_set: Process a set of peptides input.
         process_hierarchy: Process a hierarchy of peptides input.
     """
-    def __init__(self):
+
+    def __init__(self) -> None:
         """Initialize the StandardInput.
 
         Args:
@@ -48,7 +47,7 @@ class StandardInput(PipelineComponent):
                 Default is None, which uses the default configuration.
         """
         super().__init__()
-        self.logger = logging.getLogger(__name__)
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
     def detect_hierarchy(self, peptides: Set[Peptide]) -> bool:
         """Detect if the input peptides likely form a hierarchical structure.
@@ -60,9 +59,9 @@ class StandardInput(PipelineComponent):
             bool: True if the peptides likely form a hierarchical structure, False otherwise.
         """
         # Count peptides of different lengths
-        length_counts = {}
+        length_counts: dict = {}
         for peptide in peptides:
-            length = len(peptide.sequence)
+            length: int = len(peptide.sequence)
             length_counts[length] = length_counts.get(length, 0) + 1
 
         # Check if we have peptides of different lengths
@@ -74,8 +73,10 @@ class StandardInput(PipelineComponent):
             if len(peptide.sequence) > 1:
                 # Check if potential truncations exist
                 for i in range(len(peptide.sequence)):
-                    truncated_seq = peptide.sequence[:i] + peptide.sequence[i+1:]
-                    truncated_str = '-'.join([block.identifier for block in truncated_seq][::-1])
+                    truncated_seq = peptide.sequence[:i] + peptide.sequence[i + 1 :]
+                    truncated_str = "-".join(
+                        [block.identifier for block in truncated_seq][::-1]
+                    )
 
                     # Look for matching truncation
                     for potential_truncation in peptides:
@@ -84,7 +85,9 @@ class StandardInput(PipelineComponent):
 
         return False
 
-    def build_hierarchy(self, peptides: Set[Peptide]) -> Tuple[PeptideHierarchy, Set[Peptide]]:
+    def build_hierarchy(
+        self, peptides: Set[Peptide]
+    ) -> Tuple[PeptideHierarchy, Set[Peptide]]:
         """Build hierarchy from peptides, returning both hierarchy and orphaned peptides."""
         hierarchy = PeptideHierarchy()
         orphaned = set()
@@ -103,8 +106,10 @@ class StandardInput(PipelineComponent):
 
             # Generate all possible truncation sequences
             for i in range(len(peptide.sequence)):
-                truncated_seq = peptide.sequence[:i] + peptide.sequence[i+1:]
-                truncation_sequences.add('-'.join([block.identifier for block in truncated_seq][::-1]))
+                truncated_seq = peptide.sequence[:i] + peptide.sequence[i + 1 :]
+                truncation_sequences.add(
+                    "-".join([block.identifier for block in truncated_seq][::-1])
+                )
 
             # Check if truncations exist in hierarchy
             for truncation_seq in truncation_sequences:
@@ -119,44 +124,51 @@ class StandardInput(PipelineComponent):
 
         return hierarchy, orphaned
 
-    def load_data(self, input_data: Dict[str, Any]) -> Union[PeptideSetInput, PeptideHierarchyInput]:
+    def load_data(
+        self, input_data: Dict[str, Any]
+    ) -> Union[PeptideSetInput, PeptideHierarchyInput]:
         """Load data from dictionary format into appropriate input type."""
         peptides = set()
 
         # Load building blocks
-        for bb_id, bb_data in input_data['building_blocks'].items():
+        for bb_id, bb_data in input_data["building_blocks"].items():
             block = BuildingBlock(
                 identifier=bb_id,
                 properties={
-                    'name': bb_data['name'],
-                    'smiles': bb_data['smiles'],
-                    'stereochem': bb_data['stereochem']
-                }
+                    "name": bb_data["name"],
+                    "smiles": bb_data["smiles"],
+                    "stereochem": bb_data["stereochem"],
+                },
             )
             BuildingBlockRegistry.register(block)
 
         # Create peptides
-        for peptide_data in input_data['peptides']:
-            sequence = self._create_sequence(peptide_data['sequence'])
+        for peptide_data in input_data["peptides"]:
+            sequence = self._create_sequence(peptide_data["sequence"])
             if sequence:
                 peptide = self._create_peptide(sequence, peptide_data)
                 peptides.add(peptide)
 
         # Determine processing type
-        if self.pipeline.config.hierarchical or self.detect_hierarchy(peptides):
+        if self.pipeline.config.hierarchical or self.detect_hierarchy(peptides):  # type: ignore
             hierarchy, orphaned = self.build_hierarchy(peptides)
-            return PeptideHierarchyInput(hierarchy=hierarchy, orphaned_peptides=orphaned)
+            return PeptideHierarchyInput(hierarchy=hierarchy, orphaned_peptides=orphaned)  # type: ignore
 
         return PeptideSetInput(peptides=peptides)
 
-    def _create_sequence(self, sequence_names: List[str]) -> Optional[List[BuildingBlock]]:
+    def _create_sequence(
+        self, sequence_names: List[str]
+    ) -> Optional[List[BuildingBlock]]:
         """Create sequence of building blocks from names."""
         sequence = []
         for name in sequence_names:
             matching_block = next(
-                (block for block in BuildingBlockRegistry.blocks.values()
-                 if block.properties['name'] == name),
-                None
+                (
+                    block
+                    for block in BuildingBlockRegistry.blocks.values()  # type: ignore
+                    if block.properties["name"] == name
+                ),
+                None,
             )
             if matching_block:
                 sequence.append(matching_block)
@@ -165,15 +177,17 @@ class StandardInput(PipelineComponent):
                 return None
         return sequence if len(sequence) == len(sequence_names) else None
 
-    def _create_peptide(self, sequence: List[BuildingBlock], peptide_data: Dict) -> Peptide:
+    def _create_peptide(
+        self, sequence: List[BuildingBlock], peptide_data: Dict
+    ) -> Peptide:
         """Create peptide with chromatogram from sequence and data."""
         chromatogram = Chromatogram(
-            times=np.array(peptide_data['chromatogram']['times']),
-            intensities=np.array(peptide_data['chromatogram']['intensities'])
+            times=np.array(peptide_data["chromatogram"]["times"]),
+            intensities=np.array(peptide_data["chromatogram"]["intensities"]),
         )
 
-        properties = peptide_data['properties'].copy()
-        properties['identifier'] = peptide_data['identifier']
+        properties = peptide_data["properties"].copy()
+        properties["identifier"] = peptide_data["identifier"]
 
         peptide = Peptide(sequence=sequence, properties=properties)
         encoding = PeptideEncoding(blocks=sequence, chromatogram=chromatogram)
@@ -188,10 +202,16 @@ class StandardInput(PipelineComponent):
 
     def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
         """Process a set of peptides input."""
-        self.logger.info(f"Handling input for peptide set: {len(input_data.peptides)} peptides")
+        self.logger.info(
+            f"Handling input for peptide set: {len(input_data.peptides)} peptides"
+        )
         return input_data
 
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """Process a hierarchy of peptides input."""
-        self.logger.info(f"Handling input for peptide hierarchy: {input_data.hierarchy}")
+        self.logger.info(
+            f"Handling input for peptide hierarchy: {input_data.hierarchy}"
+        )
         return input_data

@@ -11,19 +11,23 @@ Classes:
     PeptideHierarchyInput: Wrapper for processing a hierarchy of peptides.
 """
 
+# Standard library imports
 from abc import ABC, abstractmethod
 from typing import Set
-from src.lcseq.core.peptide import Peptide
+
 from src.lcseq.core.hierarchy import PeptideHierarchy
+# Local application imports
+from src.lcseq.core.peptide import Peptide
+from src.lcseq.pipeline.base import PipelineComponent
+
 
 class ProcessableInput(ABC):
     """Base class for all inputs that can be processed by pipeline components."""
 
     @abstractmethod
     def accept(
-        self,
-        processor: 'PipelineComponent' # type: ignore
-    ) -> 'ProcessableInput':
+        self, processor: "PipelineComponent"  # type: ignore
+    ) -> "ProcessableInput":
         """Accept a pipeline component for processing using the visitor pattern.
 
         Args:
@@ -34,6 +38,7 @@ class ProcessableInput(ABC):
         """
         ...
 
+
 class SinglePeptideInput(ProcessableInput):
     """Wrapper for processing a single peptide.
 
@@ -41,18 +46,17 @@ class SinglePeptideInput(ProcessableInput):
         peptide (Peptide): The peptide to be processed.
     """
 
-    def __init__(self, peptide: 'Peptide'):
+    def __init__(self, peptide: Peptide) -> None:
         """Initializes the SinglePeptideInput with a single peptide.
 
         Args:
             peptide (Peptide): The peptide to be processed.
         """
-        self.peptide = peptide
+        self.peptide: Peptide = peptide
 
     def accept(
-        self,
-        processor: 'PipelineComponent' # type: ignore
-    ) -> 'SinglePeptideInput':
+        self, processor: "PipelineComponent"  # type: ignore
+    ) -> "SinglePeptideInput":
         """Accept a pipeline component for processing using the visitor pattern.
 
         Args:
@@ -63,6 +67,7 @@ class SinglePeptideInput(ProcessableInput):
         """
         return processor.process_peptide(self)
 
+
 class PeptideSetInput(ProcessableInput):
     """Wrapper for processing a set of peptides.
 
@@ -70,18 +75,17 @@ class PeptideSetInput(ProcessableInput):
         peptides (Set[Peptide]): The set of peptides to be processed.
     """
 
-    def __init__(self, peptides: Set['Peptide']):
+    def __init__(self, peptides: Set[Peptide]) -> None:
         """Initializes the PeptideSetInput with a set of peptides.
 
         Args:
             peptides (Set[Peptide]): The set of peptides to be processed.
         """
-        self.peptides = peptides
+        self.peptides: Set[Peptide] = peptides
 
     def accept(
-        self,
-        processor: 'PipelineComponent' # type: ignore
-    ) -> 'PeptideSetInput':
+        self, processor: "PipelineComponent"  # type: ignore
+    ) -> "PeptideSetInput":
         """Accept a pipeline component for processing using the visitor pattern.
 
         Args:
@@ -92,6 +96,7 @@ class PeptideSetInput(ProcessableInput):
         """
         return processor.process_peptide_set(self)
 
+
 class PeptideHierarchyInput(ProcessableInput):
     """Wrapper for processing a hierarchy of peptides.
 
@@ -99,18 +104,17 @@ class PeptideHierarchyInput(ProcessableInput):
         hierarchy (PeptideHierarchy): The hierarchy of peptides to be processed.
     """
 
-    def __init__(self, hierarchy: 'PeptideHierarchy'):
+    def __init__(self, hierarchy: PeptideHierarchy) -> None:
         """Initializes the PeptideHierarchyInput with a hierarchy of peptides.
 
         Args:
             hierarchy (PeptideHierarchy): The hierarchy of peptides to be processed.
         """
-        self.hierarchy = hierarchy
+        self.hierarchy: PeptideHierarchy = hierarchy
 
     def accept(
-        self,
-        processor: 'PipelineComponent' # type: ignore
-    ) -> 'PeptideHierarchyInput':
+        self, processor: "PipelineComponent"  # type: ignore
+    ) -> "PeptideHierarchyInput":
         """Accept a pipeline component for processing using the visitor pattern.
 
         Args:

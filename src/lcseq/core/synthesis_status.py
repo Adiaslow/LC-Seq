@@ -10,7 +10,6 @@ Classes:
 # Standard library imports
 from enum import Enum
 
-# Local application imports
 
 class SynthesisStatus(Enum):
     """Enumeration of possible synthesis validation states.
@@ -21,6 +20,7 @@ class SynthesisStatus(Enum):
         FAILURE: Synthesis confirmed failed
         PENDING: Validation in progress
     """
+
     UNKNOWN = "unknown"
     SUCCESS = "success"
     FAILURE = "failure"

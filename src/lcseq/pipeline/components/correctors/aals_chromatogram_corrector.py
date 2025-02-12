@@ -11,17 +11,20 @@ Classes:
 
 # Standard library imports
 import logging
+from dataclasses import dataclass, field
+
 import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
-from dataclasses import dataclass, field
-
+from src.lcseq.core.chromatogram import Chromatogram
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
-from src.lcseq.core.chromatogram import Chromatogram
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 @dataclass
 class AALSChromatogramCorrectorConfig:
@@ -32,9 +35,11 @@ class AALSChromatogramCorrectorConfig:
         p_value (float): The p value for the AALS baseline correction.
         max_iterations (int): The maximum number of iterations for the AALS baseline correction.
     """
+
     lambda_value: float = 1e4
     p_value: float = 0.001
     max_iterations: int = 10
+
 
 class AALSChromatogramCorrector(PipelineComponent):
     """AALSChromatogramCorrector class for correcting chromatograms using the Asymmetric Least Squares (AALS)
@@ -55,7 +60,7 @@ class AALSChromatogramCorrector(PipelineComponent):
         process_hierarchy: Process and correct a peptide hierarchy.
     """
 
-    def __init__(self, config: AALSChromatogramCorrectorConfig = None): # type: ignore
+    def __init__(self, config: AALSChromatogramCorrectorConfig = None) -> None:  # type: ignore
         """
         Initializes the AALSChromatogramCorrector with the provided configuration.
 
@@ -63,8 +68,10 @@ class AALSChromatogramCorrector(PipelineComponent):
             config (AALSChromatogramCorrectorConfig, optional): Configuration for the AALS baseline correction.
                 Default is None, which uses the default configuration.
         """
-        self.config = config or AALSChromatogramCorrectorConfig()
-        self.logger = logging.getLogger(__name__)
+        self.config: AALSChromatogramCorrectorConfig = (
+            config or AALSChromatogramCorrectorConfig()
+        )
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
     def _correct_chromatogram(self, chrom: Chromatogram) -> Chromatogram:
         """Apply AALS baseline correction to a single chromatogram.
@@ -75,26 +82,33 @@ class AALSChromatogramCorrector(PipelineComponent):
         Returns:
             Chromatogram: The corrected chromatogram.
         """
-        y = chrom.intensities
-        length = len(y)
-        diff_matrix = sparse.diags(
-            [1, -2, 1],
-            [0, 1, 2], # type: ignore
-            shape=(length, length)
+        y: np.ndarray = chrom.intensities
+        length: int = len(y)
+        diff_matrix: sparse.csr_matrix = sparse.diags(
+            [1, -2, 1], [0, 1, 2], shape=(length, length)  # type: ignore
         )
-        weights = np.ones(length)
-        baseline = np.ones(length)
+        weights: np.ndarray = np.ones(length)
+        baseline: np.ndarray = np.ones(length)
 
         for _ in range(self.config.max_iterations):
-            weight_matrix = sparse.spdiags(weights, 0, length, length)
-            z_matrix = weight_matrix + self.config.lambda_value * diff_matrix.T.dot(diff_matrix)
-            baseline = spsolve(z_matrix, weights * y)
-            weights = self.config.p_value * (y > baseline) + (1 - self.config.p_value) * (y <= baseline)
+            weight_matrix: sparse.csr_matrix = sparse.spdiags(
+                weights, 0, length, length  # type: ignore  # noqa: F821
+            )
+            z_matrix: np.ndarray = (
+                weight_matrix
+                + self.config.lambda_value * diff_matrix.T.dot(diff_matrix)
+            )
+            baseline: np.ndarray = spsolve(z_matrix, weights * y)
+            weights: np.ndarray = self.config.p_value * (y > baseline) + (
+                1 - self.config.p_value
+            ) * (y <= baseline)
 
-        corrected_intensities = np.maximum(y - baseline, 0)  # Ensure non-negative values
+        corrected_intensities: np.ndarray = np.maximum(
+            y - baseline, 0
+        )  # Ensure non-negative values
 
-        chrom.properties['corrected_intensities'] = corrected_intensities
-        chrom.properties['baseline'] = baseline
+        chrom.properties["corrected_intensities"] = corrected_intensities
+        chrom.properties["baseline"] = baseline
 
         return chrom
 
@@ -108,11 +122,17 @@ class AALSChromatogramCorrector(PipelineComponent):
         Returns:
             SinglePeptideInput: The corrected single peptide input.
         """
-        self.logger.info(f"Correcting chromatogram for peptide: {input_data.peptide.sequence_str}")
+        self.logger.info(
+            f"Correcting chromatogram for peptide: {input_data.peptide.sequence_str}"
+        )
         for encoding in input_data.peptide.encodings:
             if encoding.chromatogram is not None:
-                encoding.chromatogram = self._correct_chromatogram(encoding.chromatogram)
-                self.logger.info(f"Chromatogram corrected for {encoding}: {encoding.chromatogram.properties}")
+                encoding.chromatogram = self._correct_chromatogram(
+                    encoding.chromatogram
+                )
+                self.logger.info(
+                    f"Chromatogram corrected for {encoding}: {encoding.chromatogram.properties}"
+                )
         return input_data
 
     def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
@@ -125,14 +145,20 @@ class AALSChromatogramCorrector(PipelineComponent):
         Returns:
             PeptideSetInput: The corrected set of peptides.
         """
-        self.logger.info(f"Correcting chromatograms for peptide set: {len(input_data.peptides)} peptides")
+        self.logger.info(
+            f"Correcting chromatograms for peptide set: {len(input_data.peptides)} peptides"
+        )
         for peptide in input_data.peptides:
             for encoding in peptide.encodings:
                 if encoding.chromatogram is not None:
-                    encoding.chromatogram = self._correct_chromatogram(encoding.chromatogram)
+                    encoding.chromatogram = self._correct_chromatogram(
+                        encoding.chromatogram
+                    )
         return input_data
 
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """
         Correct chromatograms in a peptide hierarchy.
 
@@ -142,10 +168,13 @@ class AALSChromatogramCorrector(PipelineComponent):
         Returns:
             PeptideHierarchyInput: The corrected hierarchy of peptides.
         """
+
         def process_node(node):
             for encoding in node.root.encodings:
                 if encoding.chromatogram is not None:
-                    encoding.chromatogram = self._correct_chromatogram(encoding.chromatogram)
+                    encoding.chromatogram = self._correct_chromatogram(
+                        encoding.chromatogram
+                    )
             for child in node.children:
                 process_node(child)
 

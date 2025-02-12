@@ -9,9 +9,12 @@ import logging
 
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class TestPeakSelector(PipelineComponent):
     """TestPeakSelector class for selecting peaks from chromatograms.
@@ -19,21 +22,24 @@ class TestPeakSelector(PipelineComponent):
     Attributes:
         intensity_threshold (float): The intensity threshold for peak selection.
         min_duration (float): The minimum duration for peak selection.
-    
+
     Methods:
         process_peptide: Process a single peptide.
         process_peptide_set: Process a set of peptides.
         process_hierarchy: Process a hierarchy of peptides.
     """
-    def __init__(self, intensity_threshold: float = 100.0, min_duration: float = 0.1):
+
+    def __init__(
+        self, intensity_threshold: float = 100.0, min_duration: float = 0.1
+    ) -> None:
         """Initialize the TestPeakSelector.
 
         Args:
             intensity_threshold (float): The intensity threshold for peak selection.
             min_duration (float): The minimum duration for peak selection.
         """
-        self.intensity_threshold = intensity_threshold
-        self.min_duration = min_duration
+        self.intensity_threshold: float = intensity_threshold
+        self.min_duration: float = min_duration
 
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
         """Process a single peptide.
@@ -59,7 +65,9 @@ class TestPeakSelector(PipelineComponent):
         logger.info(f"Selecting peaks for peptide set: {input_data.peptides}")
         return input_data
 
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """Process a hierarchy of peptides.
 
         Args:

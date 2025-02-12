@@ -5,20 +5,17 @@ available for easy import. It includes classes and types for processing differen
 types of peptide inputs through a pipeline.
 """
 
-from src.lcseq.pipeline.input_types import (
-    ProcessableInput,
-    SinglePeptideInput,
-    PeptideSetInput,
-    PeptideHierarchyInput
-)
 from src.lcseq.pipeline.base import PipelineComponent
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput, ProcessableInput,
+                                            SinglePeptideInput)
 from src.lcseq.pipeline.pipeline import Pipeline
 
-__all__ = [
+__all__: list[str] = [
     "ProcessableInput",
     "SinglePeptideInput",
     "PeptideSetInput",
     "PeptideHierarchyInput",
     "PipelineComponent",
-    "Pipeline"
+    "Pipeline",
 ]

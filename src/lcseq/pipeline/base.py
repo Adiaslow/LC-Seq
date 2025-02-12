@@ -7,19 +7,18 @@ Classes:
     PipelineComponent: Abstract base class for pipeline components.
 """
 
+import logging
 # Standard library imports
 from abc import ABC, abstractmethod
-import logging
 
-# Local application imports
-from src.lcseq.pipeline.input_types import (
-    ProcessableInput,
-    SinglePeptideInput,
-    PeptideSetInput,
-    PeptideHierarchyInput
-)
-from src.lcseq.core.peptide import Peptide
 from src.lcseq.core.hierarchy import PeptideHierarchy
+from src.lcseq.core.peptide import Peptide
+# Local application imports
+from src.lcseq.pipeline import (PeptideHierarchyInput, PeptideSetInput,
+                                Pipeline, ProcessableInput, SinglePeptideInput)
+
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class PipelineComponent(ABC):
     """Abstract base class for pipeline components.
@@ -34,10 +33,10 @@ class PipelineComponent(ABC):
         process_hierarchy: Process a hierarchy of peptides.
         process: Main entry point for processing any type of input.
     """
-    def __init__(self):
-        self._pipeline = None
-        self.logger = logging.getLogger(__name__)
 
+    def __init__(self) -> None:
+        self._pipeline: Pipeline | None = None
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
     @abstractmethod
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
@@ -65,7 +64,9 @@ class PipelineComponent(ABC):
         pass
 
     @abstractmethod
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """Process a hierarchy of peptides.
 
         Args:
@@ -92,11 +93,11 @@ class PipelineComponent(ABC):
         return input_data.accept(self)
 
     @property
-    def pipeline(self):
+    def pipeline(self) -> Pipeline | None:
         """Get the pipeline this component belongs to."""
         return self._pipeline
 
     @pipeline.setter
-    def pipeline(self, pipeline):
+    def pipeline(self, pipeline: Pipeline) -> None:
         """Set the pipeline this component belongs to."""
         self._pipeline = pipeline

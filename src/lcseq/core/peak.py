@@ -10,12 +10,11 @@ Classes:
 from dataclasses import dataclass, field
 from typing import Dict
 
-# Local application imports
 
 @dataclass
 class Peak:
     """Represents a chromatographic peak.
-    
+
     Attributes:
         start_time (float): The start time of the peak.
         apex_time (float): The apex time of the peak.
@@ -28,6 +27,7 @@ class Peak:
     Methods:
         duration: Calculate the duration of the peak.
     """
+
     start_time: float
     apex_time: float
     end_time: float
@@ -39,7 +39,7 @@ class Peak:
     @property
     def duration(self) -> float:
         """Calculate peak duration.
-        
+
         Returns:
             float: The duration of the peak.
         """

@@ -11,23 +11,28 @@ Classes:
 
 # Standard library imports
 import logging
-import numpy as np
 from dataclasses import dataclass
 
+import numpy as np
+from src.lcseq.core.chromatogram import Chromatogram
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
-from src.lcseq.core.chromatogram import Chromatogram
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 @dataclass
 class SWMChromatogramCorrectorConfig:
     """
     Configuration for the SWM baseline correction.
     """
+
     window_length: int = 3
-    padding_mode: str = 'edge'
+    padding_mode: str = "edge"
+
 
 class SWMChromatogramCorrector(PipelineComponent):
     """
@@ -43,7 +48,7 @@ class SWMChromatogramCorrector(PipelineComponent):
             correction.
     """
 
-    def __init__(self, config: SWMChromatogramCorrectorConfig = None): # type: ignore
+    def __init__(self, config: SWMChromatogramCorrectorConfig = None) -> None:  # type: ignore
         """
         Initializes the SWMChromatogramCorrector with the provided configuration.
 
@@ -52,47 +57,49 @@ class SWMChromatogramCorrector(PipelineComponent):
                 SWM baseline correction. Default is None, which uses the default
                 configuration.
         """
-        self.config = config or SWMChromatogramCorrectorConfig()
-        self.logger = logging.getLogger(__name__)
+        self.config: SWMChromatogramCorrectorConfig = (
+            config or SWMChromatogramCorrectorConfig()
+        )
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
     def _correct_chromatogram(self, chrom: Chromatogram) -> Chromatogram:
         """Apply SWM baseline correction to a single chromatogram."""
-        x = chrom.times
-        y = chrom.intensities
+        x: np.ndarray = chrom.times
+        y: np.ndarray = chrom.intensities
 
         # Validate inputs
         self._validate_inputs(y)
 
         # Calculate window parameters
-        half_window = self.config.window_length // 2
+        half_window: int = self.config.window_length // 2
 
         # Pad signal and times
-        y_pad = self._pad_signal(y, half_window)
-        x_pad = self._pad_signal(x, half_window)
+        y_pad: np.ndarray = self._pad_signal(y, half_window)
+        x_pad: np.ndarray = self._pad_signal(x, half_window)
 
         # Calculate baseline
-        y_min = self._compute_baseline(y_pad)
+        y_min: np.ndarray = self._compute_baseline(y_pad)
 
         # Trim y_min to match the length of y
-        y_min_trimmed = y_min[half_window: -half_window or None]
+        y_min_trimmed: np.ndarray = y_min[half_window:-half_window]
 
         # Ensure y_min_trimmed has the correct length
         if len(y_min_trimmed) != len(y):
-            y_min_trimmed = y_min[:len(y)]
+            y_min_trimmed: np.ndarray = y_min[: len(y)]
 
         # Subtract baseline
-        y_diff = y - y_min_trimmed
+        y_diff: np.ndarray = y - y_min_trimmed
 
         # Set non-zero values back to their original amplitudes
-        y_corrected = np.where(y_diff > 0, y, 0)
+        y_corrected: np.ndarray = np.where(y_diff > 0, y, 0)
 
         # Filter out zero points
-        non_zero_mask = y_corrected != 0
+        non_zero_mask: np.ndarray = y_corrected != 0
         if not np.any(non_zero_mask):
             raise ValueError("No non-zero points remain after baseline correction")
 
-        chrom.properties['corrected_intensities'] = y_corrected
-        chrom.properties['baseline'] = y_min_trimmed
+        chrom.properties["corrected_intensities"] = y_corrected
+        chrom.properties["baseline"] = y_min_trimmed
         return chrom
 
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
@@ -105,20 +112,21 @@ class SWMChromatogramCorrector(PipelineComponent):
         Returns:
             SinglePeptideInput: The corrected single peptide input.
         """
-        self.logger.info(f"Correcting chromatogram for peptide: {input_data.peptide.sequence_str}")
+        self.logger.info(
+            f"Correcting chromatogram for peptide: {input_data.peptide.sequence_str}"
+        )
         for encoding in input_data.peptide.encodings:
             if encoding.chromatogram is not None:
                 encoding.chromatogram = self._correct_chromatogram(
                     encoding.chromatogram
                 )
-                self.logger.info(f"Chromatogram corrected for {encoding}:" +
-                    f"{encoding.chromatogram.properties}")
+                self.logger.info(
+                    f"Chromatogram corrected for {encoding}:"
+                    + f"{encoding.chromatogram.properties}"
+                )
         return input_data
 
-    def process_peptide_set(
-        self,
-        input_data: PeptideSetInput
-    ) -> PeptideSetInput:
+    def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
         """
         Correct chromatograms for a set of peptides.
 
@@ -128,8 +136,10 @@ class SWMChromatogramCorrector(PipelineComponent):
         Returns:
             PeptideSetInput: The corrected set of peptides.
         """
-        self.logger.info("Correcting chromatograms for peptide set:" +
-            f"{len(input_data.peptides)} peptides")
+        self.logger.info(
+            "Correcting chromatograms for peptide set:"
+            + f"{len(input_data.peptides)} peptides"
+        )
         for peptide in input_data.peptides:
             for encoding in peptide.encodings:
                 if encoding.chromatogram is not None:
@@ -139,8 +149,7 @@ class SWMChromatogramCorrector(PipelineComponent):
         return input_data
 
     def process_hierarchy(
-        self,
-        input_data: PeptideHierarchyInput
+        self, input_data: PeptideHierarchyInput
     ) -> PeptideHierarchyInput:
         """
         Correct chromatograms in a peptide hierarchy.
@@ -152,6 +161,7 @@ class SWMChromatogramCorrector(PipelineComponent):
         Returns:
             PeptideHierarchyInput: The corrected hierarchy of peptides.
         """
+
         def process_node(node):
             for encoding in node.root.encodings:
                 if encoding.chromatogram is not None:
@@ -187,13 +197,12 @@ class SWMChromatogramCorrector(PipelineComponent):
         """Pad the input signal according to config."""
         try:
             return np.pad(
-                y,
-                (half_window, half_window),
-                mode=self.config.padding_mode
+                y, (half_window, half_window), mode=self.config.padding_mode  # type: ignore
             )
         except ValueError as e:
-            raise ValueError("Invalid padding mode: " + \
-                f"{self.config.padding_mode}") from e
+            raise ValueError(
+                "Invalid padding mode: " + f"{self.config.padding_mode}"
+            ) from e
 
     def _compute_baseline(self, y_padded: np.ndarray) -> np.ndarray:
         """Compute the baseline using sliding window minimum."""

@@ -4,51 +4,46 @@ This module provides a pipeline component for the LC-seq pipeline.
 """
 
 # Local application imports
-from .analyzers import (
-    GPPAnalyzer,
-    HierarchicalAnalyzer,
-    TestAnalyzer
-)
-from .detectors import (
-    StandardPeakDetector,
-    TestPeakDetector
-)
-from .io import (
-    StandardInput,
-    StandardOutput,
-    TestInput,
-    TestOutput
-)
-from .selectors import (
-    BasicPeakSelector,
-    GPPPeakSelector,
-    HierarchicalPeakSelector,
-    TestPeakSelector
-)
-from .correctors import AALSChromatogramCorrector
-from .visualizers import (
-    StandardChromatogramVisualizer,
-    HierarchyVisualizer,
-    HierarchicalChromatogramVisualizer, 
-    TestChromatogramVisualizer
-)
-from .validators import HierarchicalSynthesisValidator
+from src.lcseq.pipeline.components.analyzers import (
+    GPPPeakAnalyzer, StandardChromatogramAnalyzer, StandardPeakAnalyzer,
+    TestChromatogramAnalyzer, TestPeakAnalyzer)
+from src.lcseq.pipeline.components.correctors import (
+    AALSChromatogramCorrector, SWMChromatogramCorrector,
+    TestChromatogramCorrector)
+from src.lcseq.pipeline.components.detectors import (StandardPeakDetector,
+                                                     TestPeakDetector)
+from src.lcseq.pipeline.components.io import (StandardInput, StandardOutput,
+                                              TestInput, TestOutput)
+from src.lcseq.pipeline.components.selectors import (GPPPeakSelector,
+                                                     HierarchicalPeakSelector,
+                                                     TestPeakSelector)
 
-__all__ = [
+from .validators import HierarchicalSynthesisValidator
+from .visualizers import (HierarchicalChromatogramVisualizer,
+                          HierarchyVisualizer, StandardChromatogramVisualizer,
+                          TestChromatogramVisualizer)
+
+__all__: list[str] = [
+    "GPPPeakAnalyzer",
+    "StandardPeakAnalyzer",
+    "TestPeakAnalyzer",
+    "StandardChromatogramAnalyzer",
+    "TestChromatogramAnalyzer",
     "StandardPeakDetector",
     "TestPeakDetector",
     "StandardInput",
     "StandardOutput",
     "TestInput",
     "TestOutput",
-    "BasicPeakSelector",
     "GPPPeakSelector",
     "HierarchicalPeakSelector",
     "TestPeakSelector",
     "AALSChromatogramCorrector",
+    "SWMChromatogramCorrector",
+    "TestChromatogramCorrector",
     "StandardChromatogramVisualizer",
     "HierarchyVisualizer",
     "HierarchicalChromatogramVisualizer",
     "TestChromatogramVisualizer",
-    "HierarchicalSynthesisValidator"
+    "HierarchicalSynthesisValidator",
 ]

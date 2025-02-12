@@ -9,13 +9,10 @@ Classes:
 """
 
 # Standard library imports
-from dataclasses import dataclass
-from typing import Any, Dict, Optional
 from copy import deepcopy
+from dataclasses import dataclass
+from typing import Any, Dict
 
-# Third party imports
-
-# Local application imports
 
 @dataclass
 class BuildingBlock:
@@ -24,12 +21,13 @@ class BuildingBlock:
     Attributes:
         identifier (str): The identifier of the building block.
         properties (Dict[str, Any]): The properties of the building block.
-    
+
     Methods:
         __post_init__: Validate building block attributes after initialization.
         __eq__: Check if two building blocks are equal.
         __hash__: Get the hash of the building block.
     """
+
     identifier: str
     properties: Dict[str, Any]
 
@@ -73,6 +71,7 @@ class BuildingBlock:
         """
         return hash(self.identifier)
 
+
 class BuildingBlockRegistry:
     """Singleton registry for managing BuildingBlock instances.
 
@@ -83,6 +82,7 @@ class BuildingBlockRegistry:
         register: Register a new building block type.
         get: Retrieve a copy of a registered building block.
     """
+
     _blocks: Dict[str, BuildingBlock] = {}
 
     @classmethod

@@ -3,6 +3,7 @@
 Thank you for your interest in contributing to the ChromatographicPeakPicking project! Contributions are welcome and appreciated. This document outlines the process for contributing to this project.
 
 ## Table of Contents
+
 1. [Code of Conduct](#code-of-conduct)
 2. [How to Contribute](#how-to-contribute)
 3. [Reporting Bugs](#reporting-bugs)
@@ -22,6 +23,7 @@ By participating in this project, you agree to abide by the [Code of Conduct](CO
 ### Reporting Bugs
 
 If you find a bug, please report it by creating an issue on GitHub. Provide the following information:
+
 - A clear and descriptive title.
 - A detailed description of the problem.
 - Steps to reproduce the issue.
@@ -30,6 +32,7 @@ If you find a bug, please report it by creating an issue on GitHub. Provide the 
 ### Suggesting Enhancements
 
 If you have an idea for an enhancement, please suggest it by creating an issue. Provide the following information:
+
 - A clear and descriptive title.
 - A detailed description of the enhancement.
 - A rationale for why this enhancement would be useful.
@@ -38,6 +41,7 @@ If you have an idea for an enhancement, please suggest it by creating an issue. 
 ### Pull Requests
 
 We welcome pull requests for bug fixes, enhancements, and documentation improvements. To submit a pull request:
+
 1. **Fork the repository** and clone it to your local machine.
 2. **Create a new branch** for your feature or bug fix (`git checkout -b feature/your-feature-name`).
 3. **Make your changes** in your branch.
@@ -46,6 +50,7 @@ We welcome pull requests for bug fixes, enhancements, and documentation improvem
 6. **Create a pull request** from your branch to the `main` branch of the original repository.
 
 Please ensure your pull request:
+
 - Includes a clear description of the changes.
 - References any related issues or pull requests.
 - Passes all tests and adheres to the project's coding style.
@@ -55,18 +60,21 @@ Please ensure your pull request:
 To set up your development environment:
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/Adiaslow/ChromatographicPeakPicking.git
    cd ChromatographicPeakPicking
    ```
 
 2. **Create a virtual environment** and activate it:
+
    ```bash
    python -m venv venv
    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
    ```
 
 3. **Install the dependencies**:
+
    ```bash
    pip install -r requirements.txt
    ```
@@ -91,6 +99,7 @@ We recommend using tools like `flake8` and `black` to check and format your code
 Before submitting a pull request, ensure that all tests pass. To run the tests:
 
 1. **Install testing dependencies**:
+
    ```bash
    pip install -r requirements-dev.txt
    ```

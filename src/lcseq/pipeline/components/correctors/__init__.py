@@ -7,15 +7,15 @@ correcting chromatograms.
 """
 
 # Local application imports
-from src.lcseq.pipeline.components.correctors.aals_chromatogram_corrector \
-    import AALSChromatogramCorrector
-from src.lcseq.pipeline.components.correctors.swm_chromatogram_corrector \
-    import SWMChromatogramCorrector
-from src.lcseq.pipeline.components.correctors.test_chromatogram_corrector \
-    import TestChromatogramCorrector
+from src.lcseq.pipeline.components.correctors.aals_chromatogram_corrector import \
+    AALSChromatogramCorrector
+from src.lcseq.pipeline.components.correctors.swm_chromatogram_corrector import \
+    SWMChromatogramCorrector
+from src.lcseq.pipeline.components.correctors.test_chromatogram_corrector import \
+    TestChromatogramCorrector
 
-__all__ = [
+__all__: list[str] = [
     "AALSChromatogramCorrector",
     "SWMChromatogramCorrector",
-    "TestChromatogramCorrector"
+    "TestChromatogramCorrector",
 ]

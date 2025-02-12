@@ -1,4 +1,5 @@
 # Chromatographic Peak Picking
+
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 ![pytest](https://github.com/Adiaslow/ChromatographicPeakPicking/actions/workflows/pytest.yml/badge.svg)
 [![Pylint](https://github.com/Adiaslow/ChromatographicPeakPicking/actions/workflows/pylint.yml/badge.svg)](https://github.com/Adiaslow/ChromatographicPeakPicking/actions/workflows/pylint.yml)
@@ -15,7 +16,9 @@ This project is a Python-based tool for chromatographic peak picking and analysi
 ### Stock Pipelines
 
 #### GPP
+
 The GPP pipeline is designed to replicate the behavior of the original LC-Seq Gaussian Peak Picking pipeline. It relies on the following components:
+
 - StandardInput: Reads the input data from a CSV file.
 - StandardChromatogramAnalyzer: Analyzes the chromatogram data.
 - SWMChromatogramCorrector: Corrects the chromatogram data.
@@ -27,7 +30,9 @@ The GPP pipeline is designed to replicate the behavior of the original LC-Seq Ga
 - StandardOutput: Writes the output data to a CSV file.
 
 #### CC
+
 The CC pipeline is designed to replicate the behavior of the original LC-Seq Classic Chrome pipeline. It relies on the following components:
+
 - StandardInput: Reads the input data from a CSV file.
 - StandardChromatogramAnalyzer: Analyzes the chromatogram data.
 - AALSChromatogramCorrector: Corrects the chromatogram data using the Adaptive Asymmetric Least Squares (AALS) algorithm.
@@ -39,7 +44,9 @@ The CC pipeline is designed to replicate the behavior of the original LC-Seq Cla
 - StandardOutput: Writes the output data to a CSV file.
 
 #### Standard
+
 The Standard pipeline is a basic pipeline that can be used as-is or as a starting point for new pipelines. It relies on the following components:
+
 - StandardInput: Reads the input data from a CSV file.
 - StandardChromatogramAnalyzer: Analyzes the chromatogram data.
 - StandardPeakDetector: Detects the peaks in the chromatogram data.
@@ -68,7 +75,9 @@ The Standard pipeline is a basic pipeline that can be used as-is or as a startin
 ---
 
 ## Installation
+
 The base package can be installed using pip:
+
 ```bash
 pip install lcseq
 ```
@@ -108,7 +117,7 @@ standard.run()
 
 ## Custom Pipelines
 
-Custom pipelines can be created by extending the `Pipeline` class and implementing the `run` method.
+Custom pipelines can be created by extending the `Pipeline` class and implementing the `run` method. See `src/lcseq/pipelines/standard.py` for a basic example.
 
 ```python
 # path/to/custom/pipeline.py
@@ -152,8 +161,8 @@ custom_componentN.config.parameterN = "valueNN"
 class CustomPipeline(Pipeline):
     def __init__(self, input_file_path: str, plot_chromatograms: bool):
         super().__init__([
-            StandardInput(), # or CustomInput() 
-            custom_component1, # if custom config or CustomComponent1() for default config  
+            StandardInput(), # or CustomInput()
+            custom_component1, # if custom config or CustomComponent1() for default config
             custom_component2, # if custom config or CustomComponent2() for default config
             ...,
             custom_componentN, # if custom config or CustomComponentN() for default config
@@ -172,7 +181,7 @@ class CustomPipeline(Pipeline):
 
 ## Custom Components
 
-Custom components can be created by extending the `PipelineComponent` class and implementing the `process` method. See `src/lcseq/pipeline/base.py` for basic structure.
+Custom components can be created by extending the `PipelineComponent` class and implementing the `process` method. See `src/lcseq/pipeline/base.py` for basic structure or any of the standard components for examples.
 
 ```python
 # path/to/custom/component.py

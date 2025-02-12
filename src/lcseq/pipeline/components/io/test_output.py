@@ -13,9 +13,12 @@ from typing import Optional
 
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
+from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
+                                            PeptideSetInput,
+                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
+
 
 class TestOutput(PipelineComponent):
     """TestOutput class for handling test output data.
@@ -25,7 +28,8 @@ class TestOutput(PipelineComponent):
         process_peptide_set: Process a set of peptides output.
         process_hierarchy: Process a hierarchy of peptides output.
     """
-    def __init__(self, input_file_path: Optional[str] = None):
+
+    def __init__(self, input_file_path: Optional[str] = None) -> None:
         """Initialize the TestOutput.
 
         Args:
@@ -33,7 +37,7 @@ class TestOutput(PipelineComponent):
                 Defaults to None.
         """
         super().__init__()
-        self.input_file_path = input_file_path
+        self.input_file_path: Optional[str] = input_file_path
 
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
         """Process a single peptide output.
@@ -59,7 +63,9 @@ class TestOutput(PipelineComponent):
         logger.info(f"Outputting results for peptide set: {input_data.peptides}")
         return input_data
 
-    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+    def process_hierarchy(
+        self, input_data: PeptideHierarchyInput
+    ) -> PeptideHierarchyInput:
         """Process a hierarchy of peptides output.
 
         Args:

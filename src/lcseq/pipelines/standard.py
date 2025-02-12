@@ -9,14 +9,15 @@ Classes:
         chromatogram data processing.
 """
 
-from ..pipeline.pipeline import Pipeline
-from ..pipeline.components.io import StandardInput
-from ..pipeline.components.analyzers import StandardChromatogramAnalyzer
+from ..pipeline.components.analyzers import (StandardChromatogramAnalyzer,
+                                             StandardPeakAnalyzer)
 from ..pipeline.components.detectors import StandardPeakDetector
+from ..pipeline.components.io import StandardInput, StandardOutput
 from ..pipeline.components.selectors import BasicPeakSelector
-from ..pipeline.components.analyzers import StandardPeakAnalyzer
-from ..pipeline.components.io import StandardOutput
 from ..pipeline.components.visualizers import StandardChromatogramVisualizer
+# Local application imports
+from ..pipeline.pipeline import Pipeline
+
 
 class StandardPipe(Pipeline):
     """
@@ -41,12 +42,14 @@ class StandardPipe(Pipeline):
             plot_chromatograms (bool): Optional; Flag to determine whether to plot
                 chromatograms. Default is False.
         """
-        super().__init__([
-            StandardInput(),
-            StandardChromatogramAnalyzer(),
-            StandardPeakDetector(),
-            StandardPeakAnalyzer(),
-            BasicPeakSelector(),
-            StandardChromatogramVisualizer(plot_chromatograms=plot_chromatograms),
-            StandardOutput(input_file_path)
-        ])
+        super().__init__(
+            [
+                StandardInput(),
+                StandardChromatogramAnalyzer(),
+                StandardPeakDetector(),
+                StandardPeakAnalyzer(),
+                BasicPeakSelector(),
+                StandardChromatogramVisualizer(plot_chromatograms=plot_chromatograms),
+                StandardOutput(input_file_path),
+            ]
+        )

@@ -9,17 +9,19 @@ Classes:
         chromatogram data processing.
 """
 
-from ..pipeline.pipeline import Pipeline
-from ..pipeline.components.io import StandardInput
-from ..pipeline.components.analyzers import StandardChromatogramAnalyzer
+from ..pipeline.components.analyzers import (GPPPeakAnalyzer,
+                                             StandardChromatogramAnalyzer,
+                                             StandardPeakAnalyzer)
 from ..pipeline.components.correctors import SWMChromatogramCorrector
 from ..pipeline.components.detectors import StandardPeakDetector
-from ..pipeline.components.analyzers import GPPPeakAnalyzer
+from ..pipeline.components.io import StandardInput, StandardOutput
 from ..pipeline.components.selectors import GPPPeakSelector
-from ..pipeline.components.analyzers import StandardPeakAnalyzer
-from ..pipeline.components.io import StandardOutput
 from ..pipeline.components.visualizers import StandardChromatogramVisualizer
-from ..pipeline.components.visualizers.standard_chromatogram_visualizer import StandardChromatogramVisualizerConfig
+from ..pipeline.components.visualizers.standard_chromatogram_visualizer import \
+    StandardChromatogramVisualizerConfig
+# Local application imports
+from ..pipeline.pipeline import Pipeline
+
 
 class GPPPipe(Pipeline):
     """
@@ -45,15 +47,19 @@ class GPPPipe(Pipeline):
                 chromatograms. Default is False.
         """
         config = StandardChromatogramVisualizerConfig(plot_corrected_gaussians=True)
-        visualizer = StandardChromatogramVisualizer(config=config, plot_chromatograms=plot_chromatograms)
-        super().__init__([
-            StandardInput(),
-            StandardChromatogramAnalyzer(),
-            SWMChromatogramCorrector(),
-            StandardPeakDetector(),
-            StandardPeakAnalyzer(),
-            GPPPeakAnalyzer(),
-            GPPPeakSelector(),
-            visualizer,
-            StandardOutput(input_file_path)
-        ])
+        visualizer = StandardChromatogramVisualizer(
+            config=config, plot_chromatograms=plot_chromatograms
+        )
+        super().__init__(
+            [
+                StandardInput(),
+                StandardChromatogramAnalyzer(),
+                SWMChromatogramCorrector(),
+                StandardPeakDetector(),
+                StandardPeakAnalyzer(),
+                GPPPeakAnalyzer(),
+                GPPPeakSelector(),
+                visualizer,
+                StandardOutput(input_file_path),
+            ]
+        )
