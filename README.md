@@ -10,7 +10,11 @@
 
 This project is a Python-based tool for chromatographic peak picking and analysis using the modular LC-Seq pipeline framework. The framework is designed to be highly configurable and extensible, allowing for the addition of custom components, configurations, and pipelines. The built-in pipelines are designed to replicate the behavior of the original LC-Seq pipeline (see GPP and CC), as well as a Standard (basic) pipeline that can be used as-is or as a starting point for new pipelines.
 
-### GPP
+---
+
+### Stock Pipelines
+
+#### GPP
 The GPP pipeline is designed to replicate the behavior of the original LC-Seq Gaussian Peak Picking pipeline. It relies on the following components:
 - StandardInput: Reads the input data from a CSV file.
 - StandardChromatogramAnalyzer: Analyzes the chromatogram data.
@@ -22,7 +26,7 @@ The GPP pipeline is designed to replicate the behavior of the original LC-Seq Ga
 - StandardChromatogramVisualizer: Visualizes the chromatogram data.
 - StandardOutput: Writes the output data to a CSV file.
 
-### CC
+#### CC
 The CC pipeline is designed to replicate the behavior of the original LC-Seq Classic Chrome pipeline. It relies on the following components:
 - StandardInput: Reads the input data from a CSV file.
 - StandardChromatogramAnalyzer: Analyzes the chromatogram data.
@@ -34,7 +38,7 @@ The CC pipeline is designed to replicate the behavior of the original LC-Seq Cla
 - HierarchyVisualizer: Visualizes the constructed hierarchy of the peptide library.
 - StandardOutput: Writes the output data to a CSV file.
 
-### StandardPipe
+#### Standard
 The Standard pipeline is a basic pipeline that can be used as-is or as a starting point for new pipelines. It relies on the following components:
 - StandardInput: Reads the input data from a CSV file.
 - StandardChromatogramAnalyzer: Analyzes the chromatogram data.
@@ -42,6 +46,8 @@ The Standard pipeline is a basic pipeline that can be used as-is or as a startin
 - StandardPeakAnalyzer: Analyzes the peaks in the chromatogram data.
 - StandardChromatogramVisualizer: Visualizes the chromatogram data.
 - StandardOutput: Writes the output data to a CSV file.
+
+---
 
 ## Features
 
@@ -59,6 +65,8 @@ The Standard pipeline is a basic pipeline that can be used as-is or as a startin
   - Multiple chromatograms
   - Hierarchy of chromatograms
 
+---
+
 ## Installation
 The base package can be installed using pip:
 ```bash
@@ -67,3 +75,153 @@ pip install lcseq
 
 ## Usage
 
+### Stock Pipelines
+
+#### GPP
+
+```python
+from lcseq.pipelines import GPPPipe
+
+gpp = GPPPipe(input_file_path="data/gpp_input.csv")
+gpp.run()
+```
+
+#### CC
+
+```python
+from lcseq.pipelines import CCPipe
+
+cc = CCPipe(input_file_path="data/cc_input.csv")
+cc.run()
+```
+
+#### StandardPipe
+
+```python
+from lcseq.pipelines import StandardPipe
+
+standard = StandardPipe(input_file_path="data/standard_input.csv")
+standard.run()
+```
+
+---
+
+## Custom Pipelines
+
+Custom pipelines can be created by extending the `Pipeline` class and implementing the `run` method.
+
+```python
+# path/to/custom/pipeline.py
+
+# Import the Pipeline class
+from lcseq.pipeline import Pipeline
+
+# Import the StandardInput and StandardOutput components
+from lcseq.pipeline.components.io import StandardInput, StandardOutput
+
+# Import custom components
+from ..path.to.custom.components import (
+    CustomComponent1,
+    CustomComponent2,
+    ...,
+    CustomComponentN
+)
+
+# Initialize components with custom parameters
+custom_component1 = CustomComponent1()
+custom_component1.config.parameter1 = "value11"
+custom_component1.config.parameter2 = "value21"
+...
+custom_component1.config.parameterN = "valueN1"
+
+custom_component2 = CustomComponent2()
+custom_component2.config.parameter1 = "value12"
+custom_component2.config.parameter2 = "value22"
+...
+custom_component2.config.parameterN = "valueN2"
+
+...
+
+custom_componentN = CustomComponentN()
+custom_componentN.config.parameter1 = "value1N"
+custom_componentN.config.parameter2 = "value2N"
+...
+custom_componentN.config.parameterN = "valueNN"
+
+# Initialize the pipeline
+class CustomPipeline(Pipeline):
+    def __init__(self, input_file_path: str, plot_chromatograms: bool):
+        super().__init__([
+            StandardInput(), # or CustomInput() 
+            custom_component1, # if custom config or CustomComponent1() for default config  
+            custom_component2, # if custom config or CustomComponent2() for default config
+            ...,
+            custom_componentN, # if custom config or CustomComponentN() for default config
+            StandardChromatogramVisualizer(plot_chromatograms=plot_chromatograms) # or HierarchicalChromatogramVisualizer(),
+            StandardOutput(input_file_path) # or CustomOutput(input_file_path)
+        ])
+
+    def run(self, input_data: ProcessableInput) -> ProcessableInput:
+        return super().run(input_data)
+        # Add custom logic here
+        ...
+        return input_data
+```
+
+---
+
+## Custom Components
+
+Custom components can be created by extending the `PipelineComponent` class and implementing the `process` method. See `src/lcseq/pipeline/base.py` for basic structure.
+
+```python
+# path/to/custom/component.py
+
+# Standard library imports
+import logging
+...
+
+# Import the PipelineComponent class
+from lcseq.pipeline.components import PipelineComponent
+
+# Local application imports
+from src.lcseq.pipeline.input_types import (
+    ProcessableInput,
+    SinglePeptideInput,
+    PeptideSetInput,
+    PeptideHierarchyInput
+)
+from src.lcseq.core.peptide import Peptide
+from src.lcseq.core.hierarchy import PeptideHierarchy
+
+class CustomComponentConfig:
+    ...
+
+class CustomComponent(PipelineComponent):
+    def __init__(self):
+        super().__init__()
+        self.logger = logging.getLogger(__name__)
+        self.config = CustomComponentConfig()
+    def process(self, input_data: ProcessableInput) -> ProcessableInput:
+        # Add custom logic here
+        ...
+        return input_data
+
+    def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
+        return super().process_peptide(input_data)
+        # Add custom logic here
+        ...
+        return input_data
+
+    def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
+        return super().process_peptide_set(input_data)
+        # Add custom logic here
+        ...
+        return input_data
+
+    def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
+        return super().process_hierarchy(input_data)
+        # Add custom logic here
+        ...
+        return input_data
+```

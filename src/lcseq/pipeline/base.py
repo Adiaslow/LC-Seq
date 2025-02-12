@@ -7,8 +7,11 @@ Classes:
     PipelineComponent: Abstract base class for pipeline components.
 """
 
+# Standard library imports
 from abc import ABC, abstractmethod
 import logging
+
+# Local application imports
 from src.lcseq.pipeline.input_types import (
     ProcessableInput,
     SinglePeptideInput,
