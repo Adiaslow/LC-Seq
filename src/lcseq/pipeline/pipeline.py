@@ -8,9 +8,17 @@ Classes:
     Pipeline: Defines a pipeline of processing components.
 """
 
+from dataclasses import dataclass
 from typing import List
 from .input_types import ProcessableInput
 from .base import PipelineComponent
+
+@dataclass
+class PipelineConfig:
+    """Configuration for pipeline behavior."""
+    hierarchical: bool = False
+    plot_chromatograms: bool = False
+    input_file_path: str = ""
 
 class Pipeline:
     """Pipeline class for processing data through a sequence of components.
@@ -23,7 +31,11 @@ class Pipeline:
             defining the processing steps.
     """
 
-    def __init__(self, components: List[PipelineComponent]):
+    def __init__(
+        self,
+        components: List[PipelineComponent],
+        config: PipelineConfig = None #type: ignore
+    ):
         """Initializes the Pipeline with the provided components.
 
         Args:
@@ -31,6 +43,10 @@ class Pipeline:
                 the pipeline.
         """
         self.components = components
+        self.config: PipelineConfig = config
+
+        for component in self.components:
+            component.pipeline = self
 
     def run(self, input_data: ProcessableInput) -> ProcessableInput:
         """Executes the pipeline components in sequence on the input data.

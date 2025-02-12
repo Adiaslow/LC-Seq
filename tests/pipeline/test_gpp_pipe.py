@@ -1,4 +1,4 @@
-# tests/pipeline/test_standard_pipe.py
+# tests/pipeline/test_gpp_pipe.py
 """Tests for GPPPipeline functionality."""
 import logging
 import pytest

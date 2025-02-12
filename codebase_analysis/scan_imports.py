@@ -1,10 +1,32 @@
+# codebase_analysis/scan_imports.py
+"""
+This script scans a project for external imports and prints them.
+
+Methods:
+    extract_imports: Extract all imports from a Python file.
+    is_internal_import: Check if an import is internal to the project.
+    find_project_packages: Find all potential Python packages in the project.
+    scan_project_imports: Scan all Python files in a project and collect their imports.
+    get_package_name: Convert import names to package names for common packages.
+    main: Main function to run the import scanner.
+"""
+
+# Standard library imports
 import ast
 import os
 from collections import defaultdict
 from pathlib import Path
+import sys
 
 def extract_imports(file_path):
-    """Extract all imports from a Python file."""
+    """Extract all imports from a Python file.
+    
+    Args:
+        file_path (str): The path to the Python file.
+
+    Returns:
+        set: A set of import names.
+    """
     with open(file_path, 'r', encoding='utf-8') as file:
         try:
             tree = ast.parse(file.read())
@@ -25,11 +47,26 @@ def extract_imports(file_path):
     return imports
 
 def is_internal_import(import_name, project_packages):
-    """Check if an import is internal to the project."""
+    """Check if an import is internal to the project.
+    
+    Args:
+        import_name (str): The import name to check.
+        project_packages (set): A set of project packages.
+
+    Returns:
+        bool: True if the import is internal to the project, False otherwise.
+    """
     return import_name in project_packages
 
 def find_project_packages(directory):
-    """Find all potential Python packages in the project."""
+    """Find all potential Python packages in the project.
+    
+    Args:
+        directory (str): The directory to scan for packages.
+
+    Returns:
+        set: A set of package names.
+    """
     packages = set()
     for root, dirs, files in os.walk(directory):
         if '__init__.py' in files:
@@ -41,7 +78,14 @@ def find_project_packages(directory):
     return packages
 
 def scan_project_imports(directory):
-    """Scan all Python files in a project and collect their imports."""
+    """Scan all Python files in a project and collect their imports.
+    
+    Args:
+        directory (str): The directory to scan for imports.
+
+    Returns:
+        dict: A dictionary of imports and their file paths.
+    """
     project_packages = find_project_packages(directory)
     external_imports = defaultdict(set)
 
@@ -59,7 +103,14 @@ def scan_project_imports(directory):
     return external_imports
 
 def get_package_name(import_name):
-    """Convert import names to package names for common packages."""
+    """Convert import names to package names for common packages.
+    
+    Args:
+        import_name (str): The import name to convert.
+
+    Returns:
+        str: The package name.
+    """
     package_mapping = {
         'PIL': 'pillow',
         'cv2': 'opencv-python',
@@ -71,7 +122,11 @@ def get_package_name(import_name):
     return package_mapping.get(import_name, import_name.lower())
 
 def main(directory='.'):
-    """Main function to run the import scanner."""
+    """Main function to run the import scanner.
+    
+    Args:
+        directory (str): The directory to scan for imports.
+    """
     print(f"Scanning directory: {directory}")
     external_imports = scan_project_imports(directory)
 
@@ -90,6 +145,6 @@ def main(directory='.'):
         print(get_package_name(import_name))
 
 if __name__ == '__main__':
-    import sys
+    """Main entry point for the script."""
     directory = sys.argv[1] if len(sys.argv) > 1 else '.'
     main(directory)

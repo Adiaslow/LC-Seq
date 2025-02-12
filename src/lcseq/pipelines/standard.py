@@ -9,30 +9,25 @@ Classes:
         chromatogram data processing.
 """
 
-from src.lcseq.pipeline.components.standard_components.standard_chromatogram_analyzer \
-    import StandardChromatogramAnalyzer
-from src.lcseq.pipeline.components.standard_components.standard_chromatogram_visualizer\
-    import StandardChromatogramVisualizer
-from src.lcseq.pipeline.components.standard_components.standard_input \
-    import StandardInput
-from src.lcseq.pipeline.components.standard_components.standard_output \
-    import StandardOutput
-from src.lcseq.pipeline.components.standard_components.standard_peak_analyzer \
-    import StandardPeakAnalyzer
-from src.lcseq.pipeline.components.standard_components.standard_peak_detector \
-    import StandardPeakDetector
-from src.lcseq.pipeline.components.basic_peak_selector import BasicPeakSelector
-from src.lcseq.pipeline.pipeline import Pipeline
+from ..pipeline.pipeline import Pipeline
+from ..pipeline.components.io import StandardInput
+from ..pipeline.components.analyzers import StandardChromatogramAnalyzer
+from ..pipeline.components.detectors import StandardPeakDetector
+from ..pipeline.components.selectors import BasicPeakSelector
+from ..pipeline.components.analyzers import StandardPeakAnalyzer
+from ..pipeline.components.io import StandardOutput
+from ..pipeline.components.visualizers import StandardChromatogramVisualizer
 
 class StandardPipe(Pipeline):
     """
     StandardPipe class for setting up a standard pipeline with a sequence of standard components.
 
-    This class inherits from the Pipeline class and initializes it with a specific sequence of standard
-    components to process chromatogram data.
+    This class inherits from the Pipeline class and initializes it with a specific
+    sequence of standard components to process chromatogram data.
 
     Attributes:
-        input_file_path (str): The file path for the output component to write the results.
+        input_file_path (str): The file path for the output component to write the
+            results.
         plot_chromatograms (bool): Flag to determine whether to plot chromatograms.
     """
 
@@ -41,9 +36,10 @@ class StandardPipe(Pipeline):
         Initializes the StandardPipe with the provided input file path and optional plotting flag.
 
         Args:
-            input_file_path (str): The file path for the output component to write the results.
-            plot_chromatograms (bool): Optional; Flag to determine whether to plot chromatograms.
-                Default is False.
+            input_file_path (str): The file path for the output component to write the
+                results.
+            plot_chromatograms (bool): Optional; Flag to determine whether to plot
+                chromatograms. Default is False.
         """
         super().__init__([
             StandardInput(),

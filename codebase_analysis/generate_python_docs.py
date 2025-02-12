@@ -1,15 +1,30 @@
 # docs/codebase_analysis/generate_python_docs.py
 """
 Generate documentation for the Python codebase.
+
+Methods:
+    extract_python_info: Extract relevant information from a Python file.
+    process_directory: Process a directory to extract information from Python files.
+    generate_documentation: Generate documentation for all Python files in the directory.   
 """
+
+# Standard library imports
 import os
 from pathlib import Path
 import datetime
 import ast
 from typing import Dict, Any, List
+import sys
 
 def extract_python_info(file_path: Path) -> Dict[str, Any]:
-    """Extract relevant information from a Python file."""
+    """Extract relevant information from a Python file.
+    
+    Args:
+        file_path (Path): The path to the Python file.
+
+    Returns:
+        Dict[str, Any]: The extracted information.
+    """
     with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
         content = f.read()
         lines = content.split('\n')
@@ -43,7 +58,16 @@ def extract_python_info(file_path: Path) -> Dict[str, Any]:
     return info
 
 def process_directory(root: str, files: List[str], base_path: str) -> tuple[int, int, List[str]]:
-    """Process a directory to extract information from Python files."""
+    """Process a directory to extract information from Python files.
+    
+    Args:
+        root (str): The root directory.
+        files (List[str]): The list of files in the directory.
+        base_path (str): The base path.
+
+    Returns:
+        tuple[int, int, List[str]]: The total files, total functions, and main content.
+    """
     total_files = 0
     total_functions = 0
     main_content = []
@@ -93,7 +117,12 @@ def process_directory(root: str, files: List[str], base_path: str) -> tuple[int,
 def generate_documentation(
     directory: str,
     output_file: str = 'codebase_analysis/python_codebase_summary.md'):
-    """Generate documentation for all Python files in the directory."""
+    """Generate documentation for all Python files in the directory.
+    
+    Args:
+        directory (str): The directory to generate documentation for.
+        output_file (str): The output file.
+    """
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Track total files and functions for summary
@@ -130,7 +159,7 @@ def generate_documentation(
         f.write('\n'.join(document_parts))
 
 if __name__ == "__main__":
-    import sys
+    """Main entry point for the script."""
     if len(sys.argv) != 2:
         print("Usage: python script.py <path_to_python_directory>")
         sys.exit(1)

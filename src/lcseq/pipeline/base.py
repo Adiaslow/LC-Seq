@@ -8,6 +8,7 @@ Classes:
 """
 
 from abc import ABC, abstractmethod
+import logging
 from src.lcseq.pipeline.input_types import (
     ProcessableInput,
     SinglePeptideInput,
@@ -30,6 +31,10 @@ class PipelineComponent(ABC):
         process_hierarchy: Process a hierarchy of peptides.
         process: Main entry point for processing any type of input.
     """
+    def __init__(self):
+        self._pipeline = None
+        self.logger = logging.getLogger(__name__)
+
 
     @abstractmethod
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
@@ -82,3 +87,13 @@ class PipelineComponent(ABC):
             ProcessableInput: The processed data.
         """
         return input_data.accept(self)
+
+    @property
+    def pipeline(self):
+        """Get the pipeline this component belongs to."""
+        return self._pipeline
+
+    @pipeline.setter
+    def pipeline(self, pipeline):
+        """Set the pipeline this component belongs to."""
+        self._pipeline = pipeline

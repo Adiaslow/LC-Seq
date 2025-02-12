@@ -1,4 +1,15 @@
 # src/lcseq/pipeline/components/standard_peak_analyzer.py
+"""
+This module provides a pipeline component for analyzing standard peaks in peptide chromatograms.
+It includes a configuration class for specifying analysis parameters and an analyzer
+class for performing the analysis.
+
+Classes:
+    StandardPeakAnalyzerConfig: Configuration for peak analysis parameters.
+    StandardPeakAnalyzer: Analyzer for performing the StandardPeakAnalysis.
+"""
+
+# Standard library imports
 import logging
 import numpy as np
 from scipy.signal import peak_widths
@@ -6,6 +17,7 @@ from scipy.optimize import curve_fit
 from dataclasses import dataclass, field
 from typing import Dict, List
 
+# Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
 from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
 from src.lcseq.core.chromatogram import Peak, Chromatogram
@@ -14,7 +26,16 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class StandardPeakAnalyzerConfig:
-    """Configuration for peak analysis parameters."""
+    """Configuration for peak analysis parameters.
+    
+    Attributes:
+        threshold (float): The threshold for peak detection.
+        min_prominence (float): The minimum prominence for peak detection.
+        min_width (float): The minimum width for peak detection.
+        max_width (float): The maximum width for peak detection.
+        min_resolution (float): The minimum resolution for peak detection.
+        min_symmetry (float): The minimum symmetry for peak detection.
+    """
     threshold: float = 0.5
     min_prominence: float = 0.1
     min_width: float = 0.1
@@ -23,6 +44,13 @@ class StandardPeakAnalyzerConfig:
     min_symmetry: float = 0.5
 
 class StandardPeakAnalyzer(PipelineComponent):
+    """Pipeline component for analyzing standard peaks in peptide chromatograms.
+    
+    Methods:
+        process_peptide: Process a single peptide's chromatogram
+        process_peptide_set: Process a set of peptides' chromatograms
+        process_hierarchy: Process a hierarchy of peptides' chromatograms
+    """
     def __init__(self, config: StandardPeakAnalyzerConfig = None): # type: ignore
         self.config = config or StandardPeakAnalyzerConfig()
         self.logger = logging.getLogger(__name__)
@@ -33,9 +61,16 @@ class StandardPeakAnalyzer(PipelineComponent):
         return amplitude * np.exp(-(x - mean) ** 2 / (2 * std ** 2))
 
     def analyze_peak(self, peak: Peak, chrom: Chromatogram) -> Peak:
-        """Analyze a single peak and calculate its characteristics."""
+        """Analyze a single peak and calculate its characteristics.
+
+        Args:
+            peak (Peak): The peak to analyze.
+            chrom (Chromatogram): The chromatogram to analyze.
+
+        Returns:
+            Peak: The analyzed peak.
+        """
         try:
-            # Calculate basic peak metrics
             peak_slice = slice(
                 np.searchsorted(chrom.times, peak.start_time),
                 np.searchsorted(chrom.times, peak.end_time) + 1
@@ -134,7 +169,15 @@ class StandardPeakAnalyzer(PipelineComponent):
         return peak
 
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
-        """Analyze peaks for a single peptide."""
+        """Analyze peaks for a single peptide.
+
+        Args:
+            input_data (SinglePeptideInput): The input data representing a single
+                peptide.
+
+        Returns:
+            SinglePeptideInput: The input data with the peaks analyzed.
+        """
         self.logger.info(f"Analyzing peaks for peptide: {input_data.peptide.sequence_str}")
         for encoding in input_data.peptide.encodings:
             if encoding.chromatogram is not None and encoding.chromatogram.peaks:
@@ -143,7 +186,15 @@ class StandardPeakAnalyzer(PipelineComponent):
         return input_data
 
     def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
-        """Analyze peaks for a set of peptides."""
+        """Analyze peaks for a set of peptides.
+
+        Args:
+            input_data (PeptideSetInput): The input data representing a set of
+                peptides.
+
+        Returns:
+            PeptideSetInput: The input data with the peaks analyzed.
+        """
         self.logger.info(f"Analyzing peaks for peptide set: {len(input_data.peptides)} peptides")
         for peptide in input_data.peptides:
             for encoding in peptide.encodings:
@@ -153,7 +204,15 @@ class StandardPeakAnalyzer(PipelineComponent):
         return input_data
 
     def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
-        """Analyze peaks for a hierarchy of peptides."""
+        """Analyze peaks for a hierarchy of peptides.
+
+        Args:
+            input_data (PeptideHierarchyInput): The input data representing a hierarchy
+                of peptides.
+
+        Returns:
+            PeptideHierarchyInput: The input data with the peaks analyzed.
+        """
         def process_node(node):
             for encoding in node.root.encodings:
                 if encoding.chromatogram is not None and encoding.chromatogram.peaks:

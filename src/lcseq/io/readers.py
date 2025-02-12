@@ -1,13 +1,38 @@
 # src/lcseq/io/readers.py
+"""
+This module provides classes for reading and parsing peptide data from CSV files.
+It includes a ColumnMapping class for defining the mapping of input columns to the
+output YAML structure, and a PeptideDataReader class for reading and parsing the data.
+
+Classes:
+    ColumnMapping: Defines how input columns map to output YAML structure.
+    ChromatogramDataParser: Parses chromatogram data from a string.
+    PeptideDataReader: Reads and parses peptide data from CSV files.
+"""
+
+# Standard library imports
 from dataclasses import dataclass
 from typing import Dict, List, Callable, Optional
 import pandas as pd
 import yaml
 from pathlib import Path
 
+# Local application imports
+
 @dataclass
 class ColumnMapping:
-    """Defines how input columns map to output YAML structure."""
+    """Defines how input columns map to output YAML structure.
+    
+    Attributes:
+        building_block_columns (Dict[str, List[str]]): The columns that map to building blocks.
+        peptide_property_columns (List[str]): The columns that map to peptide properties.
+        chromatogram_column (str): The column that maps to the chromatogram.
+        identifier_column (str): The column that maps to the identifier.
+        num_building_blocks (int): The number of building blocks.
+    
+    Methods:
+        from_config: Create mapping from a YAML configuration file.
+    """
     building_block_columns: Dict[str, List[str]]
     peptide_property_columns: List[str]
     chromatogram_column: str
@@ -16,7 +41,14 @@ class ColumnMapping:
 
     @classmethod
     def from_config(cls, config_path: Path) -> 'ColumnMapping':
-        """Create mapping from a YAML configuration file."""
+        """Create mapping from a YAML configuration file.
+
+        Args:
+            config_path (Path): The path to the YAML configuration file.
+
+        Returns:
+            ColumnMapping: The mapping of input columns to output YAML structure.
+        """
         with open(config_path, 'r') as f:
             config = yaml.safe_load(f)
         return cls(
@@ -28,10 +60,21 @@ class ColumnMapping:
         )
 
 class ChromatogramDataParser:
-    """Parser for different chromatogram data formats."""
+    """Parser for different chromatogram data formats.
+    
+    Methods:
+        parse_colon_semicolon: Parse format: time:counts;scaled_counts, time:counts;scaled_counts, ...
+    """
     @staticmethod
     def parse_colon_semicolon(data: str) -> Dict[str, List[float]]:
-        """Parse format: time:counts;scaled_counts, time:counts;scaled_counts, ..."""
+        """Parse format: time:counts;scaled_counts, time:counts;scaled_counts, ...
+
+        Args:
+            data (str): The chromatogram data to parse.
+
+        Returns:
+            Dict[str, List[float]]: The parsed chromatogram data.
+        """
         points = data.split(', ')
         times = []
         intensities = []
@@ -51,7 +94,15 @@ class ChromatogramDataParser:
         }
 
 class PeptideDataReader:
-    """Main class for reading and parsing peptide data."""
+    """Main class for reading and parsing peptide data. 
+    
+    Attributes:
+        column_mapping (ColumnMapping): The mapping of input columns to output YAML structure.
+        chromatogram_parser (Callable): The parser for chromatogram data.
+    
+    Methods:
+        read_csv: Read and parse CSV file into internal dictionary format.
+    """
     def __init__(
         self,
         column_mapping: ColumnMapping,
@@ -62,12 +113,25 @@ class PeptideDataReader:
         self._position_to_blocks = {}  # Will store block mapping during parsing
 
     def read_csv(self, file_path: Path) -> Dict:
-        """Read and parse CSV file into internal dictionary format."""
+        """Read and parse CSV file into internal dictionary format.
+
+        Args:
+            file_path (Path): The path to the CSV file to read.
+
+        Returns:
+            Dict: The internal dictionary format.
+        """
         df = pd.read_csv(file_path)
-        return self._parse_dataframe(df)
 
     def _parse_dataframe(self, df: pd.DataFrame) -> Dict:
-        """Parse DataFrame into internal dictionary format."""
+        """Parse DataFrame into internal dictionary format.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to parse.
+
+        Returns:
+            Dict: The internal dictionary format.
+        """
         return {
             'building_blocks': self._parse_building_blocks(df),
             'peptides': self._parse_peptides(df),
@@ -75,9 +139,15 @@ class PeptideDataReader:
         }
 
     def _parse_building_blocks(self, df: pd.DataFrame) -> Dict:
-        """Parse building blocks into new hierarchical format."""
-        building_blocks = {}
+        """Parse building blocks into new hierarchical format.
 
+        Args:
+            df (pd.DataFrame): The DataFrame to parse.
+
+        Returns:
+            Dict: The internal dictionary format.
+        """
+        building_blocks = {}
         # Parse blocks by position
         for position in range(1, self.column_mapping.num_building_blocks + 1):
             position_key = f'BB{position}'
@@ -105,7 +175,14 @@ class PeptideDataReader:
         return building_blocks
 
     def _parse_peptides(self, df: pd.DataFrame) -> List[Dict]:
-        """Parse DataFrame into peptide entries with sequence and properties."""
+        """Parse DataFrame into peptide entries with sequence and properties.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to parse.
+
+        Returns:
+            List[Dict]: The peptide entries with sequence and properties.
+        """
         peptides = []
 
         for idx, row in df.iterrows():
@@ -143,7 +220,14 @@ class PeptideDataReader:
         return peptides
 
     def _parse_metadata(self, df: pd.DataFrame) -> Dict:
-        """Extract metadata from the DataFrame."""
+        """Extract metadata from the DataFrame.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to parse.
+
+        Returns:
+            Dict: The metadata.
+        """
         return {
             'num_peptides': len(df),
             'num_building_blocks': self.column_mapping.num_building_blocks,

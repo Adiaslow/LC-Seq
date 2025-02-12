@@ -1,6 +1,13 @@
 # lcseq/scripts/subset_peptides.py
 """This script subsets a peptide library CSV file based on building block composition.
 
+Methods:
+    load_column_mapping: Load the column mapping from the config file.
+    create_filter_conditions: Create filter conditions for each position.
+    find_truncations: Generate all possible truncations of a peptide.
+    parse_bb_list: Parse the building block list, handling special characters and spaces.
+    main: Main entry point for the script.
+
 Example Usage:
     # Find all peptides with Leu in position 1 and Phe in position 2
     python scripts/subset_peptides.py  \
@@ -13,6 +20,8 @@ Example Usage:
         --include-truncations \
         --null-identifier "AgxNull"
 """
+
+# Standard library imports
 from pathlib import Path
 import click
 import pandas as pd
@@ -20,8 +29,18 @@ from typing import List, Dict, Optional
 import yaml
 from itertools import combinations
 
+# Local application imports
+from src.lcseq.io.readers import ColumnMapping
+
 def load_column_mapping(config_path: Path) -> Dict[str, List[str]]:
-    """Load building block column mapping from config file."""
+    """Load building block column mapping from config file.
+
+    Args:
+        config_path (Path): The path to the config file.
+
+    Returns:
+        Dict[str, List[str]]: The building block column mapping.
+    """
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
     return config['building_block_columns']['name']
@@ -31,9 +50,17 @@ def create_filter_conditions(
     bb_columns: List[str],
     bb_filters: List[List[str]]
 ) -> pd.Series:
-    """Create filter conditions for each position."""
-    conditions = pd.Series(True, index=df.index)
+    """Create filter conditions for each position.
 
+    Args:
+        df (pd.DataFrame): The input DataFrame.
+        bb_columns (List[str]): The building block columns.
+        bb_filters (List[List[str]]): The building block filters.
+
+    Returns:
+        pd.Series: The filter conditions.
+    """
+    conditions = pd.Series(True, index=df.index)
     for col, allowed_bbs in zip(bb_columns, bb_filters):
         if allowed_bbs:  # Only apply filter if building blocks specified
             conditions &= df[col].isin(allowed_bbs)
@@ -46,12 +73,29 @@ def find_truncations(
     bb_filters: List[List[str]],
     null_identifier: str = "AgxNull"
 ) -> List[pd.Series]:
-    """Generate all possible truncations of a peptide."""
+    """Generate all possible truncations of a peptide.
+
+    Args:
+        row (pd.Series): The input row.
+        bb_columns (List[str]): The building block columns.
+        bb_filters (List[List[str]]): The building block filters.
+        null_identifier (str): The null identifier.
+
+    Returns:
+        List[pd.Series]: The truncations.
+    """
     truncations = []
     n = len(bb_columns)
 
     def make_sequence(mask):
-        """Create sequence based on binary mask."""
+        """Create sequence based on binary mask.
+
+        Args:
+            mask (List[int]): The binary mask.
+
+        Returns:
+            pd.Series: The sequence.
+        """
         trunc_row = row.copy()
         for i, keep in enumerate(mask):
             if not keep:
@@ -81,7 +125,16 @@ def find_truncations(
     return truncations
 
 def parse_bb_list(ctx, param, value) -> List[str]:
-    """Parse building block list, handling special characters and spaces."""
+    """Parse building block list, handling special characters and spaces.
+
+    Args:
+        ctx (click.Context): The click context.
+        param (click.Parameter): The click parameter.
+        value (str): The value to parse.
+
+    Returns:
+        List[str]: The parsed building block list.
+    """
     if not value:
         return []
     return [bb.strip() for bb in value.split(',')]
@@ -113,7 +166,21 @@ def main(
     include_truncations: bool,
     null_identifier: str,
 ):
-    """Subset a peptide library CSV file based on building block composition."""
+    """Subset a peptide library CSV file based on building block composition.
+
+    Args:
+        input_csv (Path): The input CSV file.
+        output_csv (Path): The output CSV file.
+        config_path (Path): The path to the config file.
+        bb1 (List[str]): The building blocks for position 1.
+        bb2 (List[str]): The building blocks for position 2.
+        bb3 (List[str]): The building blocks for position 3.
+        bb4 (List[str]): The building blocks for position 4.
+        bb5 (List[str]): The building blocks for position 5.
+        bb6 (List[str]): The building blocks for position 6.
+        include_truncations (bool): Whether to include truncated versions of matched peptides.  
+        null_identifier (str): The null identifier.
+    """
     # Load column mapping
     bb_column_mapping = load_column_mapping(config_path)
     bb_columns = list(bb_column_mapping)  # Convert mapping keys to list
@@ -164,4 +231,5 @@ def main(
     filtered_df.to_csv(output_csv, index=False)
 
 if __name__ == '__main__':
+    """Main entry point for the script."""
     main()

@@ -1,10 +1,22 @@
 # src/lcseq/pipeline/components/standard_chromatogram_analyzer.py
+"""
+This module provides a pipeline component for analyzing standard chromatograms.
+It includes a configuration class for specifying analysis parameters and an analyzer
+class for performing the analysis.
+
+Classes:
+    StandardChromatogramAnalyzerConfig: Configuration for the StandardChromatogramAnalyzer.
+    StandardChromatogramAnalyzer: Analyzer for performing the StandardChromatogramAnalysis.
+"""
+
+# Standard library imports
 from dataclasses import dataclass, field
 import logging
 import numpy as np
 from scipy import stats, signal
 from typing import List, Tuple
 
+# Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
 from src.lcseq.pipeline.input_types import SinglePeptideInput, PeptideSetInput, PeptideHierarchyInput
 from src.lcseq.core.chromatogram import Chromatogram, Peak
@@ -13,6 +25,24 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class StandardChromatogramAnalyzerConfig:
+    """Configuration for the StandardChromatogramAnalyzer.
+
+    Attributes:
+        window_width (int): The width of the moving window for calculating standard deviation.
+        window_overlap (float): The overlap between windows.
+        min_window_points (int): The minimum number of points in a window.
+        variation_threshold (float): The threshold for minimal variation.
+        min_region_width (int): The minimum width of a region of minimal variation.
+        max_region_gap (int): The maximum gap between regions of minimal variation.
+        noise_percentile (float): The percentile for noise calculation.
+        min_regions_required (int): The minimum number of regions required for noise calculation.
+        max_noise_variance (float): The maximum variance for noise calculation.
+        edge_exclusion (float): The edge exclusion for noise calculation.
+        baseline_percentile (float): The percentile for baseline calculation.
+        drift_window (int): The window for drift calculation.
+        smoothing_window (int): The window for smoothing the chromatogram.
+        outlier_threshold (float): The threshold for outlier detection.
+    """
     window_width: int = 15
     window_overlap: float = 0.5
     min_window_points: int = 5
@@ -29,14 +59,28 @@ class StandardChromatogramAnalyzerConfig:
     outlier_threshold: float = 3.0
 
 class StandardChromatogramAnalyzer(PipelineComponent):
+    """Pipeline component for analyzing standard chromatograms.
+    
+    Methods:
+        process_peptide: Process a single peptide's chromatogram
+        process_peptide_set: Process a set of peptides' chromatograms
+        process_hierarchy: Process a hierarchy of peptides' chromatograms
+    """
     def __init__(self, config: StandardChromatogramAnalyzerConfig = None): # type: ignore
         self.config = config or StandardChromatogramAnalyzerConfig()
         self.logger = logging.getLogger(__name__)
 
     def _analyze_single_chromatogram(self, chrom: Chromatogram) -> Chromatogram:
-        """Core analysis logic for a single chromatogram"""
-        self._validate_chromatogram(chrom)
+        """Core analysis logic for a single chromatogram
+
+        Args:
+            chrom (Chromatogram): The chromatogram to analyze.
+
+        Returns:
+            Chromatogram: The analyzed chromatogram.
+        """
         try:
+            self._validate_chromatogram(chrom)
             chrom.properties['times_count'] = len(chrom.times)
             chrom.properties['intensities_count'] = len(chrom.intensities)
             chrom.properties['scaled_intensities_count'] = len(chrom.intensities)
@@ -53,7 +97,15 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         return chrom
 
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
-        """Process a single peptide's chromatogram"""
+        """Process a single peptide's chromatogram.
+
+        Args:
+            input_data (SinglePeptideInput): The input data representing a single
+                peptide.
+
+        Returns:
+            SinglePeptideInput: The input data with the chromatogram analyzed.
+        """
         self.logger.info(f"Analyzing chromatogram for peptide: {input_data.peptide.sequence_str}")
         for encoding in input_data.peptide.encodings:
             if encoding.chromatogram is not None:
@@ -62,7 +114,15 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         return input_data
 
     def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
-        """Process chromatograms for a set of peptides"""
+        """Process chromatograms for a set of peptides.
+
+        Args:
+            input_data (PeptideSetInput): The input data representing a set of
+                peptides.
+
+        Returns:
+            PeptideSetInput: The input data with the chromatograms analyzed.
+        """
         self.logger.info(f"Analyzing chromatograms for peptide set: {len(input_data.peptides)} peptides")
         for peptide in input_data.peptides:
             for encoding in peptide.encodings:
@@ -71,7 +131,15 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         return input_data
 
     def process_hierarchy(self, input_data: PeptideHierarchyInput) -> PeptideHierarchyInput:
-        """Process chromatograms in a peptide hierarchy"""
+        """Process chromatograms in a peptide hierarchy.
+
+        Args:
+            input_data (PeptideHierarchyInput): The input data representing a hierarchy
+                of peptides.
+
+        Returns:
+            PeptideHierarchyInput: The input data with the chromatograms analyzed.
+        """
         def process_node(node):
             for encoding in node.root.encodings:
                 if encoding.chromatogram is not None:
@@ -84,7 +152,14 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         return input_data
 
     def _validate_chromatogram(self, chrom: Chromatogram) -> None:
-        """Validate chromatogram data"""
+        """Validate chromatogram data.
+
+        Args:
+            chrom (Chromatogram): The chromatogram to validate.
+
+        Raises:
+            ValueError: If the chromatogram is invalid.
+        """
         if chrom.times is None or chrom.intensities is None:
             raise ValueError("Chromatogram contains no signal data")
 
@@ -101,7 +176,14 @@ class StandardChromatogramAnalyzer(PipelineComponent):
             raise ValueError("Chromatogram signals contain NaN or infinite values")
 
     def _calculate_moving_std(self, intensity: np.ndarray) -> np.ndarray:
-        """Calculate moving standard deviation"""
+        """Calculate moving standard deviation.
+
+        Args:
+            intensity (np.ndarray): The intensity data.
+
+        Returns:
+            np.ndarray: The moving standard deviation.
+        """
         pad_width = self.config.window_width // 2
         intensity_padded = np.pad(intensity, pad_width, mode='edge')
         window = np.ones(self.config.window_width) / self.config.window_width
@@ -112,7 +194,14 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         return np.sqrt(moving_var)
 
     def _find_minimal_variation_regions(self, moving_std: np.ndarray) -> List[Tuple[int, int]]:
-        """Find regions of minimal variation"""
+        """Find regions of minimal variation.
+
+        Args:
+            moving_std (np.ndarray): The moving standard deviation.
+
+        Returns:
+            List[Tuple[int, int]]: The regions of minimal variation.
+        """
         min_std = np.min(moving_std)
         threshold = min_std * self.config.variation_threshold
         start_idx = int(len(moving_std) * self.config.edge_exclusion)
@@ -136,7 +225,14 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         return self._merge_regions(regions)
 
     def _merge_regions(self, regions: List[Tuple[int, int]]) -> List[Tuple[int, int]]:
-        """Merge nearby regions"""
+        """Merge nearby regions.
+
+        Args:
+            regions (List[Tuple[int, int]]): The regions to merge.
+
+        Returns:
+            List[Tuple[int, int]]: The merged regions.
+        """
         if not regions:
             return []
 
@@ -154,7 +250,11 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         return merged
 
     def _calculate_noise_metrics(self, chrom: Chromatogram) -> None:
-        """Calculate noise-related metrics"""
+        """Calculate noise-related metrics.
+
+        Args:
+            chrom (Chromatogram): The chromatogram to analyze.
+        """
         moving_std = self._calculate_moving_std(chrom.intensities)
         quiet_regions = self._find_minimal_variation_regions(moving_std)
 
@@ -174,7 +274,11 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         chrom.properties['quiet_regions'] = quiet_regions
 
     def _calculate_baseline_metrics(self, chrom: Chromatogram) -> None:
-        """Calculate baseline-related metrics"""
+        """Calculate baseline-related metrics.
+
+        Args:
+            chrom (Chromatogram): The chromatogram to analyze.
+        """
         baseline_mean = float(np.percentile(chrom.intensities, self.config.baseline_percentile))
         try:
             coefficients = np.polyfit(chrom.times, chrom.intensities, 1)
@@ -186,7 +290,11 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         chrom.properties['baseline_drift'] = drift
 
     def _calculate_area_metrics(self, chrom: Chromatogram) -> None:
-        """Calculate area-related metrics"""
+        """Calculate area-related metrics.
+
+        Args:
+            chrom (Chromatogram): The chromatogram to analyze.
+        """
         zeros = np.zeros_like(chrom.intensities)
         positive_y = np.where(chrom.intensities > zeros, chrom.intensities, zeros)
         negative_y = np.where(chrom.intensities < zeros, chrom.intensities, zeros)
@@ -200,7 +308,11 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         chrom.properties['negative_area'] = negative_area
 
     def _calculate_distribution_metrics(self, chrom: Chromatogram) -> None:
-        """Calculate distribution-related metrics"""
+        """Calculate distribution-related metrics.
+
+        Args:
+            chrom (Chromatogram): The chromatogram to analyze.
+        """
         chrom.properties.update({
             'skewness': float(stats.skew(chrom.intensities)),
             'kurtosis': float(stats.kurtosis(chrom.intensities)),
@@ -208,7 +320,11 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         })
 
     def _calculate_quality_metrics(self, chrom: Chromatogram) -> None:
-        """Calculate quality-related metrics"""
+        """Calculate quality-related metrics.
+
+        Args:
+            chrom (Chromatogram): The chromatogram to analyze.
+        """
         chrom.properties.update({
             'signal_smoothness': float(np.mean(np.abs(np.diff(chrom.intensities)))),
             'baseline_roughness': float(np.std(np.diff(chrom.intensities)))

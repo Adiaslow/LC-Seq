@@ -1,90 +1,136 @@
 # src/lcseq/core/hierarchy.py
+"""
+This module defines the PeptideHierarchy and PeptideHierarchyNode classes,
+which represent the hierarchical structure of peptides and their relationships.
+
+Classes:
+    PeptideHierarchyNode: Represents a node in the peptide hierarchy.
+    PeptideHierarchy: Represents the complete hierarchy of peptides.
+"""
+
+# Standard library imports
 from dataclasses import dataclass, field
-from typing import List, Dict, Set, Optional
-from .peptide import Peptide, PeptideEncoding
-from .building_block import BuildingBlock, BuildingBlockRegistry
+from typing import Set, Dict, List, Optional
+
+# Local application imports
+from src.lcseq.core.peptide import Peptide, PeptideEncoding
+from src.lcseq.core.synthesis_status import SynthesisStatus
+
+@dataclass
+class PeptideHierarchyNode:
+    """Represents a node in the peptide hierarchy.
+    
+    Attributes:
+        peptide (Peptide): The peptide represented by the node.
+        layer (int): The layer of the node in the hierarchy.
+        truncation_edges (Set['PeptideHierarchyNode']): The nodes that are truncations of the current node.
+        extension_edges (Set['PeptideHierarchyNode']): The nodes that are extensions of the current node.
+        equivalent_encodings (Set[PeptideEncoding]): The encodings that are equivalent to the current node.
+        synthesis_status (SynthesisStatus): The synthesis status of the node.
+        retention_time (Optional[float]): The retention time of the node.
+    
+    Methods:
+        validate_retention_times: Validate that this node's retention time is greater than all its truncations.
+        update_synthesis_status: Update the synthesis status of the node based on retention time validation and truncations.
+    """
+    peptide: Peptide
+    layer: int  # 1 for single-block, 2 for two-block, etc.
+    truncation_edges: Set['PeptideHierarchyNode'] = field(default_factory=set)
+    extension_edges: Set['PeptideHierarchyNode'] = field(default_factory=set)
+    equivalent_encodings: Set[PeptideEncoding] = field(default_factory=set)
+    synthesis_status: SynthesisStatus = SynthesisStatus.UNKNOWN
+    retention_time: Optional[float] = None
+
+    def validate_retention_times(self) -> bool:
+        """Validate that this node's retention time is greater than all its truncations.
+
+        Returns:
+            bool: True if validation passes, False otherwise.
+        """
+        if self.retention_time is None:
+            return False
+
+        for truncation in self.truncation_edges:
+            if truncation.retention_time is None:
+                return False
+            if self.retention_time <= truncation.retention_time:
+                return False
+
+        return True
+
+    def update_synthesis_status(self) -> None:
+        """Update synthesis status based on retention time validation and truncations.
+
+        Returns:
+            None
+        """
+        if not self.validate_retention_times():
+            self.synthesis_status = SynthesisStatus.FAILURE
+            return
+
+        # Check if any truncations failed
+        for truncation in self.truncation_edges:
+            if truncation.synthesis_status == SynthesisStatus.FAILURE:
+                self.synthesis_status = SynthesisStatus.FAILURE
+                return
+
+        self.synthesis_status = SynthesisStatus.SUCCESS
 
 @dataclass
 class PeptideHierarchy:
-    """Represents a hierarchical relationship between peptides."""
-    root: Peptide
-    children: List['PeptideHierarchy'] = field(default_factory=list)
-    properties: Dict = field(default_factory=dict)
+    """Represents the complete hierarchy of peptides.
+    
+    Attributes:
+        nodes (Dict[str, PeptideHierarchyNode]): A dictionary of nodes in the hierarchy.
+        layers (Dict[int, Set[PeptideHierarchyNode]]): A dictionary of layers in the hierarchy.
+    
+    Methods:
+        add_node: Add a new node to the hierarchy and establish all relationships.
+        _establish_truncation_relationships: Establish all truncation relationships for a node.
+    """
+    nodes: Dict[str, PeptideHierarchyNode] = field(default_factory=dict)
+    layers: Dict[int, Set[PeptideHierarchyNode]] = field(default_factory=lambda: {1: set(), 2: set(), 3: set()})
 
-    def __post_init__(self):
-        """Validate the hierarchy structure."""
-        self._validate_hierarchy()
+    def add_node(self, peptide: Peptide) -> PeptideHierarchyNode:
+        """Add a new node to the hierarchy and establish all relationships.
 
-    def _validate_hierarchy(self) -> None:
-        """Ensure the hierarchy is valid."""
-        if not self.root:
-            raise ValueError("Root peptide cannot be None")
+        Args:
+            peptide (Peptide): The peptide to add to the hierarchy.
 
-        # Ensure no circular references
-        seen = set()
-        self._check_circular_references(seen)
+        Returns:
+            PeptideHierarchyNode: The newly added node.
+        """
+        if peptide.sequence_str in self.nodes:
+            return self.nodes[peptide.sequence_str]
 
-    def _check_circular_references(self, seen: Set[str]) -> None:
-        """Check for circular references in the hierarchy."""
-        current_sequence = self.root.sequence_str
-        if current_sequence in seen:
-            raise ValueError("Circular reference detected in hierarchy")
+        layer = len(peptide.sequence)
+        node = PeptideHierarchyNode(peptide=peptide, layer=layer)
 
-        seen.add(current_sequence)
-        for child in self.children:
-            child._check_circular_references(seen.copy())
+        # Add to both lookups
+        self.nodes[peptide.sequence_str] = node
+        self.layers[layer].add(node)
 
-    def add_child(self, child: 'PeptideHierarchy') -> None:
-        """Add a child to the hierarchy."""
-        self.children.append(child)
-        self._validate_hierarchy()
+        # Establish truncation relationships
+        self._establish_truncation_relationships(node)
 
-class HierarchyBuilder:
-    """Utility class for building peptide hierarchies."""
+        return node
 
-    @staticmethod
-    def build_from_sequence(
-        sequence: List[BuildingBlock],
-        null_block: Optional[BuildingBlock] = None
-    ) -> PeptideHierarchy:
-        """Build a complete hierarchy from a sequence."""
-        if null_block is None:
-            null_block = BuildingBlockRegistry.get('N')
+    def _establish_truncation_relationships(self, node: PeptideHierarchyNode) -> None:
+        """Establish all truncation relationships for a node.
 
-        # Create the root peptide
-        root_peptide = Peptide(sequence)
-        hierarchy = PeptideHierarchy(root_peptide)
+        Args:
+            node (PeptideHierarchyNode): The node to establish truncation relationships for.
+        """
+        sequence = node.peptide.sequence
+        n = len(sequence)
 
-        # Generate all possible sub-sequences
-        for length in range(1, len(sequence)):
-            for i in range(len(sequence) - length + 1):
-                sub_sequence = sequence[i:i + length]
-                sub_peptide = Peptide(sub_sequence)
-                sub_hierarchy = PeptideHierarchy(sub_peptide)
-                hierarchy.add_child(sub_hierarchy)
+        # Generate all possible truncations
+        for length in range(1, n):
+            for i in range(n - length + 1):
+                truncation_seq = sequence[i:i+length]
+                truncation_str = '-'.join([block.identifier for block in truncation_seq][::-1])
 
-        return hierarchy
-
-    @staticmethod
-    def generate_null_variants(peptide: Peptide, null_block: BuildingBlock) -> List[PeptideEncoding]:
-        """Generate all possible null variants for a peptide."""
-        variants = []
-        sequence_length = len(peptide.sequence)
-
-        def generate_variants(current: List[BuildingBlock], position: int):
-            if position == sequence_length:
-                variants.append(PeptideEncoding(current.copy()))
-                return
-
-            # Try null block at this position
-            current[position] = null_block
-            generate_variants(current, position + 1)
-
-            # Try original block at this position
-            current[position] = peptide.sequence[position]
-            generate_variants(current, position + 1)
-
-        initial = [null_block] * sequence_length
-        generate_variants(initial, 0)
-
-        return variants
+                if truncation_str in self.nodes:
+                    truncation_node = self.nodes[truncation_str]
+                    node.truncation_edges.add(truncation_node)
+                    truncation_node.extension_edges.add(node)
