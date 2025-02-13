@@ -43,15 +43,29 @@ The CC pipeline is designed to replicate the behavior of the original LC-Seq Cla
 - HierarchyVisualizer: Visualizes the constructed hierarchy of the peptide library.
 - StandardOutput: Writes the output data to a CSV file.
 
-#### Standard
+#### Standard (demonstration/test pipeline)
 
-The Standard pipeline is a basic pipeline that can be used as-is or as a starting point for new pipelines. It relies on the following components:
+The Standard pipeline is a basic demonstration/testing pipeline that can be used as-is or as a starting point for new pipelines. It relies on the following components:
 
 - StandardInput: Reads the input data from a CSV file.
 - StandardChromatogramAnalyzer: Analyzes the chromatogram data.
 - StandardPeakDetector: Detects the peaks in the chromatogram data.
 - StandardPeakAnalyzer: Analyzes the peaks in the chromatogram data.
 - StandardChromatogramVisualizer: Visualizes the chromatogram data.
+- StandardOutput: Writes the output data to a CSV file.
+
+#### Hierarchical (demonstration/test pipeline)
+
+The Hierarchical pipeline is a basic demonstration/testing pipeline that can also be used as-is or as a starting point for new pipelines which take advantage of the hierarchical truncation relationships of a null-encoded library. It relies on the following components:
+
+- StandardInput: Reads the input data from a CSV file.
+- StandardChromatogramAnalyzer: Analyzes the chromatogram data.
+- StandardPeakDetector: Detects the peaks in the chromatogram data.
+- StandardPeakAnalyzer: Analyzes the peaks in the chromatogram data.
+- HierarchicalPeakSelector: Selects the peaks in the chromatogram data based on the hierarchical structure of the peptide and chromatogram.
+- HierarchicalSynthesisValidator: Validates the synthesis of the peptide.
+- HierarchyVisualizer: Visualizes the constructed hierarchy of the peptide library.
+- HierarchicalChromatogramVisualizer: Visualizes the chromatogram with added hierarchy information.
 - StandardOutput: Writes the output data to a CSV file.
 
 ---

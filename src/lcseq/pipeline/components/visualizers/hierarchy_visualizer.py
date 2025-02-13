@@ -67,8 +67,35 @@ class HierarchyVisualizer(PipelineComponent):
         """Extract the actual sequence from a node ID."""
         return node_id.split(">")[-1]
 
+    def _propagate_failure_status(self, G: nx.DiGraph) -> None:
+        """Propagate failure status up the graph.
+
+        If all terminal nodes connected to a node have failed, mark that node as failed.
+        This propagates from higher depths to lower depths.
+
+        Args:
+            G: NetworkX directed graph representing the hierarchy
+        """
+        # Process nodes from highest layer to lowest (excluding root)
+        for layer in [3, 2, 1]:
+            nodes_in_layer = [n for n in G.nodes() if G.nodes[n]["layer"] == layer]
+
+            for node in nodes_in_layer:
+                # Get all successors (nodes that use this as precursor)
+                successors = list(G.successors(node))
+
+                # If node has no successors (terminal node) and is already marked, skip
+                if not successors and G.nodes[node]["status"] in ["SUCCESS", "FAILURE"]:
+                    continue
+
+                # If all successors failed, mark this node as failed
+                if successors and all(
+                    G.nodes[succ]["status"] == "FAILURE" for succ in successors
+                ):
+                    G.nodes[node]["status"] = "FAILURE"
+
     def _create_hierarchy_graph(self, hierarchy) -> nx.DiGraph:
-        """Create a graph with unique node instances for each path in the hierarchy."""
+        """Create a graph representing abstract peptides and their relationships."""
         G = nx.DiGraph()
 
         # Add root node
@@ -80,75 +107,69 @@ class HierarchyVisualizer(PipelineComponent):
             size=self.config.node_sizes[0],
             label="ROOT",
             retention_time=None,
+            status="UNKNOWN",
         )
 
-        # Dictionary to track nodes by layer and parent
-        nodes_by_parent = defaultdict(list)
-        nodes_by_layer = defaultdict(set)
+        # Add nodes for each abstract peptide
+        for layer in [1, 2, 3]:
+            nodes_in_layer = hierarchy.get_nodes_at_depth(layer)
+            for node in nodes_in_layer:
+                # Create node ID from the effective sequence in reverse order
+                effective_sequence = [
+                    b for b in node.peptide.blocks if b.identifier != "AgxNull"
+                ]
+                # Reverse the sequence before joining
+                node_id = "-".join(b.identifier for b in effective_sequence[::-1])
 
-        # First layer: Add single building blocks
-        layer1_nodes = hierarchy.get_layer(1)
-        for node in layer1_nodes:
-            sequence = node.peptide.sequence_str
-            node_id = self._create_unique_node_id(sequence)
+                # Add number of equivalent encodings to label
+                encoding_count = len(node.peptide.encodings)
+                label = f"{node_id}\n({encoding_count} encodings)"
 
-            G.add_node(
-                node_id,
-                layer=1,
-                sequence=sequence,
-                retention_time=node.retention_time,
-                size=self.config.node_sizes[1],
-                label=sequence,
-            )
-
-            G.add_edge(root_id, node_id)
-            nodes_by_parent[root_id].append(node_id)
-            nodes_by_layer[1].add(node_id)
-
-        # Second layer: Create unique instances for each parent
-        layer2_nodes = hierarchy.get_layer(2)
-        for l1_node_id in nodes_by_layer[1]:
-            for node in layer2_nodes:
-                sequence = node.peptide.sequence_str
-                node_id = self._create_unique_node_id(sequence, l1_node_id)
+                # Get retention time from the peptide properties
+                rt = node.peptide.properties.get("retention_time")
 
                 G.add_node(
                     node_id,
-                    layer=2,
-                    sequence=sequence,
-                    retention_time=node.retention_time,
-                    size=self.config.node_sizes[2],
-                    label=sequence,
+                    layer=layer,
+                    sequence=node_id,
+                    retention_time=rt,
+                    size=self.config.node_sizes[layer],
+                    label=label,
+                    status=node.peptide.properties.get(
+                        "synthesis_status", "UNKNOWN"
+                    ).name,
                 )
 
-                G.add_edge(l1_node_id, node_id)
-                nodes_by_parent[l1_node_id].append(node_id)
-                nodes_by_layer[2].add(node_id)
+                # Add edges based on precursor relationships
+                for precursor in hierarchy.get_precursors(node):
+                    if precursor == hierarchy.root:
+                        G.add_edge(node_id, root_id)
+                    else:
+                        precursor_seq = [
+                            b
+                            for b in precursor.peptide.blocks
+                            if b.identifier != "AgxNull"
+                        ]
+                        # Reverse the precursor sequence before joining
+                        precursor_id = "-".join(
+                            b.identifier for b in precursor_seq[::-1]
+                        )
+                        G.add_edge(node_id, precursor_id)
 
-        # Third layer: Create unique instances for each parent
-        layer3_nodes = hierarchy.get_layer(3)
-        for l2_node_id in nodes_by_layer[2]:
-            for node in layer3_nodes:
-                sequence = node.peptide.sequence_str
-                node_id = self._create_unique_node_id(sequence, l2_node_id)
-
-                G.add_node(
-                    node_id,
-                    layer=3,
-                    sequence=sequence,
-                    retention_time=node.retention_time,
-                    size=self.config.node_sizes[3],
-                    label=sequence,
-                )
-
-                G.add_edge(l2_node_id, node_id)
-                nodes_by_parent[l2_node_id].append(node_id)
-                nodes_by_layer[3].add(node_id)
+        # Propagate failure status up the graph
+        self._propagate_failure_status(G)
 
         return G
 
     def _create_layout(self, G: nx.DiGraph) -> Dict:
-        """Create a hierarchical layout with layers arranged radially."""
+        """Create a radial hierarchical layout with peptides arranged by layer in concentric circles.
+
+        Args:
+            G: NetworkX directed graph representing the hierarchy
+
+        Returns:
+            Dict: Mapping of nodes to their positions in the layout
+        """
         pos = {}
         layers = defaultdict(list)
 
@@ -157,22 +178,30 @@ class HierarchyVisualizer(PipelineComponent):
             layer = G.nodes[node]["layer"]
             layers[layer].append(node)
 
-        # Calculate the total number of nodes in each layer
-        nodes_per_layer = {layer: len(nodes) for layer, nodes in layers.items()}
-        max_nodes = max(nodes_per_layer.values())
+        # Set radius for each layer (center to outside)
+        layer_radii = {
+            0: 0.0,  # Root at center
+            1: 0.3,  # Single blocks
+            2: 0.6,  # Double blocks
+            3: 1.0,  # Triple blocks
+        }
 
-        # Position nodes in a radial layout
-        radius_step = 1.0 / len(layers)
+        # Position nodes in each layer
         for layer in sorted(layers.keys()):
             nodes = layers[layer]
-            radius = 1.0 - (layer * radius_step)  # Outer layers have smaller radius
+            radius = layer_radii[layer]
 
-            # Calculate angular spacing
+            if layer == 0:
+                # Place root node at center
+                pos[nodes[0]] = np.array([0.0, 0.0])
+                continue
+
+            # Distribute nodes evenly around the circle
             angle_step = 2 * np.pi / len(nodes)
 
-            # Position each node
             for i, node in enumerate(nodes):
                 angle = i * angle_step
+                # Convert polar coordinates to Cartesian
                 x = radius * np.cos(angle)
                 y = radius * np.sin(angle)
                 pos[node] = np.array([x, y])
@@ -180,75 +209,85 @@ class HierarchyVisualizer(PipelineComponent):
         return pos
 
     def visualize(self, hierarchy) -> None:
-        """Create the hierarchy visualization.
-
-        Only creates visualization if plotting is enabled via self.plot_results.
-        Does not create output directory if plotting is disabled.
-        """
+        """Create the hierarchy visualization."""
         if not self.plot_results:
-            # Clean up any existing output directory if plotting is disabled
-            if os.path.exists(self.config.output_dir):
-                try:
-                    for file in os.listdir(self.config.output_dir):
-                        file_path = os.path.join(self.config.output_dir, file)
-                        if os.path.isfile(file_path):
-                            os.unlink(file_path)
-                    os.rmdir(self.config.output_dir)
-                except Exception as e:
-                    self.logger.warning(f"Failed to clean up output directory: {e}")
             return
 
-        # Create graph with unique node instances
+        # Create graph and propagate failure status
         G = self._create_hierarchy_graph(hierarchy)
-
-        # Create the layout
         pos = self._create_layout(G)
 
-        # Create figure
         plt.figure(figsize=self.config.figure_size, dpi=self.config.dpi)
 
-        # Draw nodes by layer
-        layer_colors = [
-            "lightgray",
-            "#3498db",
-            "#2ecc71",
-            "#e74c3c",
-        ]  # Colors for each layer
-        for layer in range(4):
-            nodes_in_layer = [n for n in G.nodes() if G.nodes[n]["layer"] == layer]
-            if not nodes_in_layer:
-                continue
-
-            # Draw nodes
-            nx.draw_networkx_nodes(
-                G,
-                pos,
-                nodelist=nodes_in_layer,
-                node_color=layer_colors[layer],
-                node_size=[G.nodes[n]["size"] for n in nodes_in_layer],
-                alpha=0.7,
-            )
-
-        # Draw edges
+        # Draw edges first so they appear behind nodes
         nx.draw_networkx_edges(
-            G, pos, edge_color="gray", arrows=True, arrowsize=15, width=0.5, alpha=0.4
+            G,
+            pos,
+            edge_color="gray",
+            arrows=True,
+            arrowsize=15,
+            width=0.5,
+            alpha=0.4,
+            arrowstyle="->",
         )
 
-        # Add labels
-        labels = {node: G.nodes[node]["label"] for node in G.nodes()}
-        nx.draw_networkx_labels(G, pos, labels=labels, font_size=self.config.font_size)
+        # Draw nodes with colors based on synthesis status
+        status_colors = {
+            "UNKNOWN": "lightgray",
+            "SUCCESS": "#2ecc71",  # Green
+            "FAILURE": "#e74c3c",  # Red
+        }
 
-        plt.title("Peptide Library Hierarchy")
+        # Draw nodes in order: FAILURE first, then SUCCESS, then UNKNOWN
+        for status in ["FAILURE", "SUCCESS", "UNKNOWN"]:
+            nodes = [n for n in G.nodes() if G.nodes[n]["status"] == status]
+            if nodes:
+                nx.draw_networkx_nodes(
+                    G,
+                    pos,
+                    nodelist=nodes,
+                    node_color=status_colors[status],
+                    node_size=[G.nodes[n]["size"] for n in nodes],
+                    alpha=0.7,
+                )
+
+        # Add labels with retention times
+        labels = {}
+        for node in G.nodes():
+            base_label = G.nodes[node]["label"]
+            rt = G.nodes[node]["retention_time"]
+            rt_text = f"\nRT: {rt:.2f}" if rt is not None else ""
+            labels[node] = f"{base_label}{rt_text}"
+
+        # Adjust label positions to prevent overlap
+        nx.draw_networkx_labels(
+            G,
+            pos,
+            labels,
+            font_size=self.config.font_size,
+            horizontalalignment="center",
+            verticalalignment="center",
+        )
+
+        plt.title("Peptide Library Hierarchy (Radial Layout)")
+        plt.axis("equal")  # Equal aspect ratio for circular layout
         plt.axis("off")
 
-        # Save or show the plot
+        # Save plots with the same logic as before
         if self.config.save_plots:
             os.makedirs(self.config.output_dir, exist_ok=True)
-            svg_filename = os.path.join(self.config.output_dir, "peptide_hierarchy.svg")
+
+            # Save SVG version
+            svg_filename = os.path.join(
+                self.config.output_dir, "peptide_hierarchy_radial.svg"
+            )
             plt.savefig(svg_filename, format="svg", bbox_inches="tight")
             self.logger.info(f"Saved hierarchy plot to {svg_filename}")
 
-            png_filename = os.path.join(self.config.output_dir, "peptide_hierarchy.png")
+            # Save PNG version
+            png_filename = os.path.join(
+                self.config.output_dir, "peptide_hierarchy_radial.png"
+            )
             plt.savefig(
                 png_filename, format="png", bbox_inches="tight", dpi=self.config.dpi
             )

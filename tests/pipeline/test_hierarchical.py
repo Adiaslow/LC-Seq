@@ -16,9 +16,13 @@ import numpy as np
 from src.lcseq.pipeline.input_types import ProcessableInput, PeptideHierarchyInput
 from src.lcseq.core.hierarchy import PeptideHierarchy
 from src.lcseq.pipelines.hierarchical import HierarchicalPipe
-from src.lcseq.core.building_block import BuildingBlock
+from src.lcseq.core.building_block import BuildingBlock, BuildingBlockRegistry
 from src.lcseq.core.peptide import Peptide, PeptideEncoding
 from src.lcseq.core.chromatogram import Chromatogram
+from src.lcseq.pipeline.components.visualizers.hierarchy_visualizer import (
+    HierarchyVisualizer,
+    HierarchyVisualizerConfig,
+)
 
 
 @pytest.fixture
@@ -55,58 +59,83 @@ def create_hierarchy_from_data(data: dict) -> PeptideHierarchy:
     Returns:
         PeptideHierarchy containing the peptides.
     """
-    hierarchy = PeptideHierarchy()
+    # First register the null building block
+    try:
+        BuildingBlockRegistry.clear()  # Clear any existing blocks
+    except ValueError:
+        pass
+
+    null_block = BuildingBlock(
+        identifier="AgxNull", properties={"smiles": "", "stereochem": "none"}
+    )
+    BuildingBlockRegistry.register(null_block)
 
     if not data or "peptides" not in data or "building_blocks" not in data:
+        hierarchy = PeptideHierarchy()  # Create hierarchy after registering null block
         return hierarchy
 
-    # Create building blocks dictionary for lookup
-    building_blocks: dict = data["building_blocks"]
+    # Register all building blocks from the data
+    building_blocks = data["building_blocks"]
+    for position_data in building_blocks.values():
+        if isinstance(position_data, dict):
+            for identifier, properties in position_data.items():
+                if isinstance(properties, dict):
+                    block = BuildingBlock(
+                        identifier=identifier,
+                        properties={
+                            "smiles": properties.get("smiles", ""),
+                            "stereochem": properties.get("stereochem", "none"),
+                        },
+                    )
+                    BuildingBlockRegistry.register(block)
 
-    # First create all peptides to establish nodes
-    peptides: List[Peptide] = []
-    for peptide_data in data["peptides"]:
+    # Create hierarchy after all blocks are registered
+    hierarchy = PeptideHierarchy()
+
+    # Create peptides and organize by depth
+    peptides_by_depth: dict[int, List[Peptide]] = {1: [], 2: [], 3: []}
+
+    for peptide_data in data.get("peptides", []):
         # Get sequence and look up building block definitions
-        sequence: List[BuildingBlock] = []
-        for block_name in peptide_data["sequence"]:
-            # Find the building block definition in the correct BB group
-            for bb_group in building_blocks.values():
-                if block_name in bb_group:
-                    block_def = bb_group[block_name]
-                    properties = {
-                        "smiles": block_def["smiles"],
-                        "stereochem": block_def["stereochem"],
-                    }
-                    block = BuildingBlock(identifier=block_name, properties=properties)
-                    sequence.append(block)
-                    break
+        blocks: List[BuildingBlock] = []
+        for block_name in peptide_data.get("sequence", []):
+            try:
+                block = BuildingBlockRegistry.get(block_name)
+                blocks.append(block)
+            except KeyError:
+                continue  # Skip if building block not found
 
-        if sequence:  # Only create peptide if we found all building blocks
-            peptide: Peptide = Peptide(sequence=sequence)
+        if blocks:  # Only create peptide if we found all building blocks
+            peptide = Peptide(blocks=blocks)
 
             # Add chromatogram data if available
             if "chromatogram" in peptide_data:
                 chromatogram_data = peptide_data["chromatogram"]
-                chromatogram = Chromatogram(
-                    times=np.array(chromatogram_data["times"]),
-                    intensities=np.array(chromatogram_data["intensities"]),
-                )
-                encoding = PeptideEncoding(blocks=sequence, chromatogram=chromatogram)
-                peptide.add_encoding(encoding)
+                if chromatogram_data.get("times") and chromatogram_data.get(
+                    "intensities"
+                ):
+                    chromatogram = Chromatogram(
+                        times=np.array(chromatogram_data["times"]),
+                        intensities=np.array(chromatogram_data["intensities"]),
+                    )
+                    encoding = PeptideEncoding(blocks=blocks, chromatogram=chromatogram)
+                    peptide.add_encoding(encoding)
 
-            peptides.append(peptide)
+            # Add to appropriate depth group
+            depth = len([b for b in blocks if b.identifier != "AgxNull"])
+            if depth in peptides_by_depth:
+                peptides_by_depth[depth].append(peptide)
 
-    # Sort peptides by length (longest first)
-    sorted_peptides = sorted(peptides, key=lambda p: len(p.sequence), reverse=True)
-
-    # Add all peptides to hierarchy
-    for peptide in sorted_peptides:
-        hierarchy.add_node(peptide)
+    # Add peptides to hierarchy in order of increasing depth
+    for depth in [1, 2, 3]:
+        for peptide in peptides_by_depth[depth]:
+            hierarchy.add_peptide(peptide)
 
     return hierarchy
 
 
 def test_hierarchical_pipeline_no_plots(test_data_path: str, output_dir: Path) -> None:
+    """Test the hierarchical pipeline with plotting disabled."""
     # Clean up both plot directories before test
     for plot_dir in ["hierarchy_plots", "chromatogram_plots"]:
         if os.path.exists(plot_dir):
@@ -137,12 +166,7 @@ def test_hierarchical_pipeline_no_plots(test_data_path: str, output_dir: Path) -
 
 
 def test_hierarchical_pipeline(test_data_path: str, output_dir: Path) -> None:
-    """Test the hierarchical pipeline end-to-end.
-
-    Args:
-        test_data_path: Path to test data file.
-        output_dir: Path to output directory.
-    """
+    """Test the hierarchical pipeline end-to-end."""
     # Initialize pipeline with visualization enabled
     pipeline = HierarchicalPipe(
         input_file_path=test_data_path,
@@ -154,33 +178,45 @@ def test_hierarchical_pipeline(test_data_path: str, output_dir: Path) -> None:
         raw_data = yaml.safe_load(f)
     hierarchy = create_hierarchy_from_data(raw_data)
 
-    # Test direct visualization
-    hierarchy_viz_path = output_dir / "direct_hierarchy_viz.png"
-    hierarchy.visualize_hierarchy()  # This will save to the default location
+    # Test visualization
+    config = HierarchyVisualizerConfig(
+        figure_size=(30, 30),
+        dpi=300,
+        font_size=8,
+        save_plots=True,
+        output_dir="hierarchy_plots",
+    )
+    visualizer = HierarchyVisualizer(config=config, plot_results=True)
+    visualizer.visualize(hierarchy)
 
-    # Verify direct visualization was created
+    # Verify visualization was created
     assert os.path.exists(
-        "hierarchy_plots/peptide_hierarchy.png"
-    ), "Direct hierarchy visualization not created"
+        "hierarchy_plots/peptide_hierarchy_radial.png"
+    ), "Hierarchy visualization not created"
     assert os.path.exists(
-        "hierarchy_plots/peptide_hierarchy.svg"
-    ), "Direct hierarchy SVG not created"
+        "hierarchy_plots/peptide_hierarchy_radial.svg"
+    ), "Hierarchy SVG not created"
 
     # Run the pipeline
     input_data = PeptideHierarchyInput(hierarchy=hierarchy)
     result = pipeline.run(input_data)
 
     # Verify pipeline output files exist
-    hierarchy_plot = os.path.join("hierarchy_plots", "peptide_hierarchy.png")
-    assert os.path.exists(hierarchy_plot), "Hierarchy plot not created"
-    assert os.path.getsize(hierarchy_plot) > 0, "Hierarchy plot is empty"
+    assert os.path.exists(
+        "hierarchy_plots/peptide_hierarchy_radial.png"
+    ), "Hierarchy plot not created"
+    assert (
+        os.path.getsize("hierarchy_plots/peptide_hierarchy_radial.png") > 0
+    ), "Hierarchy plot is empty"
 
     # Check chromatogram plots
     chromatogram_plots = os.listdir("chromatogram_plots")
     assert len(chromatogram_plots) > 0, "No chromatogram plots created"
 
-    # Verify expected number of peptides were processed
-    assert len(hierarchy.peptides) > 0, "No peptides in hierarchy"
+    # Verify expected number of nodes were processed
+    assert len(hierarchy.get_nodes_at_depth(1)) > 0, "No depth 1 nodes in hierarchy"
+    assert len(hierarchy.get_nodes_at_depth(2)) > 0, "No depth 2 nodes in hierarchy"
+    assert len(hierarchy.get_nodes_at_depth(3)) > 0, "No depth 3 nodes in hierarchy"
 
 
 def test_hierarchical_pipeline_invalid_input() -> None:
@@ -190,14 +226,15 @@ def test_hierarchical_pipeline_invalid_input() -> None:
 
 
 def test_hierarchical_pipeline_empty_input(tmp_path: Path) -> None:
-    """Test the hierarchical pipeline with empty input.
-
-    Args:
-        tmp_path: Pytest temporary path fixture.
-    """
-    # Create empty YAML file
+    """Test the hierarchical pipeline with empty input."""
+    # Create empty YAML file with minimal structure
     empty_file: Path = tmp_path / "empty.yaml"
-    empty_file.write_text("{}")
+    empty_file.write_text(
+        """
+building_blocks: {}
+peptides: []
+"""
+    )
 
     pipeline = HierarchicalPipe(input_file_path=str(empty_file))
     with pytest.warns(UserWarning, match="No peptides found in input data"):

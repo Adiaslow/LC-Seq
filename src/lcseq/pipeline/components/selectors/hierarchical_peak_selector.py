@@ -56,7 +56,7 @@ class HierarchicalPeakSelector(PipelineComponent):
         )
 
     def select_peaks(self, peaks: list[Peak]) -> list[Peak]:
-        """Select the peak with the highest time value meeting criteria.
+        """Select the peak with the lowest time value meeting criteria.
 
         Args:
             peaks (list[Peak]): The list of peaks to select from.
@@ -81,10 +81,10 @@ class HierarchicalPeakSelector(PipelineComponent):
             self.logger.warning("No valid peaks found")
             return []
 
-        # Find peak with highest time
-        latest_peak: Peak = max(valid_peaks, key=lambda p: p.apex_time)
-        self.logger.info(f"Selected peak at {latest_peak.apex_time}")
-        return [latest_peak]
+        # Find peak with lowest time (earliest peak)
+        earliest_peak: Peak = min(valid_peaks, key=lambda p: p.apex_time)
+        self.logger.info(f"Selected peak at {earliest_peak.apex_time}")
+        return [earliest_peak]
 
     def _validates_against_truncations(
         self, peak: Peak, node: PeptideHierarchyNode
@@ -110,17 +110,17 @@ class HierarchicalPeakSelector(PipelineComponent):
         if not truncation_times:
             return True  # No truncations to validate against
 
-        max_truncation_time = max(truncation_times)
+        min_truncation_time = min(truncation_times)
 
-        # A peak is valid if it's significantly higher than all truncation peaks
-        # or if it's clearly a failed synthesis (significantly lower)
+        # A peak is valid if it's significantly lower than all truncation peaks
+        # or if it's clearly a failed synthesis (significantly higher)
         if (
             peak.apex_time
-            > max_truncation_time + self.config.min_retention_time_difference
+            < min_truncation_time - self.config.min_retention_time_difference
         ):
             return True  # Valid synthesis peak
 
-        # If the peak is close to or below truncation times, it's likely a failed synthesis
+        # If the peak is close to or above truncation times, it's likely a failed synthesis
         # We'll still keep these peaks but they'll be marked as failures later
         return False
 
@@ -162,39 +162,54 @@ class HierarchicalPeakSelector(PipelineComponent):
     ) -> PeptideHierarchyInput:
         """Process hierarchy layer by layer.
 
+        For example, with Val-Phe-Leu:
+        1. First process Val, Phe, and Leu (depth 1)
+        2. Then process Val-Phe, Val-Leu, Phe-Leu (depth 2)
+        3. Finally process Val-Phe-Leu (depth 3)
+
         Args:
             input_data (PeptideHierarchyInput): The input data to process.
 
         Returns:
             PeptideHierarchyInput: The processed input data.
         """
-        # Process from shortest to longest peptides
-        max_layer = max(input_data.hierarchy.layers.keys())
+        hierarchy = input_data.hierarchy
 
-        # First process single building blocks (layer 1)
-        for node in input_data.hierarchy.layers[1]:
-            for encoding in node.peptide.encodings:
-                if encoding.chromatogram and encoding.chromatogram.peaks:
-                    # For single blocks, just take the highest peak
-                    encoding.chromatogram.peaks = self.select_peaks(
-                        encoding.chromatogram.peaks
+        # Process nodes layer by layer
+        for depth in range(1, 4):  # Process depths 1, 2, and 3
+            nodes_at_depth = hierarchy.get_nodes_at_depth(depth)
+            self.logger.info(f"Processing {len(nodes_at_depth)} nodes at depth {depth}")
+
+            for node in nodes_at_depth:
+                # Get precursors that have already been processed
+                precursors = hierarchy.get_precursors(node)
+                if depth > 1 and not all(
+                    p.peptide.properties.get("retention_time") is not None
+                    for p in precursors
+                ):
+                    self.logger.warning(
+                        f"Not all precursors have been processed for {node.peptide.effective_sequence_str}"
                     )
-                    if encoding.chromatogram.peaks:
-                        node.retention_time = encoding.chromatogram.peaks[0].apex_time
+                    continue
 
-        # Then process each subsequent layer
-        for layer in range(2, max_layer + 1):
-            for node in input_data.hierarchy.layers[layer]:
+                # Process the node
                 self._process_node_with_truncations(node)
 
-                # Update node's retention time and synthesis status
+                # Update node's retention time from the selected peak
                 for encoding in node.peptide.encodings:
                     if encoding.chromatogram and encoding.chromatogram.peaks:
-                        node.retention_time = encoding.chromatogram.peaks[0].apex_time
+                        rt = encoding.chromatogram.peaks[0].apex_time
+                        node.peptide.properties["retention_time"] = rt
                         break
 
-                # Update synthesis status based on RT relationships
-                node.update_synthesis_status()
+                # Update synthesis status based on precursors and RT
+                node.update_synthesis_status(precursors)
+
+                self.logger.info(
+                    f"Processed {node.peptide.effective_sequence_str}: "
+                    f"RT = {node.peptide.properties.get('retention_time')}, "
+                    f"Status = {node.peptide.properties.get('synthesis_status')}"
+                )
 
         return input_data
 
@@ -227,11 +242,11 @@ class HierarchicalPeakSelector(PipelineComponent):
                 # If we found valid synthesis peaks, use those
                 if synthesis_peaks:
                     encoding.chromatogram.peaks = [
-                        max(synthesis_peaks, key=lambda p: p.apex_time)
+                        min(synthesis_peaks, key=lambda p: p.apex_time)
                     ]
                 else:
-                    # If no valid synthesis peaks, take the highest peak
+                    # If no valid synthesis peaks, take the lowest peak
                     # (will be marked as failed synthesis)
                     encoding.chromatogram.peaks = [
-                        max(valid_peaks, key=lambda p: p.apex_time)
+                        min(valid_peaks, key=lambda p: p.apex_time)
                     ]

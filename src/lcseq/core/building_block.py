@@ -96,8 +96,9 @@ class BuildingBlockRegistry:
             ValueError: If the building block identifier is already registered.
         """
         if block.identifier in cls._blocks:
-            raise ValueError(f"Building block {block.identifier} already registered")
-        cls._blocks[block.identifier] = block
+            pass
+        else:
+            cls._blocks[block.identifier] = block
 
     @classmethod
     def get(cls, identifier: str) -> BuildingBlock:

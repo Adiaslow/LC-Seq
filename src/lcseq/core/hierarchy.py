@@ -1,3 +1,4 @@
+# lcseq/core/hierarchy.py
 """
 This module defines the PeptideHierarchy and PeptideHierarchyNode classes,
 which represent the hierarchical structure of peptides and their relationships.
@@ -17,315 +18,258 @@ import matplotlib.pyplot as plt
 import os
 
 # Local application imports
-from src.lcseq.core.building_block import BuildingBlock
+from src.lcseq.core.building_block import BuildingBlock, BuildingBlockRegistry
 from src.lcseq.core.peptide import Peptide, PeptideEncoding
 from src.lcseq.core.synthesis_status import SynthesisStatus
 
 
 @dataclass
 class PeptideHierarchyNode:
-    """Represents a node in the peptide hierarchy.
+    """Represents a node in the peptide hierarchy graph.
+
+    The node focuses purely on graph structure, with all peptide-specific
+    information stored in the peptide object and its encodings.
 
     Attributes:
-        peptide (Peptide): The peptide represented by the node.
-        layer (int): The layer of the node in the hierarchy (1 for single-block, 2 for two-block, etc.).
-        truncation_edges (Set['PeptideHierarchyNode']): The nodes that are truncations of the current node.
-        extension_edges (Set['PeptideHierarchyNode']): The nodes that are extensions of the current node.
-        equivalent_encodings (Set[PeptideEncoding]): The encodings that are equivalent to the current node.
-        synthesis_status (SynthesisStatus): The synthesis status of the node.
-        retention_time (Optional[float]): The retention time of the node.
+        peptide (Peptide): The abstract peptide represented by this node
+        depth (int): Depth in synthesis graph (number of non-null building blocks)
+        rt_threshold (float): Minimum retention time difference required for successful synthesis
     """
 
     peptide: Peptide
-    layer: int
-    truncation_edges: Set["PeptideHierarchyNode"] = field(default_factory=set)
-    extension_edges: Set["PeptideHierarchyNode"] = field(default_factory=set)
-    equivalent_encodings: Set[PeptideEncoding] = field(default_factory=set)
-    synthesis_status: SynthesisStatus = SynthesisStatus.UNKNOWN
-    retention_time: Optional[float] = None
+    depth: int
+    rt_threshold: float = 0.5  # Default threshold of 0.5
 
-    @property
-    def encodings(self) -> List[PeptideEncoding]:
-        """Get the encodings from the peptide."""
-        return self.peptide.encodings
+    def validate_retention_times(
+        self, precursors: List["PeptideHierarchyNode"]
+    ) -> bool:
+        """Validate retention times of this peptide's encodings against precursors.
 
-    def validate_retention_times(self) -> bool:
-        """Validate that this node's retention time is greater than all its truncations."""
-        if self.retention_time is None:
+        For each encoding of this peptide, its retention time should be greater
+        than all retention times of corresponding precursor encodings.
+
+        Args:
+            precursors: List of precursor nodes in the synthesis graph
+
+        Returns:
+            bool: True if retention time validation passes
+        """
+        # Check if this peptide has any encodings with retention times
+        peptide_rts = [
+            enc.properties.get("retention_time")
+            for enc in self.peptide.encodings
+            if enc.properties.get("retention_time") is not None
+        ]
+        if not peptide_rts:
             return False
 
-        for truncation in self.truncation_edges:
-            if truncation.retention_time is None:
+        # Check each precursor
+        for precursor in precursors:
+            precursor_rts = [
+                enc.properties.get("retention_time")
+                for enc in precursor.peptide.encodings
+                if enc.properties.get("retention_time") is not None
+            ]
+            if not precursor_rts:
                 return False
-            if self.retention_time <= truncation.retention_time:
-                return False
+
+            # Each encoding's RT should be greater than all precursor RTs
+            for rt in peptide_rts:
+                if any(rt <= p_rt for p_rt in precursor_rts):
+                    return False
 
         return True
 
-    def update_synthesis_status(self) -> None:
-        """Update synthesis status based on retention time validation and truncations."""
-        if not self.validate_retention_times():
-            self.synthesis_status = SynthesisStatus.FAILURE
+    def update_synthesis_status(
+        self, precursors: Optional[List["PeptideHierarchyNode"]] = None
+    ) -> None:
+        """Update synthesis status based on retention time relationships with precursors.
+
+        A synthesis is considered successful if:
+        1. For depth 1: Always successful (base building blocks)
+        2. For depth > 1: RT must be greater than all precursor RTs by at least rt_threshold
+
+        Args:
+            precursors: Optional list of precursor nodes. If None, will be determined from hierarchy.
+        """
+        if self.depth == 0:  # Root node
+            self.peptide.properties["synthesis_status"] = SynthesisStatus.UNKNOWN
             return
 
-        # Check if any truncations failed
-        for truncation in self.truncation_edges:
-            if truncation.synthesis_status == SynthesisStatus.FAILURE:
-                self.synthesis_status = SynthesisStatus.FAILURE
-                return
+        if self.depth == 1:  # Base building blocks
+            self.peptide.properties["synthesis_status"] = SynthesisStatus.SUCCESS
+            return
 
-        self.synthesis_status = SynthesisStatus.SUCCESS
+        # Get retention time of this peptide
+        current_rt = None
+        for encoding in self.peptide.encodings:
+            if "retention_time" in encoding.properties:
+                current_rt = encoding.properties["retention_time"]
+                break
 
-    def __str__(self) -> str:
-        """Return a string representation of the node."""
-        return f"PeptideHierarchyNode(peptide={self.peptide}, layer={self.layer})"
+        if current_rt is None:
+            self.peptide.properties["synthesis_status"] = SynthesisStatus.FAILURE
+            return
 
-    def __repr__(self) -> str:
-        """Return a string representation of the node."""
-        return self.__str__()
+        # Get precursor retention times
+        if precursors is None:
+            precursors = []  # Should be populated from hierarchy
+
+        precursor_rts = []
+        for precursor in precursors:
+            for encoding in precursor.peptide.encodings:
+                if "retention_time" in encoding.properties:
+                    precursor_rts.append(encoding.properties["retention_time"])
+                    break
+
+        if not precursor_rts:
+            self.peptide.properties["synthesis_status"] = SynthesisStatus.FAILURE
+            return
+
+        # Check if any precursor has failed synthesis
+        any_precursor_failed = any(
+            precursor.peptide.properties.get("synthesis_status")
+            == SynthesisStatus.FAILURE
+            for precursor in precursors
+        )
+
+        if any_precursor_failed:
+            self.peptide.properties["synthesis_status"] = SynthesisStatus.FAILURE
+            return
+
+        # Check if current RT is greater than all precursor RTs by at least rt_threshold
+        max_precursor_rt = max(precursor_rts)
+        if current_rt > (max_precursor_rt + self.rt_threshold):
+            self.peptide.properties["synthesis_status"] = SynthesisStatus.SUCCESS
+        else:
+            self.peptide.properties["synthesis_status"] = SynthesisStatus.FAILURE
+
+    def __hash__(self) -> int:
+        """Hash based on peptide's effective sequence."""
+        return hash(self.peptide)
 
     def __eq__(self, other: Any) -> bool:
-        """Check if two nodes are equal."""
+        """Equality based on peptide's effective sequence."""
         if not isinstance(other, PeptideHierarchyNode):
             return False
         return self.peptide == other.peptide
 
-    def __hash__(self) -> int:
-        """Return the hash of the node."""
-        return hash(self.peptide)
+    def __str__(self) -> str:
+        """String representation of the node."""
+        return f"PeptideHierarchyNode(peptide={self.peptide}, depth={self.depth})"
+
+    def __repr__(self) -> str:
+        """Detailed string representation of the node."""
+        return self.__str__()
 
 
-@dataclass
 class PeptideHierarchy:
-    """Represents the complete hierarchy of peptides."""
+    """Graph-based representation of peptide synthesis relationships.
 
-    NULL_IDENTIFIER: str = "AgxNull"
-    nodes: Dict[str, PeptideHierarchyNode] = field(default_factory=dict)
-    layers: Dict[int, Set[PeptideHierarchyNode]] = field(
-        default_factory=lambda: {1: set(), 2: set(), 3: set()}
-    )
-    root: Optional[PeptideHierarchyNode] = None
+    The hierarchy is represented as a NetworkX DiGraph where:
+    - Nodes are PeptideHierarchyNode objects
+    - Edges represent synthesis relationships (precursor -> product)
+    - Root node represents the starting point (depth 0)
+    """
 
-    def __post_init__(self) -> None:
-        """Initialize the root node during hierarchy creation."""
-        # Create a peptide with all null blocks for the root
-        root_sequence = [
-            BuildingBlock(identifier=self.NULL_IDENTIFIER, properties={})
-            for _ in range(3)  # Assuming max depth of 3
-        ]
-        root_peptide = Peptide(sequence=root_sequence)
-        self.root = PeptideHierarchyNode(peptide=root_peptide, layer=0)
+    def __init__(self, null_identifier: str = "AgxNull"):
+        """Initialize empty hierarchy with root node.
 
-    @property
-    def children(self) -> List[PeptideHierarchyNode]:
-        """Get all nodes in the hierarchy."""
-        return list(self.nodes.values())
+        Args:
+            null_identifier: Identifier for null building blocks
+        """
+        self.graph = nx.DiGraph()
+        self.null_identifier = null_identifier
 
-    @property
-    def peptides(self) -> List[Peptide]:
-        """Get all peptides in the hierarchy."""
-        return [node.peptide for node in self.children]
+        # Initialize root node
+        root_sequence = [BuildingBlockRegistry.get(null_identifier) for _ in range(3)]
+        root_peptide = Peptide(blocks=root_sequence)
+        root_peptide.properties["synthesis_status"] = (
+            SynthesisStatus.SUCCESS
+        )  # Root is always successful
+        self.root = PeptideHierarchyNode(peptide=root_peptide, depth=0)
+        self.graph.add_node(self.root)
 
-    def get_layer(self, layer: int) -> Set[PeptideHierarchyNode]:
-        """Get all nodes in a specific layer."""
-        return self.layers.get(layer, set())
+    def add_peptide(self, peptide: Peptide) -> PeptideHierarchyNode:
+        """Add a peptide to the hierarchy.
 
-    def add_node(self, peptide: Peptide) -> PeptideHierarchyNode:
-        """Add a new node to the hierarchy and establish all relationships."""
-        # Get effective sequence (non-null blocks)
-        effective_sequence = [
-            b for b in peptide.sequence if b.identifier != self.NULL_IDENTIFIER
-        ]
+        Args:
+            peptide: The peptide to add
 
-        # Handle root node case (all nulls)
-        if not effective_sequence:
-            return self.root
-
-        # Generate canonical key for this abstract peptide
-        canonical_key = "-".join(b.identifier for b in effective_sequence)
-
-        # If we already have this abstract peptide, add this as another encoding
-        if canonical_key in self.nodes:
-            node = self.nodes[canonical_key]
-            node.equivalent_encodings.add(peptide.encodings[0])  # Add this encoding
-            return node
-
-        # Create new node for this abstract peptide
-        node = PeptideHierarchyNode(peptide=peptide, layer=len(effective_sequence))
-
-        # Add initial encoding
-        if peptide.encodings:
-            node.equivalent_encodings.add(peptide.encodings[0])
-
-        # Add to lookups
-        self.nodes[canonical_key] = node
-        self.layers[len(effective_sequence)].add(node)
+        Returns:
+            PeptideHierarchyNode: The created node
+        """
+        # Create node
+        node = PeptideHierarchyNode(
+            peptide=peptide, depth=len(peptide.effective_sequence)
+        )
+        self.graph.add_node(node)
 
         # Establish relationships
         self._establish_relationships(node)
 
+        # Update synthesis status based on precursors
+        precursors = self.get_precursors(node)
+        node.update_synthesis_status(precursors)
+
         return node
 
     def _establish_relationships(self, node: PeptideHierarchyNode) -> None:
-        """Establish parent-child relationships for this node.
+        """Establish synthesis relationships in the graph.
 
-        For a node at depth N, connect it to appropriate nodes at depth N-1
-        based on the valid cartesian products of building blocks.
+        Args:
+            node: Node to establish relationships for
         """
-        effective_sequence = [
-            b for b in node.peptide.sequence if b.identifier != self.NULL_IDENTIFIER
-        ]
-        depth = len(effective_sequence)
+        if node.depth == 0:
+            return
 
-        if depth == 1:
-            # Connect to root
-            node.extension_edges.add(self.root)
-            self.root.truncation_edges.add(node)
-        else:
-            # Find parent nodes at depth-1 that this node extends
-            parent_sequence = effective_sequence[:-1]
-            parent_key = "-".join(b.identifier for b in parent_sequence)
+        # Connect depth 1 nodes to root
+        if node.depth == 1:
+            self.graph.add_edge(self.root, node)
+            return
 
-            if parent_key in self.nodes:
-                parent_node = self.nodes[parent_key]
-                node.extension_edges.add(parent_node)
-                parent_node.truncation_edges.add(node)
+        sequence = node.peptide.effective_sequence
 
-    def get_hierarchy_structure(self) -> Dict[str, Any]:
-        """
-        Generate a structured representation of the hierarchy for visualization/debugging.
+        # For depth 2 nodes, find valid pairs of depth 1 precursors
+        if node.depth == 2:
+            for graph_node in self.graph.nodes:
+                if not isinstance(graph_node, PeptideHierarchyNode):
+                    continue
+                if graph_node.depth == 1:
+                    if graph_node.peptide.effective_sequence[0] in sequence:
+                        self.graph.add_edge(graph_node, node)
+            return
 
-        Returns:
-            Dict with the following structure:
-            {
-                'layers': {
-                    1: ['A', 'B', 'C'],  # nodes in layer 1
-                    2: ['A-B', 'B-C'],   # nodes in layer 2
-                    3: ['A-B-C']         # nodes in layer 3
-                },
-                'relationships': {
-                    'A-B': {
-                        'truncations': ['A', 'B'],
-                        'extensions': ['A-B-C'],
-                        'synthesis_status': 'SUCCESS',
-                        'retention_time': 5.6
-                    },
-                    # ... other nodes
-                }
-            }
-        """
-        structure = {"layers": {}, "relationships": {}}
-
-        # Populate layers
-        for layer_num, nodes in self.layers.items():
-            structure["layers"][layer_num] = [
-                node.peptide.sequence_str for node in nodes
+        # For depth 3 nodes, find valid depth 2 precursors
+        if node.depth == 3:
+            # Get all possible pairs from the sequence
+            pairs = [
+                (sequence[i], sequence[j])
+                for i in range(len(sequence))
+                for j in range(i + 1, len(sequence))
             ]
 
-        # Populate relationships
-        for seq_str, node in self.nodes.items():
-            structure["relationships"][seq_str] = {
-                "truncations": [n.peptide.sequence_str for n in node.truncation_edges],
-                "extensions": [n.peptide.sequence_str for n in node.extension_edges],
-                "synthesis_status": node.synthesis_status.name,
-                "retention_time": node.retention_time,
-            }
+            for graph_node in self.graph.nodes:
+                if not isinstance(graph_node, PeptideHierarchyNode):
+                    continue
+                if graph_node.depth == 2:
+                    precursor_seq = graph_node.peptide.effective_sequence
+                    # Check if precursor sequence matches any consecutive pair
+                    if tuple(precursor_seq) in pairs:
+                        self.graph.add_edge(graph_node, node)
 
-        return structure
+    def get_precursors(self, node: PeptideHierarchyNode) -> List[PeptideHierarchyNode]:
+        """Get immediate precursor nodes of a given node."""
+        return list(self.graph.predecessors(node))
 
-    def visualize_hierarchy(self) -> None:
-        """
-        Visualize the peptide hierarchy using NetworkX. Integrates with HierarchyVisualizer class structure.
-        """
-        # Create graph with unique node instances
-        G = nx.DiGraph()
+    def get_products(self, node: PeptideHierarchyNode) -> List[PeptideHierarchyNode]:
+        """Get immediate product nodes of a given node."""
+        return list(self.graph.successors(node))
 
-        # Add nodes with attributes for each layer
-        layer_colors = ["lightgray", "#3498db", "#2ecc71", "#e74c3c"]
-        node_sizes = {
-            0: 1200,  # Root node
-            1: 900,  # Single building blocks
-            2: 600,  # Two building blocks
-            3: 400,  # Three building blocks
-        }
-
-        # Add root node
-        root_id = "ROOT"
-        G.add_node(
-            root_id,
-            layer=0,
-            sequence=root_id,
-            size=node_sizes[0],
-            label="ROOT",
-            retention_time=None,
-        )
-
-        # Add peptide nodes by layer
-        for layer in [1, 2, 3]:
-            nodes_in_layer = self.get_layer(layer)
-            for node in nodes_in_layer:
-                G.add_node(
-                    node.peptide.sequence_str,
-                    layer=layer,
-                    sequence=node.peptide.sequence_str,
-                    retention_time=node.retention_time,
-                    size=node_sizes[layer],
-                    label=node.peptide.sequence_str,
-                    status=node.synthesis_status.name,
-                )
-
-        # Add edges for truncation relationships
-        for seq_str, node in self.nodes.items():
-            for truncation in node.truncation_edges:
-                G.add_edge(seq_str, truncation.peptide.sequence_str)
-
-        # Create hierarchical layout
-        pos = nx.spring_layout(G, k=1, iterations=50)
-
-        # Set up the plot
-        plt.figure(figsize=(40, 40), dpi=300)
-
-        # Draw nodes by layer
-        for layer in range(4):  # Including root layer
-            nodes_in_layer = [n for n in G.nodes() if G.nodes[n]["layer"] == layer]
-            if not nodes_in_layer:
-                continue
-
-            nx.draw_networkx_nodes(
-                G,
-                pos,
-                nodelist=nodes_in_layer,
-                node_color=layer_colors[layer],
-                node_size=[G.nodes[n]["size"] for n in nodes_in_layer],
-                alpha=0.7,
-            )
-
-        # Draw edges
-        nx.draw_networkx_edges(
-            G, pos, edge_color="gray", arrows=True, arrowsize=15, width=0.5, alpha=0.4
-        )
-
-        # Add labels with retention times
-        labels = {}
-        for node in G.nodes():
-            rt = G.nodes[node]["retention_time"]
-            layer = G.nodes[node]["layer"]
-            rt_text = f"\nRT: {rt:.2f}" if rt is not None else ""
-            labels[node] = f"{G.nodes[node]['label']}\nLayer {layer}{rt_text}"
-
-        nx.draw_networkx_labels(G, pos, labels, font_size=10)
-
-        plt.title("Peptide Library Hierarchy")
-        plt.axis("off")
-
-        # Create output directory if it doesn't exist
-        os.makedirs("hierarchy_plots", exist_ok=True)
-
-        # Save both SVG and PNG versions
-        svg_filename = os.path.join("hierarchy_plots", "peptide_hierarchy.svg")
-        plt.savefig(svg_filename, format="svg", bbox_inches="tight")
-
-        png_filename = os.path.join("hierarchy_plots", "peptide_hierarchy.png")
-        plt.savefig(png_filename, format="png", bbox_inches="tight", dpi=300)
-
-        plt.close()
+    def get_nodes_at_depth(self, depth: int) -> List[PeptideHierarchyNode]:
+        """Get all nodes at a specific depth in the hierarchy."""
+        return [
+            n
+            for n in self.graph.nodes
+            if isinstance(n, PeptideHierarchyNode) and n.depth == depth
+        ]

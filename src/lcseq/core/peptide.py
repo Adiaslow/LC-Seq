@@ -21,16 +21,14 @@ from src.lcseq.core.chromatogram import Chromatogram
 class PeptideEncoding:
     """Represents a specific encoding of a peptide with its associated chromatogram.
 
-    Attributes:
-        blocks (List[BuildingBlock]): The blocks that make up the encoding.
-        chromatogram (Optional[Chromatogram]): The chromatogram associated with the encoding.
-        properties (Dict): The properties of the encoding.
+    An encoding represents a specific arrangement of building blocks, including null blocks.
+    The canonical_sequence includes all blocks (including nulls), while the effective_sequence
+    only includes non-null blocks.
 
-    Methods:
-        __post_init__: Validate encoding blocks.
-        sequence: Get the sequence as a string.
-        sequence_str: Get the canonical sequence as a string.
-        __str__: Get the sequence as a string.
+    Attributes:
+        blocks (List[BuildingBlock]): The blocks that make up the encoding
+        chromatogram (Optional[Chromatogram]): The chromatogram associated with the encoding
+        properties (Dict): The properties of the encoding, including retention_time if measured
     """
 
     blocks: List[BuildingBlock]
@@ -47,22 +45,42 @@ class PeptideEncoding:
             raise ValueError("All blocks must be BuildingBlock instances")
 
     @property
-    def sequence(self) -> str:
-        """Get the sequence as a string.
+    def canonical_sequence(self) -> List[str]:
+        """Get the canonical sequence as a list of strings.
 
         Returns:
-            str: The sequence as a string.
+            List[str]: The canonical sequence including null blocks.
         """
-        return self.sequence_str
+        return [block.identifier for block in self.blocks]
 
     @property
-    def sequence_str(self) -> str:
-        """Get the canonical sequence as a string.
+    def canonical_sequence_str(self) -> str:
+        """Get the canonical sequence as a hyphen-separated string.
 
         Returns:
-            str: The canonical sequence as a string.
+            str: The canonical sequence string including null blocks.
         """
-        return "-".join([block.identifier for block in self.blocks][::-1])
+        return "-".join(self.canonical_sequence[::-1])
+
+    @property
+    def effective_sequence(self) -> List[str]:
+        """Get the effective sequence as a list of strings.
+
+        Returns:
+            List[str]: The effective sequence without null blocks.
+        """
+        return [
+            block.identifier for block in self.blocks if block.identifier != "AgxNull"
+        ]
+
+    @property
+    def effective_sequence_str(self) -> str:
+        """Get the effective sequence as a hyphen-separated string.
+
+        Returns:
+            str: The effective sequence string without null blocks.
+        """
+        return "-".join(self.effective_sequence[::-1])
 
     def __str__(self) -> str:
         """Get the sequence as a string.
@@ -70,60 +88,54 @@ class PeptideEncoding:
         Returns:
             str: The sequence as a string.
         """
-        return self.sequence_str
+        return self.canonical_sequence_str
 
     def __hash__(self) -> int:
-        """Get the hash of the peptide.
+        """Get the hash of the encoding.
 
         Returns:
-            int: The hash of the peptide.
+            int: The hash of the encoding.
         """
-        return hash(self.sequence_str)
+        return hash(self.canonical_sequence_str)
 
 
 @dataclass
 class Peptide:
     """Represents a peptide with its possible encodings.
 
-    Attributes:
-        sequence (List[BuildingBlock]): The sequence of the peptide.
-        encodings (List[PeptideEncoding]): The possible encodings of the peptide.
-        properties (Dict): The properties of the peptide.
+    A peptide represents a sequence of building blocks with multiple possible encodings.
+    Each encoding can include null blocks in different positions, but their effective
+    sequences (non-null blocks) must match the peptide's sequence.
 
-    Methods:
-        __post_init__: Validate the peptide sequence.
-        sequence_str: Get the canonical sequence as a string.
-        add_encoding: Add a new encoding to the peptide.
-        remove_encoding: Remove an encoding from the peptide.
-        get_encoding: Get a specific encoding by its sequence.
-        has_chromatogram: Check if the peptide has any encoding with a chromatogram.
-        get_chromatogram: Get the chromatogram from the first encoding that has one.
+    Attributes:
+        blocks (List[BuildingBlock]): The sequence of the peptide
+        encodings (List[PeptideEncoding]): The possible encodings of the peptide
+        properties (Dict): The properties of the peptide
     """
 
-    sequence: List[BuildingBlock]
+    blocks: List[BuildingBlock]
     encodings: List[PeptideEncoding] = field(default_factory=list)
     properties: Dict = field(default_factory=dict)
 
-    def __post_init__(self) -> None:
-        """Validate the peptide sequence.
-
-        Raises:
-            ValueError: If the sequence is empty or contains non-BuildingBlock instances.
-        """
-        if not self.sequence:
-            raise ValueError("Peptide sequence cannot be empty")
-
-        if not all(isinstance(block, BuildingBlock) for block in self.sequence):
-            raise ValueError("All sequence items must be BuildingBlock instances")
-
     @property
-    def sequence_str(self) -> str:
-        """Get the canonical sequence as a string.
+    def effective_sequence(self) -> List[str]:
+        """Get the effective sequence as a list of strings.
 
         Returns:
-            str: The canonical sequence as a string.
+            List[str]: The effective sequence without null blocks.
         """
-        return "-".join([block.identifier for block in self.sequence][::-1])
+        return [
+            block.identifier for block in self.blocks if block.identifier != "AgxNull"
+        ]
+
+    @property
+    def effective_sequence_str(self) -> str:
+        """Get the effective sequence as a hyphen-separated string.
+
+        Returns:
+            str: The effective sequence string without null blocks.
+        """
+        return "-".join(self.effective_sequence[::-1])
 
     def add_encoding(self, encoding: PeptideEncoding) -> None:
         """Add a new encoding to the peptide.
@@ -144,17 +156,17 @@ class Peptide:
         if encoding in self.encodings:
             self.encodings.remove(encoding)
 
-    def get_encoding(self, sequence: str) -> Optional[PeptideEncoding]:
-        """Get a specific encoding by its sequence.
+    def get_encoding(self, sequence: List[str]) -> Optional[PeptideEncoding]:
+        """Get a specific encoding by its canonical sequence.
 
         Args:
-            sequence (str): The sequence of the encoding to get.
+            sequence (List[str]): The canonical sequence to look for.
 
         Returns:
             Optional[PeptideEncoding]: The encoding if found, otherwise None.
         """
         for encoding in self.encodings:
-            if encoding.sequence == sequence:
+            if encoding.canonical_sequence == sequence:
                 return encoding
         return None
 
@@ -169,7 +181,7 @@ class Peptide:
         """
         if not isinstance(other, Peptide):
             return False
-        return self.sequence_str == other.sequence_str
+        return self.effective_sequence == other.effective_sequence
 
     def __str__(self) -> str:
         """Get the sequence as a string.
@@ -177,7 +189,7 @@ class Peptide:
         Returns:
             str: The sequence as a string.
         """
-        return self.sequence_str
+        return self.effective_sequence_str
 
     def __hash__(self) -> int:
         """Get the hash of the peptide.
@@ -185,7 +197,7 @@ class Peptide:
         Returns:
             int: The hash of the peptide.
         """
-        return hash(self.sequence_str)
+        return hash(self.effective_sequence_str)
 
     def has_chromatogram(self) -> bool:
         """Check if the peptide has any encoding with a chromatogram.
