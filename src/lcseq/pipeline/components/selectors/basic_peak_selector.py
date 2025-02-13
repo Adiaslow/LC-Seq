@@ -10,11 +10,14 @@ from dataclasses import dataclass
 
 from src.lcseq.core.chromatogram import Peak
 from src.lcseq.core.hierarchy import PeptideHierarchyNode
+
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -46,7 +49,7 @@ class BasicPeakSelector(PipelineComponent):
         process_hierarchy: Process a hierarchy of peptides.
     """
 
-    def __init__(self, config: BasicPeakSelectorConfig = None):  # type: ignore
+    def __init__(self, config: BasicPeakSelectorConfig = None) -> None:  # type: ignore
         """Initialize the BasicPeakSelector.
 
         Args:
@@ -144,14 +147,20 @@ class BasicPeakSelector(PipelineComponent):
         """
 
         def process_node(node: PeptideHierarchyNode) -> None:
+            """Process a single node in the hierarchy.
+
+            Args:
+                node (PeptideHierarchyNode): The node to process.
+            """
             for encoding in node.peptide.encodings:
                 if encoding.chromatogram is not None and encoding.chromatogram.peaks:
                     encoding.chromatogram.peaks = self.select_peaks(
                         encoding.chromatogram.peaks
                     )
-            for child in node.children:
-                process_node(child)
+            for extension in node.extension_edges:
+                process_node(extension)
 
-        self.logger.info(f"Selecting peaks for peptide hierarchy")
-        process_node(input_data.hierarchy.root)
+        self.logger.info("Selecting peaks for peptide hierarchy")
+        for node in input_data.hierarchy.layers[1]:
+            process_node(node)
         return input_data

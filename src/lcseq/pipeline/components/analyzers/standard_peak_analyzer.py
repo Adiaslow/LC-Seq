@@ -17,12 +17,16 @@ from typing import Dict, List
 import numpy as np
 from scipy.optimize import curve_fit
 from scipy.signal import peak_widths
-from src.lcseq.core.chromatogram import Chromatogram, Peak
+
 # Local application imports
+from src.lcseq.core.chromatogram import Chromatogram, Peak
+from src.lcseq.core.hierarchy import PeptideHierarchyNode
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -83,82 +87,89 @@ class StandardPeakAnalyzer(PipelineComponent):
                 np.searchsorted(chrom.times, peak.start_time),
                 np.searchsorted(chrom.times, peak.end_time) + 1,
             )
-            times = chrom.times[peak_slice]
-            intensities = chrom.intensities[peak_slice]
+            times: np.ndarray = chrom.times[peak_slice]
+            intensities: np.ndarray = chrom.intensities[peak_slice]
 
             # Calculate peak width at half maximum
-            half_max = (peak.apex_intensity + peak.start_intensity) / 2
-            width_indices = np.where(intensities >= half_max)[0]
+            half_max: float = (peak.apex_intensity + peak.start_intensity) / 2
+            width_indices: np.ndarray = np.where(intensities >= half_max)[0]
             if len(width_indices) >= 2:
-                width = times[width_indices[-1]] - times[width_indices[0]]
+                width: float = float(times[width_indices[-1]] - times[width_indices[0]])
             else:
-                width = peak.end_time - peak.start_time
+                width: float = float(peak.end_time - peak.start_time)
 
             # Calculate area using trapezoidal rule
-            area = np.trapezoid(intensities, times)
+            area: float = float(np.trapezoid(intensities, times))
 
             # Calculate symmetry
-            apex_idx = np.searchsorted(times, peak.apex_time)
-            left = intensities[: apex_idx + 1]
-            right = intensities[apex_idx:][::-1]
-            min_len = min(len(left), len(right))
-            symmetry = 1 - np.mean(
-                np.abs(left[-min_len:] - right[-min_len:]) / peak.apex_intensity
+            apex_idx: int = int(np.searchsorted(times, peak.apex_time))
+            left: np.ndarray = intensities[: apex_idx + 1]
+            right: np.ndarray = intensities[apex_idx:][::-1]
+            min_len: int = min(len(left), len(right))
+            symmetry: float = float(
+                1
+                - np.mean(
+                    np.abs(left[-min_len:] - right[-min_len:]) / peak.apex_intensity
+                )
             )
 
             # Improved Gaussian fitting
             try:
                 # Use a wider window for fitting
-                window_extension = width  # Extend by one peak width on each side
-                extended_start = max(peak.start_time - window_extension, chrom.times[0])
-                extended_end = min(peak.end_time + window_extension, chrom.times[-1])
+                window_extension: float = width  # Extend by one peak width on each side
+                extended_start: float = max(
+                    peak.start_time - window_extension, chrom.times[0]
+                )
+                extended_end: float = min(
+                    peak.end_time + window_extension, chrom.times[-1]
+                )
 
-                fit_slice = slice(
+                fit_slice: slice = slice(
                     np.searchsorted(chrom.times, extended_start),
                     np.searchsorted(chrom.times, extended_end) + 1,
                 )
-                fit_times = chrom.times[fit_slice]
-                fit_intensities = chrom.intensities[fit_slice]
+                fit_times: np.ndarray = chrom.times[fit_slice]
+                fit_intensities: np.ndarray = chrom.intensities[fit_slice]
 
                 # Better initial parameter estimates
-                p0 = [
+                p0: List[float] = [
                     peak.apex_intensity,  # Amplitude
                     peak.apex_time,  # Mean
                     width / 2.355,  # Sigma (FWHM/2.355)
                 ]
 
                 # Add bounds to constrain the fit
-                lower_bounds = [
+                lower_bounds: List[float] = [
                     peak.apex_intensity * 0.5,  # Amplitude lower bound
                     peak.start_time,  # Mean lower bound
                     width / 4,  # Sigma lower bound
                 ]
-                upper_bounds = [
+                upper_bounds: List[float] = [
                     peak.apex_intensity * 1.5,  # Amplitude upper bound
                     peak.end_time,  # Mean upper bound
                     width,  # Sigma upper bound
                 ]
 
                 # Perform fit with bounds and better initial guesses
-                popt, _ = curve_fit(
+                popt: List[float] = curve_fit(
                     self._gaussian,
                     fit_times,
                     fit_intensities,
                     p0=p0,
                     bounds=(lower_bounds, upper_bounds),
                     maxfev=1000,  # Increase max iterations
-                )
+                )[0]
 
                 # Calculate residuals using the original peak region
-                gaussian_residuals = (
+                gaussian_residuals: float = float(
                     np.sqrt(np.mean((intensities - self._gaussian(times, *popt)) ** 2))
                     / peak.apex_intensity
                 )
 
             except (RuntimeError, ValueError) as e:
                 self.logger.warning(f"Gaussian fitting failed: {str(e)}")
-                gaussian_residuals = 1.0
-                popt = [0, 0, 0]
+                gaussian_residuals: float = 1.0
+                popt: List[float] = [0, 0, 0]
 
             # Update peak properties
             peak.properties.update(
@@ -237,16 +248,17 @@ class StandardPeakAnalyzer(PipelineComponent):
             PeptideHierarchyInput: The input data with the peaks analyzed.
         """
 
-        def process_node(node):
-            for encoding in node.root.encodings:
+        def process_node(node: PeptideHierarchyNode) -> None:
+            for encoding in node.peptide.encodings:
                 if encoding.chromatogram is not None and encoding.chromatogram.peaks:
                     for i, peak in enumerate(encoding.chromatogram.peaks):
                         encoding.chromatogram.peaks[i] = self.analyze_peak(
                             peak, encoding.chromatogram
                         )
-            for child in node.children:
-                process_node(child)
+            for extension in node.extension_edges:
+                process_node(extension)
 
-        self.logger.info(f"Analyzing peaks for peptide hierarchy")
-        process_node(input_data.hierarchy)
+        self.logger.info("Analyzing peaks for peptide hierarchy")
+        for node in input_data.hierarchy.layers[1]:
+            process_node(node)
         return input_data

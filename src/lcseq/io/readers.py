@@ -13,7 +13,7 @@ Classes:
 # Standard library imports
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 
 import pandas as pd
 import yaml
@@ -51,7 +51,7 @@ class ColumnMapping:
             ColumnMapping: The mapping of input columns to output YAML structure.
         """
         with open(config_path, "r") as f:
-            config = yaml.safe_load(f)
+            config: Dict[str, Any] = yaml.safe_load(f)
         return cls(
             building_block_columns=config["building_block_columns"],
             peptide_property_columns=config["peptide_property_columns"],
@@ -78,10 +78,10 @@ class ChromatogramDataParser:
         Returns:
             Dict[str, List[float]]: The parsed chromatogram data.
         """
-        points = data.split(", ")
-        times = []
-        intensities = []
-        scaled_intensities = []
+        points: List[str] = data.split(", ")
+        times: List[float] = []
+        intensities: List[float] = []
+        scaled_intensities: List[float] = []
         for point in points:
             time, counts = point.split(":")
             raw, scaled = counts.split(";")
@@ -89,7 +89,9 @@ class ChromatogramDataParser:
             intensities.append(float(raw))
             scaled_intensities.append(float(scaled))
         # Sort by time
-        sorted_data = sorted(zip(times, intensities, scaled_intensities))
+        sorted_data: List[Tuple[float, float, float]] = sorted(
+            zip(times, intensities, scaled_intensities)
+        )
         return {
             "times": [x[0] / 60 for x in sorted_data],
             "intensities": [x[1] for x in sorted_data],
@@ -112,10 +114,12 @@ class PeptideDataReader:
         self,
         column_mapping: ColumnMapping,
         chromatogram_parser: Callable = ChromatogramDataParser.parse_colon_semicolon,
-    ):
-        self.column_mapping = column_mapping
-        self.chromatogram_parser = chromatogram_parser
-        self._position_to_blocks = {}  # Will store block mapping during parsing
+    ) -> None:
+        self.column_mapping: ColumnMapping = column_mapping
+        self.chromatogram_parser: Callable = chromatogram_parser
+        self._position_to_blocks: Dict[int, Dict[str, Dict]] = (
+            {}
+        )  # Will store block mapping during parsing
 
     def read_csv(self, file_path: Path) -> Dict:
         """Read and parse CSV file into internal dictionary format.
@@ -129,7 +133,7 @@ class PeptideDataReader:
                 - peptides: List of peptide entries with sequences and properties
                 - metadata: Dictionary of dataset metadata
         """
-        df = pd.read_csv(file_path)
+        df: pd.DataFrame = pd.read_csv(file_path)
         return self._parse_dataframe(df)
 
     def _parse_dataframe(self, df: pd.DataFrame) -> Dict:
@@ -156,24 +160,26 @@ class PeptideDataReader:
         Returns:
             Dict: The internal dictionary format.
         """
-        building_blocks = {}
+        building_blocks: Dict[str, Dict] = {}
         # Parse blocks by position
         for position in range(1, self.column_mapping.num_building_blocks + 1):
-            position_key = f"BB{position}"
+            position_key: str = f"BB{position}"
             building_blocks[position_key] = {}
 
-            idx = position - 1  # Array index for column names
-            name_col = self.column_mapping.building_block_columns["name"][idx]
-            smiles_col = self.column_mapping.building_block_columns["smiles"][idx]
-            stereochem_col = self.column_mapping.building_block_columns["stereochem"][
-                idx
-            ]
+            idx: int = position - 1  # Array index for column names
+            name_col: str = self.column_mapping.building_block_columns["name"][idx]
+            smiles_col: str = self.column_mapping.building_block_columns["smiles"][idx]
+            stereochem_col: str = self.column_mapping.building_block_columns[
+                "stereochem"
+            ][idx]
 
             # Get unique blocks for this position
-            unique_blocks = df[[name_col, smiles_col, stereochem_col]].drop_duplicates()
+            unique_blocks: pd.DataFrame = df[
+                [name_col, smiles_col, stereochem_col]
+            ].drop_duplicates()
 
             for _, block in unique_blocks.iterrows():
-                name = block[name_col]
+                name: str = block[name_col]
                 if pd.isna(name) or name == "-":  # type: ignore
                     continue
 
@@ -194,28 +200,30 @@ class PeptideDataReader:
         Returns:
             List[Dict]: The peptide entries with sequence and properties.
         """
-        peptides = []
+        peptides: List[Dict] = []
 
         for idx, row in df.iterrows():
             try:
                 # Get identifier from specified column
-                identifier = row[self.column_mapping.identifier_column]
+                identifier: str = row[self.column_mapping.identifier_column]
 
                 # Parse chromatogram data
-                chrom_data = row[self.column_mapping.chromatogram_column]
-                parsed_chrom = self.chromatogram_parser(chrom_data)
+                chrom_data: str = row[self.column_mapping.chromatogram_column]
+                parsed_chrom: Dict[str, List[float]] = self.chromatogram_parser(
+                    chrom_data
+                )
 
                 # Get sequence from name columns
-                sequence = []
+                sequence: List[str] = []
                 for bb_idx in range(self.column_mapping.num_building_blocks):
-                    name_col = self.column_mapping.building_block_columns["name"][
+                    name_col: str = self.column_mapping.building_block_columns["name"][
                         bb_idx
                     ]
-                    bb_name = row[name_col]
+                    bb_name: str = row[name_col]
                     if pd.notna(bb_name) and bb_name != "-":  # type: ignore
                         sequence.append(bb_name)
 
-                peptide = {
+                peptide: Dict = {
                     "identifier": identifier,
                     "sequence": sequence,
                     "properties": {

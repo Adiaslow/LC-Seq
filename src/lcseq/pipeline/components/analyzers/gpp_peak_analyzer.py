@@ -16,14 +16,18 @@ from typing import List
 
 import numpy as np
 from scipy.optimize import curve_fit
-from src.lcseq.core.chromatogram import Chromatogram, Peak
-# Local application imports
-from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
 
-logger = logging.getLogger(__name__)
+# Local application imports
+from src.lcseq.core.chromatogram import Chromatogram, Peak
+from src.lcseq.pipeline.base import PipelineComponent
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
+from src.lcseq.core.hierarchy import PeptideHierarchyNode
+
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -60,8 +64,8 @@ class GPPPeakAnalyzer(PipelineComponent):
             config (GPPPeakAnalyzerConfig, optional): Configuration for Gaussian fitting parameters.
                 Default is None, which uses the default configuration.
         """
-        self.config = config or GPPPeakAnalyzerConfig()
-        self.logger = logging.getLogger(__name__)
+        self.config: GPPPeakAnalyzerConfig = config or GPPPeakAnalyzerConfig()
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
     @staticmethod
     def _gaussian(
@@ -96,8 +100,8 @@ class GPPPeakAnalyzer(PipelineComponent):
                 np.searchsorted(chrom.times, peak.start_time),
                 np.searchsorted(chrom.times, peak.end_time) + 1,
             )
-            times = chrom.times[peak_slice]
-            corrected_intensities = chrom.properties.get(
+            times: np.ndarray = chrom.times[peak_slice]
+            corrected_intensities: np.ndarray = chrom.properties.get(
                 "corrected_intensities", chrom.intensities[peak_slice]
             )
 
@@ -108,22 +112,26 @@ class GPPPeakAnalyzer(PipelineComponent):
 
             # Improved Gaussian fitting
             try:
-                window_extension = (
+                window_extension: float = (
                     peak.end_time - peak.start_time
                 )  # Extend by one peak width on each side
-                extended_start = max(peak.start_time - window_extension, chrom.times[0])
-                extended_end = min(peak.end_time + window_extension, chrom.times[-1])
+                extended_start: float = max(
+                    peak.start_time - window_extension, chrom.times[0]
+                )
+                extended_end: float = min(
+                    peak.end_time + window_extension, chrom.times[-1]
+                )
 
                 fit_slice = slice(
                     np.searchsorted(chrom.times, extended_start),
                     np.searchsorted(chrom.times, extended_end) + 1,
                 )
-                fit_times = chrom.times[fit_slice]
-                fit_intensities = chrom.properties.get(
+                fit_times: np.ndarray = chrom.times[fit_slice]
+                fit_intensities: np.ndarray = chrom.properties.get(
                     "corrected_intensities", chrom.intensities
                 )[fit_slice]
 
-                p0 = [
+                p0: List[float] = [
                     peak.apex_intensity,  # Amplitude
                     peak.apex_time,  # Mean
                     max(
@@ -131,12 +139,12 @@ class GPPPeakAnalyzer(PipelineComponent):
                     ),  # Sigma (FWHM/2.355)
                 ]
 
-                lower_bounds = [
+                lower_bounds: List[float] = [
                     peak.apex_intensity * 0.5,  # Amplitude lower bound
                     peak.start_time,  # Mean lower bound
                     self.config.min_std,  # Sigma lower bound
                 ]
-                upper_bounds = [
+                upper_bounds: List[float] = [
                     peak.apex_intensity * 1.5,  # Amplitude upper bound
                     peak.end_time,  # Mean upper bound
                     peak.end_time - peak.start_time,  # Sigma upper bound
@@ -151,7 +159,7 @@ class GPPPeakAnalyzer(PipelineComponent):
                     maxfev=1000,  # Increase max iterations
                 )
 
-                gaussian_residuals = (
+                gaussian_residuals: float = (
                     np.sqrt(
                         np.mean(
                             (corrected_intensities - self._gaussian(times, *popt)) ** 2
@@ -162,10 +170,10 @@ class GPPPeakAnalyzer(PipelineComponent):
 
             except (RuntimeError, ValueError) as e:
                 self.logger.warning(f"Gaussian fitting failed: {str(e)}")
-                gaussian_residuals = 1.0
-                popt = [0, 0, 0]
+                gaussian_residuals: float = 1.0
+                popt: List[float] = [0, 0, 0]
 
-            logger.info(f"Found Gaussian fit parameters: {popt} for peak {peak}")
+            self.logger.info(f"Found Gaussian fit parameters: {popt} for peak {peak}")
 
             # Update peak properties with corrected values
             peak.properties.update(
@@ -241,21 +249,22 @@ class GPPPeakAnalyzer(PipelineComponent):
             PeptideHierarchyInput: The input data with the peaks analyzed.
         """
 
-        def process_node(node):
+        def process_node(node: PeptideHierarchyNode) -> None:
             """Process a single node in the hierarchy.
 
             Args:
                 node (PeptideHierarchyNode): The node to process.
             """
-            for encoding in node.root.encodings:
+            for encoding in node.peptide.encodings:
                 if encoding.chromatogram is not None and encoding.chromatogram.peaks:
                     for i, peak in enumerate(encoding.chromatogram.peaks):
                         encoding.chromatogram.peaks[i] = self.analyze_peak(
                             peak, encoding.chromatogram
                         )
-            for child in node.children:
-                process_node(child)
+            for extension in node.extension_edges:
+                process_node(extension)
 
-        self.logger.info(f"Analyzing peaks for peptide hierarchy")
-        process_node(input_data.hierarchy)
+        self.logger.info("Analyzing peaks for peptide hierarchy")
+        for node in input_data.hierarchy.layers[1]:
+            process_node(node)
         return input_data

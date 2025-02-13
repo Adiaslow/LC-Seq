@@ -10,7 +10,7 @@ Classes:
 
 # Standard library imports
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 # Local application imports
 from src.lcseq.core.building_block import BuildingBlock
@@ -37,7 +37,7 @@ class PeptideEncoding:
     chromatogram: Optional[Chromatogram] = None
     properties: Dict = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate encoding blocks.
 
         Raises:
@@ -72,6 +72,14 @@ class PeptideEncoding:
         """
         return self.sequence_str
 
+    def __hash__(self) -> int:
+        """Get the hash of the peptide.
+
+        Returns:
+            int: The hash of the peptide.
+        """
+        return hash(self.sequence_str)
+
 
 @dataclass
 class Peptide:
@@ -88,13 +96,15 @@ class Peptide:
         add_encoding: Add a new encoding to the peptide.
         remove_encoding: Remove an encoding from the peptide.
         get_encoding: Get a specific encoding by its sequence.
+        has_chromatogram: Check if the peptide has any encoding with a chromatogram.
+        get_chromatogram: Get the chromatogram from the first encoding that has one.
     """
 
     sequence: List[BuildingBlock]
     encodings: List[PeptideEncoding] = field(default_factory=list)
     properties: Dict = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate the peptide sequence.
 
         Raises:
@@ -148,7 +158,7 @@ class Peptide:
                 return encoding
         return None
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """Check if two peptides are equal.
 
         Args:
@@ -176,3 +186,22 @@ class Peptide:
             int: The hash of the peptide.
         """
         return hash(self.sequence_str)
+
+    def has_chromatogram(self) -> bool:
+        """Check if the peptide has any encoding with a chromatogram.
+
+        Returns:
+            bool: True if any encoding has a chromatogram, False otherwise.
+        """
+        return any(encoding.chromatogram is not None for encoding in self.encodings)
+
+    def get_chromatogram(self) -> Optional[Chromatogram]:
+        """Get the chromatogram from the first encoding that has one.
+
+        Returns:
+            Optional[Chromatogram]: The chromatogram if found, otherwise None.
+        """
+        for encoding in self.encodings:
+            if encoding.chromatogram is not None:
+                return encoding.chromatogram
+        return None

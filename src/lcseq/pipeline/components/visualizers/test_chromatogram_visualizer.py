@@ -10,9 +10,11 @@ Classes:
 import logging
 
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 

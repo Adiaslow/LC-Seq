@@ -2,3 +2,5 @@
 """
 This module provides the tests for the project.
 """
+
+"""Test package."""

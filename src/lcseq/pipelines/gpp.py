@@ -9,18 +9,21 @@ Classes:
         chromatogram data processing.
 """
 
-from ..pipeline.components.analyzers import (GPPPeakAnalyzer,
-                                             StandardChromatogramAnalyzer,
-                                             StandardPeakAnalyzer)
-from ..pipeline.components.correctors import SWMChromatogramCorrector
-from ..pipeline.components.detectors import StandardPeakDetector
-from ..pipeline.components.io import StandardInput, StandardOutput
-from ..pipeline.components.selectors import GPPPeakSelector
-from ..pipeline.components.visualizers import StandardChromatogramVisualizer
-from ..pipeline.components.visualizers.standard_chromatogram_visualizer import \
-    StandardChromatogramVisualizerConfig
 # Local application imports
-from ..pipeline.pipeline import Pipeline
+from src.lcseq.pipeline.components.analyzers import (
+    GPPPeakAnalyzer,
+    StandardChromatogramAnalyzer,
+    StandardPeakAnalyzer,
+)
+from src.lcseq.pipeline.components.correctors import SWMChromatogramCorrector
+from src.lcseq.pipeline.components.detectors import StandardPeakDetector
+from src.lcseq.pipeline.components.io import StandardInput, StandardOutput
+from src.lcseq.pipeline.components.selectors import GPPPeakSelector
+from src.lcseq.pipeline.components.visualizers import StandardChromatogramVisualizer
+from src.lcseq.pipeline.components.visualizers.standard_chromatogram_visualizer import (
+    StandardChromatogramVisualizerConfig,
+)
+from src.lcseq.pipeline.pipeline import Pipeline
 
 
 class GPPPipe(Pipeline):
@@ -36,7 +39,7 @@ class GPPPipe(Pipeline):
         plot_chromatograms (bool): Flag to determine whether to plot chromatograms.
     """
 
-    def __init__(self, input_file_path: str, plot_chromatograms=False):
+    def __init__(self, input_file_path: str, plot_chromatograms: bool = False) -> None:
         """
         Initializes the GPP with the provided input file path and optional plotting flag.
 

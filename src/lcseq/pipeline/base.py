@@ -8,19 +8,23 @@ Classes:
 """
 
 import logging
-# Standard library imports
-from abc import ABC, abstractmethod
 
-from src.lcseq.core.hierarchy import PeptideHierarchy
-from src.lcseq.core.peptide import Peptide
-# Local application imports
-from src.lcseq.pipeline import (PeptideHierarchyInput, PeptideSetInput,
-                                Pipeline, ProcessableInput, SinglePeptideInput)
+# Standard library imports
+import abc
+from typing import Any, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.lcseq.pipeline.input_types import (
+        PeptideHierarchyInput,
+        PeptideSetInput,
+        SinglePeptideInput,
+        ProcessableInput,
+    )
 
 logger: logging.Logger = logging.getLogger(__name__)
 
 
-class PipelineComponent(ABC):
+class PipelineComponent(abc.ABC):
     """Abstract base class for pipeline components.
 
     This class defines the interface for components that can process different types of
@@ -35,11 +39,11 @@ class PipelineComponent(ABC):
     """
 
     def __init__(self) -> None:
-        self._pipeline: Pipeline | None = None
+        self._pipeline: Any = None
         self.logger: logging.Logger = logging.getLogger(__name__)
 
-    @abstractmethod
-    def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
+    @abc.abstractmethod
+    def process_peptide(self, input_data: "SinglePeptideInput") -> "SinglePeptideInput":
         """Process a single peptide.
 
         Args:
@@ -51,8 +55,8 @@ class PipelineComponent(ABC):
         """
         pass
 
-    @abstractmethod
-    def process_peptide_set(self, input_data: PeptideSetInput) -> PeptideSetInput:
+    @abc.abstractmethod
+    def process_peptide_set(self, input_data: "PeptideSetInput") -> "PeptideSetInput":
         """Process a set of peptides.
 
         Args:
@@ -63,10 +67,10 @@ class PipelineComponent(ABC):
         """
         pass
 
-    @abstractmethod
+    @abc.abstractmethod
     def process_hierarchy(
-        self, input_data: PeptideHierarchyInput
-    ) -> PeptideHierarchyInput:
+        self, input_data: "PeptideHierarchyInput"
+    ) -> "PeptideHierarchyInput":
         """Process a hierarchy of peptides.
 
         Args:
@@ -78,7 +82,7 @@ class PipelineComponent(ABC):
         """
         pass
 
-    def process(self, input_data: ProcessableInput) -> ProcessableInput:
+    def process(self, input_data: "ProcessableInput") -> "ProcessableInput":
         """Main entry point for processing any type of input.
 
         This method delegates the processing to the appropriate method based on the
@@ -93,11 +97,11 @@ class PipelineComponent(ABC):
         return input_data.accept(self)
 
     @property
-    def pipeline(self) -> Pipeline | None:
+    def pipeline(self) -> Any:
         """Get the pipeline this component belongs to."""
         return self._pipeline
 
     @pipeline.setter
-    def pipeline(self, pipeline: Pipeline) -> None:
+    def pipeline(self, pipeline: Any) -> None:
         """Set the pipeline this component belongs to."""
         self._pipeline = pipeline

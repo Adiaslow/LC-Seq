@@ -17,11 +17,14 @@ from dataclasses import dataclass
 
 from src.lcseq.core.chromatogram import Peak
 from src.lcseq.core.hierarchy import PeptideHierarchyNode
+
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -53,15 +56,15 @@ class GPPPeakSelector(PipelineComponent):
         process_hierarchy: Process a hierarchy of peptides.
     """
 
-    def __init__(self, config: GPPPeakSelectorConfig = None):  # type: ignore
+    def __init__(self, config: GPPPeakSelectorConfig = None) -> None:  # type: ignore
         """Initialize GPPPeakSelector with the given configuration.
 
         Args:
             config: An optional GPPPeakSelectorConfig object. If not provided,
                 a default configuration will be used.
         """
-        self.config = config or GPPPeakSelectorConfig()
-        self.logger = logging.getLogger(__name__)
+        self.config: GPPPeakSelectorConfig = config or GPPPeakSelectorConfig()
+        self.logger: logging.Logger = logging.getLogger(__name__)
 
     def select_peaks(self, peaks: list[Peak]) -> list[Peak]:
         """Select the peak with the highest corrected Gaussian mean time value.
@@ -73,7 +76,7 @@ class GPPPeakSelector(PipelineComponent):
             A list containing the selected Peak object with the highest corrected Gaussian
             mean time value. If no valid peaks are found, an empty list is returned.
         """
-        peak_info = [
+        peak_info: list[str] = [
             f"{peak.properties.get('corrected_gaussian_fit_params', {}).get('mean', 'N/A')} ({peak.apex_intensity})"
             for peak in peaks
         ]
@@ -84,7 +87,7 @@ class GPPPeakSelector(PipelineComponent):
             return []
 
         # Filter peaks based on basic criteria
-        valid_peaks = [
+        valid_peaks: list[Peak] = [
             peak
             for peak in peaks
             if peak.apex_intensity >= self.config.intensity_threshold
@@ -96,7 +99,7 @@ class GPPPeakSelector(PipelineComponent):
             return []
 
         # Find peak with highest corrected Gaussian mean time
-        latest_peak = max(
+        latest_peak: Peak = max(
             valid_peaks,
             key=lambda p: p.properties.get("corrected_gaussian_fit_params", {}).get(
                 "mean", float("-inf")
@@ -159,14 +162,20 @@ class GPPPeakSelector(PipelineComponent):
         """
 
         def process_node(node: PeptideHierarchyNode) -> None:
+            """Process a single node in the hierarchy.
+
+            Args:
+                node (PeptideHierarchyNode): The node to process.
+            """
             for encoding in node.peptide.encodings:
                 if encoding.chromatogram is not None and encoding.chromatogram.peaks:
                     encoding.chromatogram.peaks = self.select_peaks(
                         encoding.chromatogram.peaks
                     )
-            for child in node.children:
-                process_node(child)
+            for extension in node.extension_edges:
+                process_node(extension)
 
-        self.logger.info(f"Selecting peaks for peptide hierarchy")
-        process_node(input_data.hierarchy.root)
+        self.logger.info("Selecting peaks for peptide hierarchy")
+        for node in input_data.hierarchy.layers[1]:
+            process_node(node)
         return input_data

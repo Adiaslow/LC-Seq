@@ -35,7 +35,7 @@ class Chromatogram:
     properties: Dict = field(default_factory=dict)
     peaks: List[Peak] = field(default_factory=list)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Ensure times and intensities are numpy arrays and validate inputs.
 
         Raises:
@@ -65,8 +65,8 @@ class Chromatogram:
         Returns:
             Chromatogram: A new Chromatogram object containing the sub-section.
         """
-        mask = (self.times >= start_time) & (self.times <= end_time)
-        new_properties = self.properties.copy()
+        mask: np.ndarray = (self.times >= start_time) & (self.times <= end_time)
+        new_properties: Dict = self.properties.copy()
         if "corrected_intensities" in self.properties:
             new_properties["corrected_intensities"] = self.properties[
                 "corrected_intensities"

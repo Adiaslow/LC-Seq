@@ -31,7 +31,7 @@ class BuildingBlock:
     identifier: str
     properties: Dict[str, Any]
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate building block attributes after initialization.
 
         Raises:
@@ -50,7 +50,7 @@ class BuildingBlock:
         if not self.properties:
             raise ValueError("Building block properties cannot be empty")
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         """Check if two building blocks are equal.
 
         Args:
@@ -63,7 +63,7 @@ class BuildingBlock:
             return False
         return self.identifier == other.identifier
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         """Get the hash of the building block.
 
         Returns:

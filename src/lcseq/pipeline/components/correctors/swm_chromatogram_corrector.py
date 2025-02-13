@@ -14,12 +14,16 @@ import logging
 from dataclasses import dataclass
 
 import numpy as np
-from src.lcseq.core.chromatogram import Chromatogram
+
 # Local application imports
+from src.lcseq.core.chromatogram import Chromatogram
+from src.lcseq.core.hierarchy import PeptideHierarchyNode
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -162,17 +166,18 @@ class SWMChromatogramCorrector(PipelineComponent):
             PeptideHierarchyInput: The corrected hierarchy of peptides.
         """
 
-        def process_node(node):
-            for encoding in node.root.encodings:
+        def process_node(node: PeptideHierarchyNode) -> None:
+            for encoding in node.peptide.encodings:
                 if encoding.chromatogram is not None:
                     encoding.chromatogram = self._correct_chromatogram(
                         encoding.chromatogram
                     )
-            for child in node.children:
-                process_node(child)
+            for extension in node.extension_edges:
+                process_node(extension)
 
-        self.logger.info(f"Correcting chromatograms for peptide hierarchy")
-        process_node(input_data.hierarchy)
+        self.logger.info("Correcting chromatograms for peptide hierarchy")
+        for node in input_data.hierarchy.layers[1]:
+            process_node(node)
         return input_data
 
     def _validate_inputs(self, y: np.ndarray) -> None:
@@ -207,7 +212,7 @@ class SWMChromatogramCorrector(PipelineComponent):
     def _compute_baseline(self, y_padded: np.ndarray) -> np.ndarray:
         """Compute the baseline using sliding window minimum."""
         try:
-            window_view = np.lib.stride_tricks.sliding_window_view(
+            window_view: np.ndarray = np.lib.stride_tricks.sliding_window_view(
                 y_padded, self.config.window_length
             )
             return np.min(window_view, axis=1)

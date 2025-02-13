@@ -16,12 +16,21 @@ from typing import Any, Dict, List, Optional, Set, Tuple, Union
 import numpy as np
 import yaml
 
-from ....core import (BuildingBlock, BuildingBlockRegistry, Chromatogram,
-                      Peptide, PeptideEncoding, PeptideHierarchy)
-from ....pipeline import (PeptideHierarchyInput, PeptideSetInput,
-                          SinglePeptideInput)
 # Local application imports
-from ...pipeline import PipelineComponent
+from src.lcseq.core import (
+    BuildingBlock,
+    BuildingBlockRegistry,
+    Chromatogram,
+    Peptide,
+    PeptideEncoding,
+    PeptideHierarchy,
+)
+from src.lcseq.pipeline import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
+from src.lcseq.pipeline.base import PipelineComponent
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -73,8 +82,10 @@ class StandardInput(PipelineComponent):
             if len(peptide.sequence) > 1:
                 # Check if potential truncations exist
                 for i in range(len(peptide.sequence)):
-                    truncated_seq = peptide.sequence[:i] + peptide.sequence[i + 1 :]
-                    truncated_str = "-".join(
+                    truncated_seq: List[BuildingBlock] = (
+                        peptide.sequence[:i] + peptide.sequence[i + 1 :]
+                    )
+                    truncated_str: str = "-".join(
                         [block.identifier for block in truncated_seq][::-1]
                     )
 
@@ -93,20 +104,22 @@ class StandardInput(PipelineComponent):
         orphaned = set()
 
         # First pass: add all single-block peptides
-        single_block = {p for p in peptides if len(p.sequence) == 1}
+        single_block: Set[Peptide] = {p for p in peptides if len(p.sequence) == 1}
         for peptide in single_block:
             hierarchy.add_node(peptide)
 
         # Second pass: try to build up multi-block peptides
-        remaining = peptides - single_block
+        remaining: Set[Peptide] = peptides - single_block
         for peptide in remaining:
             # Check if all possible truncations exist
-            has_all_truncations = True
-            truncation_sequences = set()
+            has_all_truncations: bool = True
+            truncation_sequences: Set[str] = set()
 
             # Generate all possible truncation sequences
             for i in range(len(peptide.sequence)):
-                truncated_seq = peptide.sequence[:i] + peptide.sequence[i + 1 :]
+                truncated_seq: List[BuildingBlock] = (
+                    peptide.sequence[:i] + peptide.sequence[i + 1 :]
+                )
                 truncation_sequences.add(
                     "-".join([block.identifier for block in truncated_seq][::-1])
                 )
@@ -144,13 +157,17 @@ class StandardInput(PipelineComponent):
 
         # Create peptides
         for peptide_data in input_data["peptides"]:
-            sequence = self._create_sequence(peptide_data["sequence"])
+            sequence: Optional[List[BuildingBlock]] = self._create_sequence(
+                peptide_data["sequence"]
+            )
             if sequence:
-                peptide = self._create_peptide(sequence, peptide_data)
+                peptide: Peptide = self._create_peptide(sequence, peptide_data)
                 peptides.add(peptide)
 
         # Determine processing type
         if self.pipeline.config.hierarchical or self.detect_hierarchy(peptides):  # type: ignore
+            hierarchy: PeptideHierarchy
+            orphaned: Set[Peptide]
             hierarchy, orphaned = self.build_hierarchy(peptides)
             return PeptideHierarchyInput(hierarchy=hierarchy, orphaned_peptides=orphaned)  # type: ignore
 
@@ -160,9 +177,9 @@ class StandardInput(PipelineComponent):
         self, sequence_names: List[str]
     ) -> Optional[List[BuildingBlock]]:
         """Create sequence of building blocks from names."""
-        sequence = []
+        sequence: List[BuildingBlock] = []
         for name in sequence_names:
-            matching_block = next(
+            matching_block: Optional[BuildingBlock] = next(
                 (
                     block
                     for block in BuildingBlockRegistry.blocks.values()  # type: ignore
@@ -186,11 +203,13 @@ class StandardInput(PipelineComponent):
             intensities=np.array(peptide_data["chromatogram"]["intensities"]),
         )
 
-        properties = peptide_data["properties"].copy()
+        properties: Dict = peptide_data["properties"].copy()
         properties["identifier"] = peptide_data["identifier"]
 
-        peptide = Peptide(sequence=sequence, properties=properties)
-        encoding = PeptideEncoding(blocks=sequence, chromatogram=chromatogram)
+        peptide: Peptide = Peptide(sequence=sequence, properties=properties)
+        encoding: PeptideEncoding = PeptideEncoding(
+            blocks=sequence, chromatogram=chromatogram
+        )
         peptide.add_encoding(encoding)
 
         return peptide

@@ -18,9 +18,11 @@ import numpy as np
 from scipy.signal import find_peaks as sp_find_peaks
 from src.lcseq.core.chromatogram import Chromatogram, Peak
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -256,17 +258,34 @@ class StandardPeakDetector(PipelineComponent):
     def process_hierarchy(
         self, input_data: PeptideHierarchyInput
     ) -> PeptideHierarchyInput:
-        """Process a hierarchy of peptides."""
+        """Process a hierarchy of peptides.
 
-        def process_node(node):
-            for encoding in node.root.encodings:
-                if encoding.chromatogram is not None:
-                    encoding.chromatogram = self.find_peaks(encoding.chromatogram)
-            for child in node.children:
-                process_node(child)
-
+        Processes each node in the hierarchy, starting with the longest peptides
+        and working down to shorter ones to ensure proper peak detection order.
+        """
         self.logger.info(f"Detecting peaks for peptide hierarchy")
-        process_node(input_data.hierarchy)
+
+        # Process nodes layer by layer, starting with the highest layer
+        hierarchy = input_data.hierarchy
+        max_layer = max(hierarchy.layers.keys())
+
+        for layer in range(max_layer, 0, -1):  # Process from highest to lowest layer
+            nodes = hierarchy.get_layer(layer)
+            for node in nodes:
+                # Process all encodings for this node
+                for encoding in node.encodings:
+                    if encoding.chromatogram is not None:
+                        encoding.chromatogram = self.find_peaks(encoding.chromatogram)
+
+                # Process equivalent encodings if they exist
+                equivalent_nodes = hierarchy.get_equivalent_encodings(node)
+                for equiv_node in equivalent_nodes:
+                    for encoding in equiv_node.encodings:
+                        if encoding.chromatogram is not None:
+                            encoding.chromatogram = self.find_peaks(
+                                encoding.chromatogram
+                            )
+
         return input_data
 
     def _calculate_height_threshold(self, chrom: Chromatogram) -> float:

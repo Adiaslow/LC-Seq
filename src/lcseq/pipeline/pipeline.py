@@ -73,7 +73,7 @@ class Pipeline:
                 the pipeline.
         """
         self.components: List[PipelineComponent] = components
-        self.config: PipelineConfig = config
+        self.config: PipelineConfig = config or PipelineConfig()
 
         for component in self.components:
             component.pipeline = self
@@ -93,12 +93,6 @@ class Pipeline:
         """
         if input_data is None:
             raise ValueError("Input data cannot be None")
-
-        if not isinstance(input_data, ProcessableInput):
-            raise ValueError(
-                "Input data must be an instance of ProcessableInput, "
-                f"got {type(input_data)}"
-            )
 
         current_data: ProcessableInput = input_data
         for component in self.components:

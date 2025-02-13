@@ -5,16 +5,20 @@ It includes a class for hierarchical peak selection.
 """
 
 import logging
+
 # Standard library imports
 from dataclasses import dataclass
 
 from src.lcseq.core.chromatogram import Peak
 from src.lcseq.core.hierarchy import PeptideHierarchyNode
+
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -39,7 +43,7 @@ class HierarchicalPeakSelectorConfig:
 class HierarchicalPeakSelector(PipelineComponent):
     """Selects peaks considering hierarchical relationships between peptides."""
 
-    def __init__(self, config: HierarchicalPeakSelectorConfig = None):  # type: ignore
+    def __init__(self, config: HierarchicalPeakSelectorConfig = None) -> None:  # type: ignore
         """Initialize the HierarchicalPeakSelector.
 
         Args:
@@ -94,17 +98,31 @@ class HierarchicalPeakSelector(PipelineComponent):
         Returns:
             bool: True if the peak is valid, False otherwise.
         """
+        # Get all truncation peak times
+        truncation_times = []
         for truncation in node.truncation_edges:
             for encoding in truncation.peptide.encodings:
                 if encoding.chromatogram and encoding.chromatogram.peaks:
-                    for trunc_peak in encoding.chromatogram.peaks:
-                        if (
-                            peak.apex_time
-                            <= trunc_peak.apex_time
-                            + self.config.min_retention_time_difference
-                        ):
-                            return False
-        return True
+                    truncation_times.extend(
+                        peak.apex_time for peak in encoding.chromatogram.peaks
+                    )
+
+        if not truncation_times:
+            return True  # No truncations to validate against
+
+        max_truncation_time = max(truncation_times)
+
+        # A peak is valid if it's significantly higher than all truncation peaks
+        # or if it's clearly a failed synthesis (significantly lower)
+        if (
+            peak.apex_time
+            > max_truncation_time + self.config.min_retention_time_difference
+        ):
+            return True  # Valid synthesis peak
+
+        # If the peak is close to or below truncation times, it's likely a failed synthesis
+        # We'll still keep these peaks but they'll be marked as failures later
+        return False
 
     def process_peptide(self, input_data: SinglePeptideInput) -> SinglePeptideInput:
         """Process a single peptide (treat as non-hierarchical).
@@ -150,18 +168,33 @@ class HierarchicalPeakSelector(PipelineComponent):
         Returns:
             PeptideHierarchyInput: The processed input data.
         """
-        # Process single-block peptides first
+        # Process from shortest to longest peptides
+        max_layer = max(input_data.hierarchy.layers.keys())
+
+        # First process single building blocks (layer 1)
         for node in input_data.hierarchy.layers[1]:
             for encoding in node.peptide.encodings:
                 if encoding.chromatogram and encoding.chromatogram.peaks:
+                    # For single blocks, just take the highest peak
                     encoding.chromatogram.peaks = self.select_peaks(
                         encoding.chromatogram.peaks
                     )
+                    if encoding.chromatogram.peaks:
+                        node.retention_time = encoding.chromatogram.peaks[0].apex_time
 
-        # Then process multi-block peptides using truncation information
-        for layer in range(2, max(input_data.hierarchy.layers.keys()) + 1):
+        # Then process each subsequent layer
+        for layer in range(2, max_layer + 1):
             for node in input_data.hierarchy.layers[layer]:
                 self._process_node_with_truncations(node)
+
+                # Update node's retention time and synthesis status
+                for encoding in node.peptide.encodings:
+                    if encoding.chromatogram and encoding.chromatogram.peaks:
+                        node.retention_time = encoding.chromatogram.peaks[0].apex_time
+                        break
+
+                # Update synthesis status based on RT relationships
+                node.update_synthesis_status()
 
         return input_data
 
@@ -173,9 +206,32 @@ class HierarchicalPeakSelector(PipelineComponent):
         """
         for encoding in node.peptide.encodings:
             if encoding.chromatogram and encoding.chromatogram.peaks:
-                valid_peaks: list[Peak] = [
+                # First filter by basic criteria
+                valid_peaks = [
                     peak
                     for peak in encoding.chromatogram.peaks
+                    if peak.apex_intensity >= self.config.intensity_threshold
+                    and (peak.end_time - peak.start_time) >= self.config.min_duration
+                ]
+
+                if not valid_peaks:
+                    continue
+
+                # Then validate against truncations
+                synthesis_peaks = [
+                    peak
+                    for peak in valid_peaks
                     if self._validates_against_truncations(peak, node)
                 ]
-                encoding.chromatogram.peaks = self.select_peaks(valid_peaks)
+
+                # If we found valid synthesis peaks, use those
+                if synthesis_peaks:
+                    encoding.chromatogram.peaks = [
+                        max(synthesis_peaks, key=lambda p: p.apex_time)
+                    ]
+                else:
+                    # If no valid synthesis peaks, take the highest peak
+                    # (will be marked as failed synthesis)
+                    encoding.chromatogram.peaks = [
+                        max(valid_peaks, key=lambda p: p.apex_time)
+                    ]

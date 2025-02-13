@@ -16,24 +16,25 @@ import ast
 from typing import Dict, Any, List
 import sys
 
+
 def extract_python_info(file_path: Path) -> Dict[str, Any]:
     """Extract relevant information from a Python file.
-    
+
     Args:
         file_path (Path): The path to the Python file.
 
     Returns:
         Dict[str, Any]: The extracted information.
     """
-    with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
         content = f.read()
-        lines = content.split('\n')
+        lines = content.split("\n")
 
     info = {
-        'functions': [],
-        'total_lines': len(lines),
-        'non_empty_lines': len([line for line in lines if line.strip()]),
-        'header_comment': []
+        "functions": [],
+        "total_lines": len(lines),
+        "non_empty_lines": len([line for line in lines if line.strip()]),
+        "header_comment": [],
     }
 
     try:
@@ -43,23 +44,24 @@ def extract_python_info(file_path: Path) -> Dict[str, Any]:
         # Get module docstring
         docstring = ast.get_docstring(tree)
         if docstring is not None:
-            info['header_comment'] = [
-                line.strip() for line in docstring.split('\n')
-            ]
+            info["header_comment"] = [line.strip() for line in docstring.split("\n")]
 
         # Extract function definitions
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef):
-                info['functions'].append(node.name)
+                info["functions"].append(node.name)
 
     except SyntaxError:
         print(f"Syntax error in file {file_path}")
 
     return info
 
-def process_directory(root: str, files: List[str], base_path: str) -> tuple[int, int, List[str]]:
+
+def process_directory(
+    root: str, files: List[str], base_path: str
+) -> tuple[int, int, List[str]]:
     """Process a directory to extract information from Python files.
-    
+
     Args:
         root (str): The root directory.
         files (List[str]): The list of files in the directory.
@@ -70,22 +72,24 @@ def process_directory(root: str, files: List[str], base_path: str) -> tuple[int,
     """
     total_files = 0
     total_functions = 0
-    main_content = []
+    main_content: List[str] = []
 
-    python_files = [f for f in files if f.endswith('.py')]
+    python_files: List[str] = [f for f in files if f.endswith(".py")]
 
     if python_files:
-        rel_path = os.path.relpath(root, base_path)
-        section_header = "\n## Root Directory\n\n" \
-            if rel_path == '.' \
+        rel_path: str = os.path.relpath(root, base_path)
+        section_header: str = (
+            "\n## Root Directory\n\n"
+            if rel_path == "."
             else f"\n## Directory: {rel_path}\n\n"
+        )
         main_content.append(section_header)
 
         for file in sorted(python_files):
             total_files += 1
-            file_path = Path(root) / file
-            info = extract_python_info(file_path)
-            total_functions += len(info['functions'])
+            file_path: Path = Path(root) / file
+            info: Dict[str, Any] = extract_python_info(file_path)
+            total_functions += len(info["functions"])
 
             # Write file information
             main_content.append(f"### {file}")
@@ -96,16 +100,16 @@ def process_directory(root: str, files: List[str], base_path: str) -> tuple[int,
             main_content.append("")
 
             # Write header comments if they exist
-            if info['header_comment']:
+            if info["header_comment"]:
                 main_content.append("**File Description:**")
-                main_content.extend(info['header_comment'])
+                main_content.extend(info["header_comment"])
                 main_content.append("")
 
             # Write function definitions
-            if info['functions']:
+            if info["functions"]:
                 main_content.append("**Functions:**")
                 main_content.append("```python")
-                for func in info['functions']:
+                for func in info["functions"]:
                     main_content.append(f"def {func}")
                 main_content.append("```")
 
@@ -114,33 +118,39 @@ def process_directory(root: str, files: List[str], base_path: str) -> tuple[int,
 
     return total_files, total_functions, main_content
 
+
 def generate_documentation(
-    directory: str,
-    output_file: str = 'codebase_analysis/python_codebase_summary.md'):
+    directory: str, output_file: str = "codebase_analysis/python_codebase_summary.md"
+) -> None:
     """Generate documentation for all Python files in the directory.
-    
+
     Args:
         directory (str): The directory to generate documentation for.
         output_file (str): The output file.
     """
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp: str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Track total files and functions for summary
     total_files = 0
     total_functions = 0
 
     # Generate the main content first
-    main_content = []
+    main_content: List[str] = []
 
     # Walk through directory
     for root, _, files in os.walk(directory):
-        files_count, functions_count, content = process_directory(root, files, directory)
+        files_count: int
+        functions_count: int
+        content: List[str]
+        files_count, functions_count, content = process_directory(
+            root, files, directory
+        )
         total_files += files_count
         total_functions += functions_count
         main_content.extend(content)
 
     # Create the complete document structure
-    document_parts = [
+    document_parts: List[str] = [
         "# Python Codebase Summary",
         "",
         f"Generated on: {timestamp}",
@@ -151,12 +161,13 @@ def generate_documentation(
         "",
         "---",
         "",
-        *main_content
+        *main_content,
     ]
 
     # Write everything to the output file
-    with open(output_file, 'w', encoding='utf-8') as f:
-        f.write('\n'.join(document_parts))
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(document_parts))
+
 
 if __name__ == "__main__":
     """Main entry point for the script."""
@@ -164,6 +175,6 @@ if __name__ == "__main__":
         print("Usage: python script.py <path_to_python_directory>")
         sys.exit(1)
 
-    base_dir = sys.argv[1]
+    base_dir: str = sys.argv[1]
     generate_documentation(base_dir)
     print("Documentation generated in 'python_codebase_summary.md'")

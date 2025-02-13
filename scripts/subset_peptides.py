@@ -25,12 +25,13 @@ Example Usage:
 from pathlib import Path
 import click
 import pandas as pd
-from typing import List, Dict, Optional
+from typing import Any, Dict, List
 import yaml
 from itertools import combinations
 
 # Local application imports
 from src.lcseq.io.readers import ColumnMapping
+
 
 def load_column_mapping(config_path: Path) -> Dict[str, List[str]]:
     """Load building block column mapping from config file.
@@ -41,14 +42,13 @@ def load_column_mapping(config_path: Path) -> Dict[str, List[str]]:
     Returns:
         Dict[str, List[str]]: The building block column mapping.
     """
-    with open(config_path, 'r') as f:
-        config = yaml.safe_load(f)
-    return config['building_block_columns']['name']
+    with open(config_path, "r") as f:
+        config: Dict[str, Any] = yaml.safe_load(f)
+    return config["building_block_columns"]["name"]
+
 
 def create_filter_conditions(
-    df: pd.DataFrame,
-    bb_columns: List[str],
-    bb_filters: List[List[str]]
+    df: pd.DataFrame, bb_columns: List[str], bb_filters: List[List[str]]
 ) -> pd.Series:
     """Create filter conditions for each position.
 
@@ -67,11 +67,12 @@ def create_filter_conditions(
 
     return conditions
 
+
 def find_truncations(
     row: pd.Series,
     bb_columns: List[str],
     bb_filters: List[List[str]],
-    null_identifier: str = "AgxNull"
+    null_identifier: str = "AgxNull",
 ) -> List[pd.Series]:
     """Generate all possible truncations of a peptide.
 
@@ -84,10 +85,10 @@ def find_truncations(
     Returns:
         List[pd.Series]: The truncations.
     """
-    truncations = []
-    n = len(bb_columns)
+    truncations: List[pd.Series] = []
+    n: int = len(bb_columns)
 
-    def make_sequence(mask):
+    def make_sequence(mask: List[int]) -> pd.Series:
         """Create sequence based on binary mask.
 
         Args:
@@ -96,7 +97,7 @@ def find_truncations(
         Returns:
             pd.Series: The sequence.
         """
-        trunc_row = row.copy()
+        trunc_row: pd.Series = row.copy()
         for i, keep in enumerate(mask):
             if not keep:
                 trunc_row[bb_columns[i]] = null_identifier
@@ -116,7 +117,7 @@ def find_truncations(
 
             if valid:
                 # Create pattern - start with all 1s (keep)
-                pattern = [1] * n
+                pattern: List[int] = [1] * n
                 # Set null positions to 0
                 for pos in null_positions:
                     pattern[pos] = 0
@@ -124,7 +125,8 @@ def find_truncations(
 
     return truncations
 
-def parse_bb_list(ctx, param, value) -> List[str]:
+
+def parse_bb_list(ctx: click.Context, param: click.Parameter, value: str) -> List[str]:
     """Parse building block list, handling special characters and spaces.
 
     Args:
@@ -137,22 +139,29 @@ def parse_bb_list(ctx, param, value) -> List[str]:
     """
     if not value:
         return []
-    return [bb.strip() for bb in value.split(',')]
+    return [bb.strip() for bb in value.split(",")]
+
 
 @click.command()
-@click.argument('input_csv', type=click.Path(exists=True, path_type=Path))
-@click.argument('output_csv', type=click.Path(path_type=Path))
-@click.argument('config_path', type=click.Path(exists=True, path_type=Path))
-@click.option('--bb1', callback=parse_bb_list, help='Building blocks for position 1')
-@click.option('--bb2', callback=parse_bb_list, help='Building blocks for position 2')
-@click.option('--bb3', callback=parse_bb_list, help='Building blocks for position 3')
-@click.option('--bb4', callback=parse_bb_list, help='Building blocks for position 4')
-@click.option('--bb5', callback=parse_bb_list, help='Building blocks for position 5')
-@click.option('--bb6', callback=parse_bb_list, help='Building blocks for position 6')
-@click.option('--include-truncations/--no-truncations', default=False,
-              help='Include truncated versions of matched peptides')
-@click.option('--null-identifier', default='AgxNull',
-              help='Identifier used for null/truncated positions')
+@click.argument("input_csv", type=click.Path(exists=True, path_type=Path))
+@click.argument("output_csv", type=click.Path(path_type=Path))
+@click.argument("config_path", type=click.Path(exists=True, path_type=Path))
+@click.option("--bb1", callback=parse_bb_list, help="Building blocks for position 1")
+@click.option("--bb2", callback=parse_bb_list, help="Building blocks for position 2")
+@click.option("--bb3", callback=parse_bb_list, help="Building blocks for position 3")
+@click.option("--bb4", callback=parse_bb_list, help="Building blocks for position 4")
+@click.option("--bb5", callback=parse_bb_list, help="Building blocks for position 5")
+@click.option("--bb6", callback=parse_bb_list, help="Building blocks for position 6")
+@click.option(
+    "--include-truncations/--no-truncations",
+    default=False,
+    help="Include truncated versions of matched peptides",
+)
+@click.option(
+    "--null-identifier",
+    default="AgxNull",
+    help="Identifier used for null/truncated positions",
+)
 def main(
     input_csv: Path,
     output_csv: Path,
@@ -165,7 +174,7 @@ def main(
     bb6: List[str],
     include_truncations: bool,
     null_identifier: str,
-):
+) -> None:
     """Subset a peptide library CSV file based on building block composition.
 
     Args:
@@ -178,21 +187,23 @@ def main(
         bb4 (List[str]): The building blocks for position 4.
         bb5 (List[str]): The building blocks for position 5.
         bb6 (List[str]): The building blocks for position 6.
-        include_truncations (bool): Whether to include truncated versions of matched peptides.  
+        include_truncations (bool): Whether to include truncated versions of matched peptides.
         null_identifier (str): The null identifier.
     """
     # Load column mapping
-    bb_column_mapping = load_column_mapping(config_path)
-    bb_columns = list(bb_column_mapping)  # Convert mapping keys to list
+    bb_column_mapping: Dict[str, List[str]] = load_column_mapping(config_path)
+    bb_columns: List[str] = list(bb_column_mapping)  # Convert mapping keys to list
 
     # Create bb_filters list from provided options
-    all_bbs = [bb1, bb2, bb3, bb4, bb5, bb6]
-    bb_filters = all_bbs[:len(bb_columns)]  # Only take as many as we have columns
+    all_bbs: List[List[str]] = [bb1, bb2, bb3, bb4, bb5, bb6]
+    bb_filters: List[List[str]] = all_bbs[
+        : len(bb_columns)
+    ]  # Only take as many as we have columns
 
     # Read input CSV
     click.echo(f"Reading input file: {input_csv}")
-    df = pd.read_csv(input_csv, low_memory=False)
-    total_peptides = len(df)
+    df: pd.DataFrame = pd.read_csv(input_csv, low_memory=False)
+    total_peptides: int = len(df)
     click.echo(f"Found {total_peptides} total peptides in input file")
 
     # Display filter criteria
@@ -203,18 +214,20 @@ def main(
             click.echo(f"Position {pos}: No filter applied")
 
     # Apply building block filters
-    mask = create_filter_conditions(df, bb_columns, bb_filters)
-    filtered_df = df[mask].copy()
+    mask: pd.Series = create_filter_conditions(df, bb_columns, bb_filters)
+    filtered_df: pd.DataFrame = df[mask].copy()
 
-    initial_matches = len(filtered_df)
+    initial_matches: int = len(filtered_df)
     click.echo(f"\nFound {initial_matches} peptides matching the specified criteria")
 
     if include_truncations and not filtered_df.empty:
         # Generate truncations for each matched peptide
-        all_rows = []
+        all_rows: List[pd.Series] = []
         for _, row in filtered_df.iterrows():
             all_rows.append(row)  # Include the original row
-            truncations = find_truncations(row, bb_columns, bb_filters, null_identifier)
+            truncations: List[pd.Series] = find_truncations(
+                row, bb_columns, bb_filters, null_identifier
+            )
             all_rows.extend(truncations)
 
         # Create new DataFrame with original matches and truncations
@@ -223,13 +236,14 @@ def main(
         # Remove duplicates
         filtered_df = filtered_df.drop_duplicates()
 
-        truncation_count = len(filtered_df) - initial_matches
+        truncation_count: int = len(filtered_df) - initial_matches
         click.echo(f"Generated {truncation_count} truncation variants")
 
     click.echo(f"\nTotal peptides in output: {len(filtered_df)}")
     click.echo(f"Writing output to: {output_csv}")
     filtered_df.to_csv(output_csv, index=False)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     """Main entry point for the script."""
     main()

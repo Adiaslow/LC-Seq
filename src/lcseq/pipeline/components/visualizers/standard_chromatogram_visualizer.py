@@ -17,11 +17,14 @@ import numpy as np
 from src.lcseq.core.chromatogram import Chromatogram
 from src.lcseq.core.hierarchy import PeptideHierarchyNode
 from src.lcseq.core.peak import Peak
+
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -170,7 +173,7 @@ class StandardChromatogramVisualizer(PipelineComponent):
         # Plot width line if width is in properties
         if "width" in peak.properties:
             # Get half max intensity for width line
-            half_max = (peak.apex_intensity + peak.start_intensity) / 2
+            half_max: float = (peak.apex_intensity + peak.start_intensity) / 2
             plt.hlines(
                 y=half_max,
                 xmin=peak.start_time,
@@ -181,7 +184,7 @@ class StandardChromatogramVisualizer(PipelineComponent):
             )
 
         # Plot Gaussian fit if parameters are available
-        gaussian_fit_key = (
+        gaussian_fit_key: str = (
             "corrected_gaussian_fit_params"
             if self.config.plot_corrected_gaussians
             else "gaussian_fit_params"
@@ -283,9 +286,10 @@ class StandardChromatogramVisualizer(PipelineComponent):
                     self.visualize_chromatogram(
                         encoding.chromatogram, node.peptide.sequence_str
                     )
-            for child in node.children:
-                process_node(child)
+            for extension in node.extension_edges:
+                process_node(extension)
 
-        self.logger.info(f"Visualizing chromatograms for peptide hierarchy")
-        process_node(input_data.hierarchy.root)
+        self.logger.info("Visualizing chromatograms for peptide hierarchy")
+        for node in input_data.hierarchy.layers[1]:
+            process_node(node)
         return input_data

@@ -9,15 +9,18 @@ Classes:
 # Standard library imports
 import logging
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import yaml
-from src.lcseq.core.peptide import Peptide
+from src.lcseq.core import Peptide, Peak, PeptideHierarchyNode
+
 # Local application imports
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -95,7 +98,7 @@ class StandardOutput(PipelineComponent):
 
                     # Add peak metrics to properties
                     if encoding.chromatogram.peaks:
-                        peak = encoding.chromatogram.peaks[0]
+                        peak: Peak = encoding.chromatogram.peaks[0]
                         peptide.properties["picked_peak_metrics"] = {
                             "apex_time": float(peak.apex_time),
                             "end_time": float(peak.end_time),
@@ -152,7 +155,7 @@ class StandardOutput(PipelineComponent):
                     if hasattr(peptide, "encodings"):
                         for encoding in peptide.encodings:
                             if encoding.chromatogram:
-                                chrom_data = {
+                                chrom_data: Dict[str, Any] = {
                                     "times": encoding.chromatogram.times.tolist(),
                                     "intensities": encoding.chromatogram.intensities.tolist(),
                                 }
@@ -279,8 +282,10 @@ class StandardOutput(PipelineComponent):
             self.logger.warning("No input file path provided. Cannot save results.")
             return
 
-        base, ext = os.path.splitext(self.input_file_path)
-        results_file = f"{base}_results{ext}"
+        split_path: List[str] = self.input_file_path.split(".")
+        base: str = ".".join(split_path[:-1])
+        ext: str = split_path[-1]
+        results_file: str = f"{base}_results.{ext}"
 
         try:
             with open(results_file, "w") as f:
@@ -304,7 +309,9 @@ class StandardOutput(PipelineComponent):
         )
         input_data.peptide = self._add_retention_time(input_data.peptide)
 
-        output_data = self._format_output({"peptides": [input_data.peptide]})
+        output_data: Dict[str, Any] = self._format_output(
+            {"peptides": [input_data.peptide]}
+        )
         self._save_results(output_data)
 
         return input_data
@@ -324,12 +331,14 @@ class StandardOutput(PipelineComponent):
         )
         processed_peptides = set()
         for peptide in input_data.peptides:
-            processed_peptide = self._add_retention_time(peptide)
+            processed_peptide: Peptide = self._add_retention_time(peptide)
             processed_peptides.add(processed_peptide)
         input_data.peptides = processed_peptides
 
         # Format and save output
-        output_data = self._format_output({"peptides": list(processed_peptides)})
+        output_data: Dict[str, Any] = self._format_output(
+            {"peptides": list(processed_peptides)}
+        )
         self._save_results(output_data)
 
         return input_data
@@ -346,25 +355,29 @@ class StandardOutput(PipelineComponent):
             PeptideHierarchyInput: The processed input data.
         """
 
-        def process_node(node):
-            node.root = self._add_retention_time(node.root)
-            for child in node.children:
-                process_node(child)
+        def process_node(node: PeptideHierarchyNode) -> None:
+            node.peptide = self._add_retention_time(node.peptide)
+            for extension in node.extension_edges:
+                process_node(extension)
 
-        self.logger.info(f"Outputting results for peptide hierarchy")
-        process_node(input_data.hierarchy)
+        self.logger.info("Outputting results for peptide hierarchy")
+        for node in input_data.hierarchy.layers[1]:
+            process_node(node)
 
         # Format and save output
         # Note: For hierarchy, we flatten the structure for output
-        all_peptides = []
+        all_peptides: List[Peptide] = []
 
-        def collect_peptides(node):
-            all_peptides.append(node.root)
-            for child in node.children:
-                collect_peptides(child)
+        def collect_peptides(node: PeptideHierarchyNode) -> None:
+            all_peptides.append(node.peptide)
+            for extension in node.extension_edges:
+                collect_peptides(extension)
 
-        collect_peptides(input_data.hierarchy)
-        output_data = self._format_output({"peptides": all_peptides})
+        # Start collecting from layer 1 nodes
+        for node in input_data.hierarchy.layers[1]:
+            collect_peptides(node)
+
+        output_data: Dict[str, Any] = self._format_output({"peptides": all_peptides})
         self._save_results(output_data)
 
         return input_data

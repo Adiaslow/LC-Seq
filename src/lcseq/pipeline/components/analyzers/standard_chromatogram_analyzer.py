@@ -10,18 +10,23 @@ Classes:
 """
 
 import logging
+
 # Standard library imports
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 
 import numpy as np
 from scipy import signal, stats
-from src.lcseq.core.chromatogram import Chromatogram, Peak
+
 # Local application imports
+from src.lcseq.core.chromatogram import Chromatogram
+from src.lcseq.core.hierarchy import PeptideHierarchyNode
 from src.lcseq.pipeline.base import PipelineComponent
-from src.lcseq.pipeline.input_types import (PeptideHierarchyInput,
-                                            PeptideSetInput,
-                                            SinglePeptideInput)
+from src.lcseq.pipeline.input_types import (
+    PeptideHierarchyInput,
+    PeptideSetInput,
+    SinglePeptideInput,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -72,8 +77,10 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         process_hierarchy: Process a hierarchy of peptides' chromatograms
     """
 
-    def __init__(self, config: StandardChromatogramAnalyzerConfig = None):  # type: ignore
-        self.config = config or StandardChromatogramAnalyzerConfig()
+    def __init__(self, config: StandardChromatogramAnalyzerConfig = None) -> None:  # type: ignore
+        self.config: StandardChromatogramAnalyzerConfig = (
+            config or StandardChromatogramAnalyzerConfig()
+        )
         self.logger: logging.Logger = logging.getLogger(__name__)
 
     def _analyze_single_chromatogram(self, chrom: Chromatogram) -> Chromatogram:
@@ -159,17 +166,18 @@ class StandardChromatogramAnalyzer(PipelineComponent):
             PeptideHierarchyInput: The input data with the chromatograms analyzed.
         """
 
-        def process_node(node):
-            for encoding in node.root.encodings:
+        def process_node(node: PeptideHierarchyNode) -> None:
+            for encoding in node.peptide.encodings:
                 if encoding.chromatogram is not None:
                     encoding.chromatogram = self._analyze_single_chromatogram(
                         encoding.chromatogram
                     )
-            for child in node.children:
-                process_node(child)
+            for extension in node.extension_edges:
+                process_node(extension)
 
-        self.logger.info(f"Analyzing chromatograms for peptide hierarchy")
-        process_node(input_data.hierarchy)
+        self.logger.info("Analyzing chromatograms for peptide hierarchy")
+        for node in input_data.hierarchy.layers[1]:
+            process_node(node)
         return input_data
 
     def _validate_chromatogram(self, chrom: Chromatogram) -> None:
@@ -209,13 +217,19 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         Returns:
             np.ndarray: The moving standard deviation.
         """
-        pad_width = self.config.window_width // 2
-        intensity_padded = np.pad(intensity, pad_width, mode="edge")
-        window = np.ones(self.config.window_width) / self.config.window_width
-        moving_mean = signal.convolve(intensity_padded, window, mode="valid")
-        intensity_squared = intensity_padded**2
-        moving_mean_squared = signal.convolve(intensity_squared, window, mode="valid")
-        moving_var = np.maximum(moving_mean_squared - moving_mean**2, 0)
+        pad_width: int = self.config.window_width // 2
+        intensity_padded: np.ndarray = np.pad(intensity, pad_width, mode="edge")
+        window: np.ndarray = (
+            np.ones(self.config.window_width) / self.config.window_width
+        )
+        moving_mean: np.ndarray = signal.convolve(
+            intensity_padded, window, mode="valid"
+        )
+        intensity_squared: np.ndarray = intensity_padded**2
+        moving_mean_squared: np.ndarray = signal.convolve(
+            intensity_squared, window, mode="valid"
+        )
+        moving_var: np.ndarray = np.maximum(moving_mean_squared - moving_mean**2, 0)
         return np.sqrt(moving_var)
 
     def _find_minimal_variation_regions(
@@ -229,14 +243,14 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         Returns:
             List[Tuple[int, int]]: The regions of minimal variation.
         """
-        min_std = np.min(moving_std)
-        threshold = min_std * self.config.variation_threshold
-        start_idx = int(len(moving_std) * self.config.edge_exclusion)
-        end_idx = len(moving_std) - start_idx
+        min_std: float = np.min(moving_std)
+        threshold: float = min_std * self.config.variation_threshold
+        start_idx: int = int(len(moving_std) * self.config.edge_exclusion)
+        end_idx: int = len(moving_std) - start_idx
 
-        below_threshold = moving_std[start_idx:end_idx] < threshold
-        regions = []
-        current_start = None
+        below_threshold: np.ndarray = moving_std[start_idx:end_idx] < threshold
+        regions: List[Tuple[int, int]] = []
+        current_start: Optional[int] = None
 
         for i, is_quiet in enumerate(below_threshold, start=start_idx):
             if is_quiet and current_start is None:
@@ -266,15 +280,17 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         if not regions:
             return []
 
-        merged = []
-        current_start, current_end = regions[0]
+        merged: List[Tuple[int, int]] = []
+        current_start: int = regions[0][0]
+        current_end: int = regions[0][1]
 
         for start, end in regions[1:]:
             if start - current_end <= self.config.max_region_gap:
-                current_end = end
+                current_end: int = end
             else:
                 merged.append((current_start, current_end))
-                current_start, current_end = start, end
+                current_start: int = start
+                current_end: int = end
 
         merged.append((current_start, current_end))
         return merged
@@ -285,19 +301,25 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         Args:
             chrom (Chromatogram): The chromatogram to analyze.
         """
-        moving_std = self._calculate_moving_std(chrom.intensities)
-        quiet_regions = self._find_minimal_variation_regions(moving_std)
+        moving_std: np.ndarray = self._calculate_moving_std(chrom.intensities)
+        quiet_regions: List[Tuple[int, int]] = self._find_minimal_variation_regions(
+            moving_std
+        )
 
         if len(quiet_regions) < self.config.min_regions_required:
-            noise_level = float(np.std(chrom.intensities))
+            noise_level: float = float(np.std(chrom.intensities))
         else:
-            quiet_stds = []
+            quiet_stds: List[float] = []
             for start, end in quiet_regions:
                 quiet_stds.extend(moving_std[start:end])
-            noise_level = float(np.percentile(quiet_stds, self.config.noise_percentile))
+            noise_level: float = float(
+                np.percentile(quiet_stds, self.config.noise_percentile)
+            )
 
-        signal_range = float(np.max(chrom.intensities) - np.min(chrom.intensities))
-        snr = float("inf") if noise_level == 0 else signal_range / noise_level
+        signal_range: float = float(
+            np.max(chrom.intensities) - np.min(chrom.intensities)
+        )
+        snr: float = float("inf") if noise_level == 0 else signal_range / noise_level
 
         chrom.properties["noise_level"] = noise_level
         chrom.properties["signal_to_noise"] = snr
@@ -313,10 +335,10 @@ class StandardChromatogramAnalyzer(PipelineComponent):
             np.percentile(chrom.intensities, self.config.baseline_percentile)
         )
         try:
-            coefficients = np.polyfit(chrom.times, chrom.intensities, 1)
-            drift = float(coefficients[0])
+            coefficients: np.ndarray = np.polyfit(chrom.times, chrom.intensities, 1)
+            drift: float = float(coefficients[0])
         except np.exceptions.RankWarning:
-            drift = float(np.nan)
+            drift: float = float(np.nan)
 
         chrom.properties["baseline_mean"] = baseline_mean
         chrom.properties["baseline_drift"] = drift
@@ -327,13 +349,17 @@ class StandardChromatogramAnalyzer(PipelineComponent):
         Args:
             chrom (Chromatogram): The chromatogram to analyze.
         """
-        zeros = np.zeros_like(chrom.intensities)
-        positive_y = np.where(chrom.intensities > zeros, chrom.intensities, zeros)
-        negative_y = np.where(chrom.intensities < zeros, chrom.intensities, zeros)
+        zeros: np.ndarray = np.zeros_like(chrom.intensities)
+        positive_y: np.ndarray = np.where(
+            chrom.intensities > zeros, chrom.intensities, zeros
+        )
+        negative_y: np.ndarray = np.where(
+            chrom.intensities < zeros, chrom.intensities, zeros
+        )
 
-        total_area = float(np.trapezoid(chrom.intensities, chrom.times))
-        positive_area = float(np.trapezoid(positive_y, chrom.times))
-        negative_area = float(np.trapezoid(negative_y, chrom.times))
+        total_area: float = float(np.trapezoid(chrom.intensities, chrom.times))
+        positive_area: float = float(np.trapezoid(positive_y, chrom.times))
+        negative_area: float = float(np.trapezoid(negative_y, chrom.times))
 
         chrom.properties["total_area"] = total_area
         chrom.properties["positive_area"] = positive_area

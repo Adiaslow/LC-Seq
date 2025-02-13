@@ -56,25 +56,6 @@ peptides:
     Peptide Size: 5.0
     max_count: 364.0
     total_fractions: 94.0
-    identifier: Val-Nvl-Leu
-    retention_time: 16.25
-    chromatogram_metrics:
-      noise_level: 96.24780397040912
-      signal_to_noise: 5.122194789520291
-      baseline_mean: 3.0
-      total_area: 2509.625
-      dynamic_range: 493.0
-    picked_peak_metrics:
-      apex_time: 16.25
-      end_time: 20.75
-      apex_intensity: 494.0
-      width: 1.0
-      area: 1744.0
-      symmetry: 0.7685560053981106
-      gaussian_residuals: 0.21555042672199615
-      gaussian_fit_amplitude: 474.7567524441266
-      gaussian_fit_mean: 15.81110273301663
-      gaussian_fit_sigma: 0.9999999999999999
   chromatogram:
     times:
     - 10.25
@@ -266,17 +247,101 @@ peptides:
     - 8.0
     - 12.0
     - 18.0
-    peaks:
-    - apex_time: 16.25
-      end_time: 20.75
-      apex_intensity: 494.0
-      width: 1.0
-      area: 1744.0
-      symmetry: 0.7685560053981106
-      gaussian_residuals: 0.21555042672199615
-      gaussian_fit_amplitude: 474.7567524441266
-      gaussian_fit_mean: 15.81110273301663
-      gaussian_fit_sigma: 0.9999999999999999
+    scaled_intensities:
+    - 135.0
+    - 132.0
+    - 98.0
+    - 123.0
+    - 120.0
+    - 129.0
+    - 152.0
+    - 151.0
+    - 184.0
+    - 152.0
+    - 205.0
+    - 318.0
+    - 364.0
+    - 247.0
+    - 87.0
+    - 101.0
+    - 65.0
+    - 62.0
+    - 60.0
+    - 56.0
+    - 39.0
+    - 25.0
+    - 33.0
+    - 44.0
+    - 35.0
+    - 40.0
+    - 19.0
+    - 15.0
+    - 14.0
+    - 17.0
+    - 9.0
+    - 12.0
+    - 13.0
+    - 7.0
+    - 7.0
+    - 9.0
+    - 9.0
+    - 7.0
+    - 2.0
+    - 8.0
+    - 9.0
+    - 7.0
+    - 9.0
+    - 9.0
+    - 10.0
+    - 4.0
+    - 6.0
+    - 9.0
+    - 5.0
+    - 5.0
+    - 6.0
+    - 5.0
+    - 2.0
+    - 5.0
+    - 7.0
+    - 6.0
+    - 6.0
+    - 6.0
+    - 1.0
+    - 3.0
+    - 5.0
+    - 2.0
+    - 2.0
+    - 3.0
+    - 6.0
+    - 4.0
+    - 7.0
+    - 2.0
+    - 5.0
+    - 4.0
+    - 1.0
+    - 3.0
+    - 3.0
+    - 2.0
+    - 1.0
+    - 1.0
+    - 4.0
+    - 2.0
+    - 2.0
+    - 5.0
+    - 1.0
+    - 4.0
+    - 6.0
+    - 8.0
+    - 2.0
+    - 3.0
+    - 3.0
+    - 5.0
+    - 4.0
+    - 3.0
+    - 4.0
+    - 4.0
+    - 5.0
+    - 8.0
 - identifier: Val-Nvl-Leu
   sequence:
   - AgxNull
@@ -4887,25 +4952,6 @@ peptides:
     Peptide Size: 5.0
     max_count: 272.0
     total_fractions: 94.0
-    identifier: Val-Phe-Leu
-    retention_time: 19.75
-    chromatogram_metrics:
-      noise_level: 77.96940236300276
-      signal_to_noise: 4.706974644891534
-      baseline_mean: 3.3000000000000007
-      total_area: 2501.25
-      dynamic_range: 367.0
-    picked_peak_metrics:
-      apex_time: 19.75
-      end_time: 23.75
-      apex_intensity: 368.0
-      width: 2.5
-      area: 1325.0
-      symmetry: 0.7653985507246377
-      gaussian_residuals: 0.15958146202792892
-      gaussian_fit_amplitude: 254.0082405661762
-      gaussian_fit_mean: 18.334292739600517
-      gaussian_fit_sigma: 2.4999999999999996
   chromatogram:
     times:
     - 10.25
@@ -5097,17 +5143,101 @@ peptides:
     - 5.0
     - 20.0
     - 2.0
-    peaks:
-    - apex_time: 19.75
-      end_time: 23.75
-      apex_intensity: 368.0
-      width: 2.5
-      area: 1325.0
-      symmetry: 0.7653985507246377
-      gaussian_residuals: 0.15958146202792892
-      gaussian_fit_amplitude: 254.0082405661762
-      gaussian_fit_mean: 18.334292739600517
-      gaussian_fit_sigma: 2.4999999999999996
+    scaled_intensities:
+    - 111.0
+    - 94.0
+    - 78.0
+    - 108.0
+    - 141.0
+    - 128.0
+    - 139.0
+    - 131.0
+    - 93.0
+    - 77.0
+    - 77.0
+    - 80.0
+    - 105.0
+    - 131.0
+    - 140.0
+    - 184.0
+    - 116.0
+    - 106.0
+    - 199.0
+    - 272.0
+    - 186.0
+    - 116.0
+    - 66.0
+    - 56.0
+    - 43.0
+    - 33.0
+    - 28.0
+    - 11.0
+    - 26.0
+    - 22.0
+    - 19.0
+    - 18.0
+    - 34.0
+    - 30.0
+    - 27.0
+    - 21.0
+    - 15.0
+    - 19.0
+    - 10.0
+    - 9.0
+    - 9.0
+    - 12.0
+    - 11.0
+    - 6.0
+    - 9.0
+    - 6.0
+    - 11.0
+    - 10.0
+    - 5.0
+    - 2.0
+    - 7.0
+    - 5.0
+    - 4.0
+    - 5.0
+    - 13.0
+    - 5.0
+    - 5.0
+    - 11.0
+    - 3.0
+    - 5.0
+    - 8.0
+    - 4.0
+    - 3.0
+    - 7.0
+    - 4.0
+    - 5.0
+    - 4.0
+    - 1.0
+    - 4.0
+    - 2.0
+    - 4.0
+    - 4.0
+    - 11.0
+    - 3.0
+    - 8.0
+    - 2.0
+    - 11.0
+    - 4.0
+    - 6.0
+    - 3.0
+    - 1.0
+    - 5.0
+    - 1.0
+    - 2.0
+    - 2.0
+    - 4.0
+    - 6.0
+    - 5.0
+    - 1.0
+    - 3.0
+    - 1.0
+    - 4.0
+    - 8.0
+    - 2.0
 - identifier: Val-Phe-Leu
   sequence:
   - AgxNull
@@ -9718,7 +9848,6 @@ peptides:
     Peptide Size: 5.0
     max_count: 722.0
     total_fractions: 95.0
-    identifier: "Val-Nvl-\u03B2Homoleu"
   chromatogram:
     times:
     - 10.25
@@ -9912,6 +10041,102 @@ peptides:
     - 11.0
     - 8.0
     - 9.0
+    scaled_intensities:
+    - 39.0
+    - 36.0
+    - 26.0
+    - 34.0
+    - 36.0
+    - 57.0
+    - 70.0
+    - 69.0
+    - 81.0
+    - 138.0
+    - 250.0
+    - 364.0
+    - 722.0
+    - 495.0
+    - 202.0
+    - 254.0
+    - 186.0
+    - 108.0
+    - 68.0
+    - 56.0
+    - 47.0
+    - 41.0
+    - 41.0
+    - 51.0
+    - 32.0
+    - 34.0
+    - 25.0
+    - 18.0
+    - 17.0
+    - 10.0
+    - 16.0
+    - 14.0
+    - 19.0
+    - 11.0
+    - 13.0
+    - 9.0
+    - 11.0
+    - 11.0
+    - 12.0
+    - 11.0
+    - 8.0
+    - 10.0
+    - 11.0
+    - 8.0
+    - 8.0
+    - 9.0
+    - 10.0
+    - 5.0
+    - 5.0
+    - 9.0
+    - 13.0
+    - 5.0
+    - 3.0
+    - 6.0
+    - 10.0
+    - 6.0
+    - 6.0
+    - 4.0
+    - 2.0
+    - 6.0
+    - 6.0
+    - 8.0
+    - 3.0
+    - 4.0
+    - 6.0
+    - 7.0
+    - 4.0
+    - 1.0
+    - 3.0
+    - 5.0
+    - 7.0
+    - 9.0
+    - 6.0
+    - 5.0
+    - 7.0
+    - 2.0
+    - 5.0
+    - 5.0
+    - 1.0
+    - 3.0
+    - 4.0
+    - 3.0
+    - 2.0
+    - 4.0
+    - 4.0
+    - 5.0
+    - 6.0
+    - 8.0
+    - 3.0
+    - 3.0
+    - 5.0
+    - 5.0
+    - 6.0
+    - 5.0
+    - 5.0
 - identifier: "Val-Nvl-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -14543,25 +14768,6 @@ peptides:
     Peptide Size: 5.0
     max_count: 410.0
     total_fractions: 96.0
-    identifier: "Val-Phe-\u03B2Homoleu"
-    retention_time: 20.25
-    chromatogram_metrics:
-      noise_level: 107.36177927598608
-      signal_to_noise: 5.7376098286942465
-      baseline_mean: 5.0
-      total_area: 2871.125
-      dynamic_range: 616.0
-    picked_peak_metrics:
-      apex_time: 20.25
-      end_time: 24.75
-      apex_intensity: 618.0
-      width: 0.5
-      area: 1871.25
-      symmetry: 0.8099604458827759
-      gaussian_residuals: 0.24385394955361211
-      gaussian_fit_amplitude: 718.8394455913358
-      gaussian_fit_mean: 19.962857650235932
-      gaussian_fit_sigma: 0.49999999999999994
   chromatogram:
     times:
     - 10.25
@@ -14757,17 +14963,103 @@ peptides:
     - 9.0
     - 14.0
     - 8.0
-    peaks:
-    - apex_time: 20.25
-      end_time: 24.75
-      apex_intensity: 618.0
-      width: 0.5
-      area: 1871.25
-      symmetry: 0.8099604458827759
-      gaussian_residuals: 0.24385394955361211
-      gaussian_fit_amplitude: 718.8394455913358
-      gaussian_fit_mean: 19.962857650235932
-      gaussian_fit_sigma: 0.49999999999999994
+    scaled_intensities:
+    - 44.0
+    - 37.0
+    - 24.0
+    - 40.0
+    - 60.0
+    - 118.0
+    - 80.0
+    - 62.0
+    - 42.0
+    - 38.0
+    - 58.0
+    - 76.0
+    - 54.0
+    - 59.0
+    - 69.0
+    - 221.0
+    - 239.0
+    - 152.0
+    - 220.0
+    - 410.0
+    - 401.0
+    - 197.0
+    - 144.0
+    - 156.0
+    - 84.0
+    - 57.0
+    - 58.0
+    - 37.0
+    - 38.0
+    - 24.0
+    - 31.0
+    - 25.0
+    - 36.0
+    - 37.0
+    - 24.0
+    - 24.0
+    - 24.0
+    - 15.0
+    - 6.0
+    - 13.0
+    - 10.0
+    - 8.0
+    - 10.0
+    - 5.0
+    - 12.0
+    - 14.0
+    - 8.0
+    - 7.0
+    - 4.0
+    - 15.0
+    - 16.0
+    - 11.0
+    - 6.0
+    - 6.0
+    - 11.0
+    - 4.0
+    - 3.0
+    - 6.0
+    - 8.0
+    - 6.0
+    - 3.0
+    - 6.0
+    - 2.0
+    - 3.0
+    - 3.0
+    - 8.0
+    - 7.0
+    - 2.0
+    - 5.0
+    - 2.0
+    - 6.0
+    - 4.0
+    - 7.0
+    - 8.0
+    - 6.0
+    - 3.0
+    - 4.0
+    - 5.0
+    - 6.0
+    - 9.0
+    - 3.0
+    - 7.0
+    - 2.0
+    - 8.0
+    - 9.0
+    - 7.0
+    - 7.0
+    - 5.0
+    - 8.0
+    - 2.0
+    - 5.0
+    - 3.0
+    - 6.0
+    - 8.0
+    - 9.0
+    - 4.0
 - identifier: "Val-Phe-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -19420,25 +19712,6 @@ peptides:
     Peptide Size: 5.0
     max_count: 327.0
     total_fractions: 91.0
-    identifier: LA03-Nvl-Leu
-    retention_time: 16.25
-    chromatogram_metrics:
-      noise_level: 86.81371122389946
-      signal_to_noise: 5.114399485294307
-      baseline_mean: 5.0
-      total_area: 2543.625
-      dynamic_range: 444.0
-    picked_peak_metrics:
-      apex_time: 16.25
-      end_time: 20.75
-      apex_intensity: 446.0
-      width: 1.0
-      area: 1755.0
-      symmetry: 0.8488789237668162
-      gaussian_residuals: 0.239963395380001
-      gaussian_fit_amplitude: 425.56198730566194
-      gaussian_fit_mean: 15.906748365462398
-      gaussian_fit_sigma: 0.9999999999999999
   chromatogram:
     times:
     - 10.25
@@ -19624,17 +19897,98 @@ peptides:
     - 7.0
     - 9.0
     - 11.0
-    peaks:
-    - apex_time: 16.25
-      end_time: 20.75
-      apex_intensity: 446.0
-      width: 1.0
-      area: 1755.0
-      symmetry: 0.8488789237668162
-      gaussian_residuals: 0.239963395380001
-      gaussian_fit_amplitude: 425.56198730566194
-      gaussian_fit_mean: 15.906748365462398
-      gaussian_fit_sigma: 0.9999999999999999
+    scaled_intensities:
+    - 127.0
+    - 141.0
+    - 119.0
+    - 83.0
+    - 117.0
+    - 124.0
+    - 136.0
+    - 117.0
+    - 165.0
+    - 121.0
+    - 185.0
+    - 273.0
+    - 327.0
+    - 237.0
+    - 129.0
+    - 82.0
+    - 64.0
+    - 84.0
+    - 88.0
+    - 93.0
+    - 69.0
+    - 50.0
+    - 23.0
+    - 14.0
+    - 60.0
+    - 66.0
+    - 49.0
+    - 39.0
+    - 33.0
+    - 19.0
+    - 18.0
+    - 19.0
+    - 16.0
+    - 13.0
+    - 10.0
+    - 11.0
+    - 7.0
+    - 12.0
+    - 4.0
+    - 5.0
+    - 10.0
+    - 6.0
+    - 4.0
+    - 9.0
+    - 9.0
+    - 7.0
+    - 6.0
+    - 8.0
+    - 11.0
+    - 12.0
+    - 14.0
+    - 17.0
+    - 7.0
+    - 9.0
+    - 11.0
+    - 4.0
+    - 4.0
+    - 5.0
+    - 6.0
+    - 6.0
+    - 4.0
+    - 5.0
+    - 5.0
+    - 4.0
+    - 5.0
+    - 3.0
+    - 5.0
+    - 7.0
+    - 5.0
+    - 4.0
+    - 4.0
+    - 3.0
+    - 2.0
+    - 5.0
+    - 5.0
+    - 3.0
+    - 6.0
+    - 8.0
+    - 5.0
+    - 5.0
+    - 5.0
+    - 10.0
+    - 2.0
+    - 4.0
+    - 5.0
+    - 3.0
+    - 2.0
+    - 6.0
+    - 3.0
+    - 5.0
+    - 6.0
 - identifier: LA03-Nvl-Leu
   sequence:
   - AgxNull
@@ -24182,25 +24536,6 @@ peptides:
     Peptide Size: 5.0
     max_count: 186.0
     total_fractions: 96.0
-    identifier: LA03-Phe-Leu
-    retention_time: 16.75
-    chromatogram_metrics:
-      noise_level: 70.02148030421134
-      signal_to_noise: 3.470363650472341
-      baseline_mean: 4.5
-      total_area: 2560.25
-      dynamic_range: 243.0
-    picked_peak_metrics:
-      apex_time: 16.75
-      end_time: 21.25
-      apex_intensity: 244.0
-      width: 3.5
-      area: 930.0
-      symmetry: 0.8770491803278688
-      gaussian_residuals: 0.23372497598041772
-      gaussian_fit_amplitude: 206.55380059247793
-      gaussian_fit_mean: 16.57771557604043
-      gaussian_fit_sigma: 3.4999999999999996
   chromatogram:
     times:
     - 10.25
@@ -24396,17 +24731,103 @@ peptides:
     - 15.0
     - 18.0
     - 3.0
-    peaks:
-    - apex_time: 16.75
-      end_time: 21.25
-      apex_intensity: 244.0
-      width: 3.5
-      area: 930.0
-      symmetry: 0.8770491803278688
-      gaussian_residuals: 0.23372497598041772
-      gaussian_fit_amplitude: 206.55380059247793
-      gaussian_fit_mean: 16.57771557604043
-      gaussian_fit_sigma: 3.4999999999999996
+    scaled_intensities:
+    - 162.0
+    - 154.0
+    - 106.0
+    - 104.0
+    - 139.0
+    - 129.0
+    - 109.0
+    - 117.0
+    - 113.0
+    - 98.0
+    - 77.0
+    - 94.0
+    - 119.0
+    - 156.0
+    - 133.0
+    - 130.0
+    - 75.0
+    - 84.0
+    - 113.0
+    - 186.0
+    - 145.0
+    - 74.0
+    - 55.0
+    - 42.0
+    - 27.0
+    - 47.0
+    - 34.0
+    - 41.0
+    - 41.0
+    - 27.0
+    - 34.0
+    - 38.0
+    - 43.0
+    - 37.0
+    - 23.0
+    - 22.0
+    - 34.0
+    - 24.0
+    - 10.0
+    - 15.0
+    - 7.0
+    - 10.0
+    - 8.0
+    - 7.0
+    - 12.0
+    - 4.0
+    - 10.0
+    - 8.0
+    - 12.0
+    - 9.0
+    - 6.0
+    - 7.0
+    - 4.0
+    - 6.0
+    - 7.0
+    - 8.0
+    - 8.0
+    - 14.0
+    - 18.0
+    - 12.0
+    - 23.0
+    - 5.0
+    - 11.0
+    - 9.0
+    - 3.0
+    - 4.0
+    - 3.0
+    - 4.0
+    - 7.0
+    - 1.0
+    - 5.0
+    - 8.0
+    - 4.0
+    - 9.0
+    - 6.0
+    - 7.0
+    - 4.0
+    - 3.0
+    - 1.0
+    - 7.0
+    - 2.0
+    - 1.0
+    - 2.0
+    - 3.0
+    - 5.0
+    - 2.0
+    - 6.0
+    - 6.0
+    - 5.0
+    - 6.0
+    - 1.0
+    - 6.0
+    - 5.0
+    - 6.0
+    - 9.0
+    - 3.0
 - identifier: LA03-Phe-Leu
   sequence:
   - AgxNull
@@ -29059,25 +29480,6 @@ peptides:
     Peptide Size: 5.0
     max_count: 485.0
     total_fractions: 96.0
-    identifier: "LA03-Nvl-\u03B2Homoleu"
-    retention_time: 16.25
-    chromatogram_metrics:
-      noise_level: 120.26281982946074
-      signal_to_noise: 5.945312117360205
-      baseline_mean: 5.5
-      total_area: 2891.125
-      dynamic_range: 715.0
-    picked_peak_metrics:
-      apex_time: 16.25
-      end_time: 19.25
-      apex_intensity: 358.0
-      width: 2.0
-      area: 1164.0
-      symmetry: 0.8032721468475659
-      gaussian_residuals: 0.40183218466365145
-      gaussian_fit_amplitude: 400.2682132890017
-      gaussian_fit_mean: 19.249999999754532
-      gaussian_fit_sigma: 1.9999999999999998
   chromatogram:
     times:
     - 10.25
@@ -29273,17 +29675,103 @@ peptides:
     - 8.0
     - 8.0
     - 3.0
-    peaks:
-    - apex_time: 16.25
-      end_time: 19.25
-      apex_intensity: 358.0
-      width: 2.0
-      area: 1164.0
-      symmetry: 0.8032721468475659
-      gaussian_residuals: 0.40183218466365145
-      gaussian_fit_amplitude: 400.2682132890017
-      gaussian_fit_mean: 19.249999999754532
-      gaussian_fit_sigma: 1.9999999999999998
+    scaled_intensities:
+    - 35.0
+    - 24.0
+    - 24.0
+    - 26.0
+    - 25.0
+    - 34.0
+    - 32.0
+    - 61.0
+    - 44.0
+    - 63.0
+    - 112.0
+    - 162.0
+    - 250.0
+    - 225.0
+    - 166.0
+    - 179.0
+    - 93.0
+    - 84.0
+    - 73.0
+    - 253.0
+    - 468.0
+    - 485.0
+    - 180.0
+    - 79.0
+    - 37.0
+    - 24.0
+    - 34.0
+    - 40.0
+    - 39.0
+    - 35.0
+    - 21.0
+    - 16.0
+    - 16.0
+    - 22.0
+    - 18.0
+    - 8.0
+    - 12.0
+    - 12.0
+    - 15.0
+    - 10.0
+    - 10.0
+    - 9.0
+    - 11.0
+    - 12.0
+    - 8.0
+    - 17.0
+    - 10.0
+    - 10.0
+    - 8.0
+    - 8.0
+    - 8.0
+    - 14.0
+    - 13.0
+    - 26.0
+    - 12.0
+    - 14.0
+    - 9.0
+    - 6.0
+    - 8.0
+    - 5.0
+    - 3.0
+    - 1.0
+    - 6.0
+    - 5.0
+    - 4.0
+    - 3.0
+    - 5.0
+    - 2.0
+    - 7.0
+    - 4.0
+    - 5.0
+    - 10.0
+    - 6.0
+    - 9.0
+    - 5.0
+    - 4.0
+    - 2.0
+    - 8.0
+    - 10.0
+    - 8.0
+    - 4.0
+    - 6.0
+    - 1.0
+    - 10.0
+    - 6.0
+    - 6.0
+    - 6.0
+    - 4.0
+    - 6.0
+    - 4.0
+    - 2.0
+    - 6.0
+    - 1.0
+    - 5.0
+    - 5.0
+    - 3.0
 - identifier: "LA03-Nvl-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -33936,25 +34424,6 @@ peptides:
     Peptide Size: 5.0
     max_count: 372.0
     total_fractions: 96.0
-    identifier: "LA03-Phe-\u03B2Homoleu"
-    retention_time: 24.75
-    chromatogram_metrics:
-      noise_level: 86.45239688454758
-      signal_to_noise: 6.02643788691905
-      baseline_mean: 7.0
-      total_area: 2640.625
-      dynamic_range: 521.0
-    picked_peak_metrics:
-      apex_time: 24.75
-      end_time: 29.25
-      apex_intensity: 522.0
-      width: 1.0
-      area: 970.75
-      symmetry: 0.8941570881226053
-      gaussian_residuals: 0.05791685558148874
-      gaussian_fit_amplitude: 503.8008709090479
-      gaussian_fit_mean: 24.874095741514736
-      gaussian_fit_sigma: 0.6959946750567508
   chromatogram:
     times:
     - 10.25
@@ -34150,17 +34619,103 @@ peptides:
     - 9.0
     - 8.0
     - 7.0
-    peaks:
-    - apex_time: 24.75
-      end_time: 29.25
-      apex_intensity: 522.0
-      width: 1.0
-      area: 970.75
-      symmetry: 0.8941570881226053
-      gaussian_residuals: 0.05791685558148874
-      gaussian_fit_amplitude: 503.8008709090479
-      gaussian_fit_mean: 24.874095741514736
-      gaussian_fit_sigma: 0.6959946750567508
+    scaled_intensities:
+    - 43.0
+    - 30.0
+    - 22.0
+    - 18.0
+    - 34.0
+    - 66.0
+    - 46.0
+    - 46.0
+    - 29.0
+    - 21.0
+    - 27.0
+    - 37.0
+    - 29.0
+    - 70.0
+    - 88.0
+    - 112.0
+    - 107.0
+    - 63.0
+    - 79.0
+    - 185.0
+    - 178.0
+    - 147.0
+    - 114.0
+    - 107.0
+    - 62.0
+    - 56.0
+    - 42.0
+    - 75.0
+    - 241.0
+    - 372.0
+    - 303.0
+    - 163.0
+    - 54.0
+    - 45.0
+    - 26.0
+    - 21.0
+    - 34.0
+    - 31.0
+    - 18.0
+    - 21.0
+    - 22.0
+    - 18.0
+    - 15.0
+    - 8.0
+    - 18.0
+    - 7.0
+    - 9.0
+    - 9.0
+    - 10.0
+    - 9.0
+    - 10.0
+    - 8.0
+    - 8.0
+    - 5.0
+    - 11.0
+    - 8.0
+    - 6.0
+    - 7.0
+    - 13.0
+    - 21.0
+    - 28.0
+    - 10.0
+    - 21.0
+    - 15.0
+    - 11.0
+    - 7.0
+    - 10.0
+    - 3.0
+    - 7.0
+    - 3.0
+    - 14.0
+    - 6.0
+    - 6.0
+    - 9.0
+    - 6.0
+    - 4.0
+    - 1.0
+    - 7.0
+    - 3.0
+    - 6.0
+    - 7.0
+    - 7.0
+    - 2.0
+    - 6.0
+    - 8.0
+    - 4.0
+    - 5.0
+    - 5.0
+    - 3.0
+    - 4.0
+    - 6.0
+    - 6.0
+    - 3.0
+    - 5.0
+    - 4.0
+    - 4.0
 - identifier: "LA03-Phe-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -38813,25 +39368,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 493.0
     total_fractions: 96.0
-    identifier: Val-Nvl-Leu-LeuMe-Pro
-    retention_time: 20.75
-    chromatogram_metrics:
-      noise_level: 120.72597062206164
-      signal_to_noise: 5.359244549173799
-      baseline_mean: 12.5
-      total_area: 4178.625
-      dynamic_range: 647.0
-    picked_peak_metrics:
-      apex_time: 20.75
-      end_time: 25.25
-      apex_intensity: 653.0
-      width: 2.5
-      area: 2361.5
-      symmetry: 0.8390505359877488
-      gaussian_residuals: 0.1646571398054773
-      gaussian_fit_amplitude: 426.2431194075359
-      gaussian_fit_mean: 20.59840916068473
-      gaussian_fit_sigma: 2.4999999999999996
   chromatogram:
     times:
     - 10.25
@@ -39027,17 +39563,103 @@ peptides:
     - 14.0
     - 10.0
     - 20.0
-    peaks:
-    - apex_time: 20.75
-      end_time: 25.25
-      apex_intensity: 653.0
-      width: 2.5
-      area: 2361.5
-      symmetry: 0.8390505359877488
-      gaussian_residuals: 0.1646571398054773
-      gaussian_fit_amplitude: 426.2431194075359
-      gaussian_fit_mean: 20.59840916068473
-      gaussian_fit_sigma: 2.4999999999999996
+    scaled_intensities:
+    - 52.0
+    - 58.0
+    - 70.0
+    - 70.0
+    - 63.0
+    - 60.0
+    - 46.0
+    - 44.0
+    - 64.0
+    - 133.0
+    - 237.0
+    - 132.0
+    - 73.0
+    - 73.0
+    - 104.0
+    - 119.0
+    - 153.0
+    - 210.0
+    - 255.0
+    - 169.0
+    - 180.0
+    - 465.0
+    - 493.0
+    - 354.0
+    - 170.0
+    - 128.0
+    - 148.0
+    - 114.0
+    - 90.0
+    - 83.0
+    - 87.0
+    - 54.0
+    - 58.0
+    - 56.0
+    - 46.0
+    - 76.0
+    - 84.0
+    - 93.0
+    - 49.0
+    - 48.0
+    - 31.0
+    - 32.0
+    - 29.0
+    - 30.0
+    - 32.0
+    - 33.0
+    - 26.0
+    - 30.0
+    - 18.0
+    - 27.0
+    - 26.0
+    - 21.0
+    - 11.0
+    - 15.0
+    - 14.0
+    - 13.0
+    - 16.0
+    - 17.0
+    - 15.0
+    - 10.0
+    - 16.0
+    - 8.0
+    - 13.0
+    - 14.0
+    - 12.0
+    - 10.0
+    - 7.0
+    - 4.0
+    - 11.0
+    - 11.0
+    - 11.0
+    - 10.0
+    - 13.0
+    - 13.0
+    - 10.0
+    - 7.0
+    - 5.0
+    - 14.0
+    - 6.0
+    - 8.0
+    - 10.0
+    - 19.0
+    - 12.0
+    - 8.0
+    - 13.0
+    - 7.0
+    - 12.0
+    - 6.0
+    - 8.0
+    - 8.0
+    - 14.0
+    - 7.0
+    - 11.0
+    - 10.0
+    - 5.0
+    - 11.0
 - identifier: Val-Nvl-Leu-LeuMe-Pro
   sequence:
   - AgxNull
@@ -43690,25 +44312,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 343.0
     total_fractions: 96.0
-    identifier: Val-Phe-Leu-LeuMe-Pro
-    retention_time: 26.25
-    chromatogram_metrics:
-      noise_level: 101.68646867861224
-      signal_to_noise: 4.779396967122929
-      baseline_mean: 16.0
-      total_area: 4420.375
-      dynamic_range: 486.0
-    picked_peak_metrics:
-      apex_time: 26.25
-      end_time: 30.25
-      apex_intensity: 495.0
-      width: 1.5
-      area: 1927.0
-      symmetry: 0.7910213243546577
-      gaussian_residuals: 0.1879559945532562
-      gaussian_fit_amplitude: 420.4179997572916
-      gaussian_fit_mean: 25.61283788686558
-      gaussian_fit_sigma: 1.4999999999999998
   chromatogram:
     times:
     - 10.25
@@ -43904,17 +44507,103 @@ peptides:
     - 12.0
     - 19.0
     - 9.0
-    peaks:
-    - apex_time: 26.25
-      end_time: 30.25
-      apex_intensity: 495.0
-      width: 1.5
-      area: 1927.0
-      symmetry: 0.7910213243546577
-      gaussian_residuals: 0.1879559945532562
-      gaussian_fit_amplitude: 420.4179997572916
-      gaussian_fit_mean: 25.61283788686558
-      gaussian_fit_sigma: 1.4999999999999998
+    scaled_intensities:
+    - 48.0
+    - 53.0
+    - 69.0
+    - 96.0
+    - 71.0
+    - 64.0
+    - 65.0
+    - 38.0
+    - 65.0
+    - 166.0
+    - 311.0
+    - 231.0
+    - 131.0
+    - 90.0
+    - 69.0
+    - 77.0
+    - 80.0
+    - 75.0
+    - 52.0
+    - 50.0
+    - 36.0
+    - 79.0
+    - 80.0
+    - 80.0
+    - 128.0
+    - 198.0
+    - 210.0
+    - 155.0
+    - 152.0
+    - 194.0
+    - 258.0
+    - 296.0
+    - 343.0
+    - 237.0
+    - 142.0
+    - 123.0
+    - 102.0
+    - 118.0
+    - 78.0
+    - 49.0
+    - 45.0
+    - 49.0
+    - 42.0
+    - 47.0
+    - 45.0
+    - 32.0
+    - 39.0
+    - 25.0
+    - 32.0
+    - 51.0
+    - 29.0
+    - 34.0
+    - 24.0
+    - 38.0
+    - 32.0
+    - 37.0
+    - 46.0
+    - 27.0
+    - 20.0
+    - 26.0
+    - 17.0
+    - 13.0
+    - 15.0
+    - 18.0
+    - 12.0
+    - 22.0
+    - 9.0
+    - 11.0
+    - 24.0
+    - 9.0
+    - 12.0
+    - 14.0
+    - 21.0
+    - 17.0
+    - 13.0
+    - 5.0
+    - 14.0
+    - 9.0
+    - 14.0
+    - 20.0
+    - 10.0
+    - 11.0
+    - 10.0
+    - 8.0
+    - 9.0
+    - 18.0
+    - 15.0
+    - 13.0
+    - 7.0
+    - 7.0
+    - 11.0
+    - 10.0
+    - 10.0
+    - 9.0
+    - 12.0
+    - 8.0
 - identifier: Val-Phe-Leu-LeuMe-Pro
   sequence:
   - AgxNull
@@ -48567,25 +49256,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 181.0
     total_fractions: 95.0
-    identifier: Val-Leu-LA03-Pro-Leu
-    retention_time: 13.75
-    chromatogram_metrics:
-      noise_level: 60.46521034487403
-      signal_to_noise: 4.1842242598176655
-      baseline_mean: 5.0
-      total_area: 2327.375
-      dynamic_range: 253.0
-    picked_peak_metrics:
-      apex_time: 13.75
-      end_time: 18.25
-      apex_intensity: 235.0
-      width: 1.0
-      area: 767.5
-      symmetry: 0.8595744680851064
-      gaussian_residuals: 0.19372490102093695
-      gaussian_fit_amplitude: 230.54844818018088
-      gaussian_fit_mean: 13.430291787351015
-      gaussian_fit_sigma: 0.9999999999999999
   chromatogram:
     times:
     - 10.25
@@ -48779,17 +49449,102 @@ peptides:
     - 9.0
     - 10.0
     - 6.0
-    peaks:
-    - apex_time: 13.75
-      end_time: 18.25
-      apex_intensity: 235.0
-      width: 1.0
-      area: 767.5
-      symmetry: 0.8595744680851064
-      gaussian_residuals: 0.19372490102093695
-      gaussian_fit_amplitude: 230.54844818018088
-      gaussian_fit_mean: 13.430291787351015
-      gaussian_fit_sigma: 0.9999999999999999
+    scaled_intensities:
+    - 65.0
+    - 66.0
+    - 53.0
+    - 55.0
+    - 96.0
+    - 127.0
+    - 127.0
+    - 152.0
+    - 93.0
+    - 60.0
+    - 74.0
+    - 71.0
+    - 41.0
+    - 47.0
+    - 30.0
+    - 33.0
+    - 22.0
+    - 34.0
+    - 21.0
+    - 24.0
+    - 29.0
+    - 34.0
+    - 42.0
+    - 46.0
+    - 37.0
+    - 51.0
+    - 80.0
+    - 123.0
+    - 181.0
+    - 146.0
+    - 161.0
+    - 150.0
+    - 121.0
+    - 116.0
+    - 102.0
+    - 64.0
+    - 36.0
+    - 32.0
+    - 20.0
+    - 19.0
+    - 25.0
+    - 24.0
+    - 20.0
+    - 20.0
+    - 23.0
+    - 10.0
+    - 10.0
+    - 9.0
+    - 14.0
+    - 13.0
+    - 16.0
+    - 9.0
+    - 11.0
+    - 11.0
+    - 6.0
+    - 11.0
+    - 9.0
+    - 4.0
+    - 5.0
+    - 4.0
+    - 7.0
+    - 3.0
+    - 6.0
+    - 6.0
+    - 8.0
+    - 3.0
+    - 5.0
+    - 3.0
+    - 9.0
+    - 3.0
+    - 5.0
+    - 8.0
+    - 5.0
+    - 8.0
+    - 4.0
+    - 4.0
+    - 4.0
+    - 6.0
+    - 4.0
+    - 6.0
+    - 8.0
+    - 5.0
+    - 3.0
+    - 5.0
+    - 2.0
+    - 7.0
+    - 4.0
+    - 3.0
+    - 6.0
+    - 3.0
+    - 6.0
+    - 8.0
+    - 7.0
+    - 6.0
+    - 4.0
 - identifier: Val-Leu-LA03-Pro-Leu
   sequence:
   - AgxNull
@@ -53421,25 +54176,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 219.0
     total_fractions: 96.0
-    identifier: "Val-Leu-LA03-Pro-\u03B2Homoleu"
-    retention_time: 24.25
-    chromatogram_metrics:
-      noise_level: 71.58873472903518
-      signal_to_noise: 4.763319274892788
-      baseline_mean: 8.5
-      total_area: 2703.375
-      dynamic_range: 341.0
-    picked_peak_metrics:
-      apex_time: 24.25
-      end_time: 28.75
-      apex_intensity: 270.0
-      width: 3.5
-      area: 1263.0
-      symmetry: 0.7057613168724279
-      gaussian_residuals: 0.09704372978012027
-      gaussian_fit_amplitude: 246.3524417257986
-      gaussian_fit_mean: 25.118003313175898
-      gaussian_fit_sigma: 2.2033979245792388
   chromatogram:
     times:
     - 10.25
@@ -53635,17 +54371,103 @@ peptides:
     - 17.0
     - 20.0
     - 6.0
-    peaks:
-    - apex_time: 24.25
-      end_time: 28.75
-      apex_intensity: 270.0
-      width: 3.5
-      area: 1263.0
-      symmetry: 0.7057613168724279
-      gaussian_residuals: 0.09704372978012027
-      gaussian_fit_amplitude: 246.3524417257986
-      gaussian_fit_mean: 25.118003313175898
-      gaussian_fit_sigma: 2.2033979245792388
+    scaled_intensities:
+    - 26.0
+    - 30.0
+    - 24.0
+    - 31.0
+    - 48.0
+    - 98.0
+    - 87.0
+    - 182.0
+    - 219.0
+    - 74.0
+    - 71.0
+    - 62.0
+    - 58.0
+    - 37.0
+    - 33.0
+    - 37.0
+    - 48.0
+    - 40.0
+    - 33.0
+    - 27.0
+    - 29.0
+    - 48.0
+    - 45.0
+    - 76.0
+    - 47.0
+    - 49.0
+    - 120.0
+    - 148.0
+    - 197.0
+    - 177.0
+    - 182.0
+    - 174.0
+    - 163.0
+    - 136.0
+    - 117.0
+    - 80.0
+    - 61.0
+    - 34.0
+    - 23.0
+    - 25.0
+    - 29.0
+    - 26.0
+    - 27.0
+    - 27.0
+    - 22.0
+    - 22.0
+    - 16.0
+    - 15.0
+    - 10.0
+    - 15.0
+    - 9.0
+    - 9.0
+    - 6.0
+    - 12.0
+    - 10.0
+    - 18.0
+    - 13.0
+    - 10.0
+    - 8.0
+    - 8.0
+    - 11.0
+    - 9.0
+    - 9.0
+    - 14.0
+    - 6.0
+    - 8.0
+    - 12.0
+    - 5.0
+    - 7.0
+    - 7.0
+    - 8.0
+    - 3.0
+    - 11.0
+    - 9.0
+    - 7.0
+    - 3.0
+    - 7.0
+    - 10.0
+    - 7.0
+    - 10.0
+    - 8.0
+    - 5.0
+    - 5.0
+    - 4.0
+    - 3.0
+    - 8.0
+    - 8.0
+    - 4.0
+    - 5.0
+    - 5.0
+    - 2.0
+    - 6.0
+    - 3.0
+    - 7.0
+    - 11.0
+    - 3.0
 - identifier: "Val-Leu-LA03-Pro-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -58298,25 +59120,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 197.0
     total_fractions: 96.0
-    identifier: LeuMe-DLeuMe-Pro-Nvl-Leu
-    retention_time: 33.25
-    chromatogram_metrics:
-      noise_level: 48.804962561810484
-      signal_to_noise: 5.409285985326788
-      baseline_mean: 13.0
-      total_area: 2243.0
-      dynamic_range: 264.0
-    picked_peak_metrics:
-      apex_time: 33.25
-      end_time: 36.25
-      apex_intensity: 270.0
-      width: 2.0
-      area: 764.25
-      symmetry: 0.8648148148148148
-      gaussian_residuals: 0.05394908737259443
-      gaussian_fit_amplitude: 252.36999306766072
-      gaussian_fit_mean: 33.45479720907286
-      gaussian_fit_sigma: 1.2856345790993007
   chromatogram:
     times:
     - 10.25
@@ -58512,17 +59315,103 @@ peptides:
     - 7.0
     - 28.0
     - 14.0
-    peaks:
-    - apex_time: 33.25
-      end_time: 36.25
-      apex_intensity: 270.0
-      width: 2.0
-      area: 764.25
-      symmetry: 0.8648148148148148
-      gaussian_residuals: 0.05394908737259443
-      gaussian_fit_amplitude: 252.36999306766072
-      gaussian_fit_mean: 33.45479720907286
-      gaussian_fit_sigma: 1.2856345790993007
+    scaled_intensities:
+    - 39.0
+    - 38.0
+    - 34.0
+    - 30.0
+    - 33.0
+    - 32.0
+    - 49.0
+    - 48.0
+    - 56.0
+    - 30.0
+    - 46.0
+    - 70.0
+    - 65.0
+    - 79.0
+    - 38.0
+    - 28.0
+    - 30.0
+    - 8.0
+    - 17.0
+    - 6.0
+    - 9.0
+    - 10.0
+    - 13.0
+    - 17.0
+    - 9.0
+    - 9.0
+    - 18.0
+    - 21.0
+    - 40.0
+    - 28.0
+    - 22.0
+    - 18.0
+    - 20.0
+    - 21.0
+    - 31.0
+    - 38.0
+    - 65.0
+    - 44.0
+    - 54.0
+    - 73.0
+    - 48.0
+    - 29.0
+    - 32.0
+    - 67.0
+    - 108.0
+    - 143.0
+    - 197.0
+    - 197.0
+    - 164.0
+    - 110.0
+    - 53.0
+    - 33.0
+    - 11.0
+    - 13.0
+    - 14.0
+    - 18.0
+    - 19.0
+    - 17.0
+    - 21.0
+    - 11.0
+    - 14.0
+    - 6.0
+    - 9.0
+    - 15.0
+    - 11.0
+    - 7.0
+    - 11.0
+    - 4.0
+    - 17.0
+    - 17.0
+    - 8.0
+    - 9.0
+    - 17.0
+    - 16.0
+    - 15.0
+    - 19.0
+    - 30.0
+    - 27.0
+    - 44.0
+    - 26.0
+    - 18.0
+    - 26.0
+    - 15.0
+    - 12.0
+    - 8.0
+    - 14.0
+    - 14.0
+    - 10.0
+    - 4.0
+    - 11.0
+    - 9.0
+    - 8.0
+    - 10.0
+    - 6.0
+    - 12.0
+    - 6.0
 - identifier: LeuMe-DLeuMe-Pro-Nvl-Leu
   sequence:
   - AgxNull
@@ -63175,25 +64064,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 235.0
     total_fractions: 96.0
-    identifier: LeuMe-DLeuMe-Pro-Phe-Leu
-    retention_time: 37.75
-    chromatogram_metrics:
-      noise_level: 54.321708200044974
-      signal_to_noise: 5.541062863699688
-      baseline_mean: 15.0
-      total_area: 2505.625
-      dynamic_range: 301.0
-    picked_peak_metrics:
-      apex_time: 37.75
-      end_time: 40.75
-      apex_intensity: 308.0
-      width: 1.5
-      area: 936.5
-      symmetry: 0.8487940630797774
-      gaussian_residuals: 0.07489007265127332
-      gaussian_fit_amplitude: 301.7758199230125
-      gaussian_fit_mean: 37.471030221584186
-      gaussian_fit_sigma: 1.1878741325397342
   chromatogram:
     times:
     - 10.25
@@ -63389,17 +64259,103 @@ peptides:
     - 25.0
     - 19.0
     - 7.0
-    peaks:
-    - apex_time: 37.75
-      end_time: 40.75
-      apex_intensity: 308.0
-      width: 1.5
-      area: 936.5
-      symmetry: 0.8487940630797774
-      gaussian_residuals: 0.07489007265127332
-      gaussian_fit_amplitude: 301.7758199230125
-      gaussian_fit_mean: 37.471030221584186
-      gaussian_fit_sigma: 1.1878741325397342
+    scaled_intensities:
+    - 42.0
+    - 40.0
+    - 26.0
+    - 31.0
+    - 43.0
+    - 56.0
+    - 39.0
+    - 33.0
+    - 28.0
+    - 14.0
+    - 29.0
+    - 23.0
+    - 27.0
+    - 36.0
+    - 46.0
+    - 45.0
+    - 31.0
+    - 19.0
+    - 37.0
+    - 56.0
+    - 45.0
+    - 36.0
+    - 36.0
+    - 26.0
+    - 14.0
+    - 16.0
+    - 11.0
+    - 18.0
+    - 14.0
+    - 18.0
+    - 11.0
+    - 15.0
+    - 7.0
+    - 10.0
+    - 12.0
+    - 20.0
+    - 20.0
+    - 35.0
+    - 28.0
+    - 49.0
+    - 50.0
+    - 46.0
+    - 50.0
+    - 43.0
+    - 27.0
+    - 12.0
+    - 16.0
+    - 28.0
+    - 21.0
+    - 31.0
+    - 43.0
+    - 93.0
+    - 82.0
+    - 187.0
+    - 219.0
+    - 235.0
+    - 198.0
+    - 115.0
+    - 53.0
+    - 31.0
+    - 23.0
+    - 12.0
+    - 20.0
+    - 30.0
+    - 31.0
+    - 21.0
+    - 19.0
+    - 10.0
+    - 14.0
+    - 15.0
+    - 19.0
+    - 9.0
+    - 19.0
+    - 22.0
+    - 19.0
+    - 8.0
+    - 13.0
+    - 15.0
+    - 24.0
+    - 14.0
+    - 19.0
+    - 14.0
+    - 22.0
+    - 26.0
+    - 36.0
+    - 36.0
+    - 36.0
+    - 30.0
+    - 25.0
+    - 19.0
+    - 11.0
+    - 13.0
+    - 13.0
+    - 13.0
+    - 8.0
+    - 6.0
 - identifier: LeuMe-DLeuMe-Pro-Phe-Leu
   sequence:
   - AgxNull
@@ -68052,25 +69008,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 286.0
     total_fractions: 96.0
-    identifier: "LeuMe-DLeuMe-Pro-Nvl-\u03B2Homoleu"
-    retention_time: 34.75
-    chromatogram_metrics:
-      noise_level: 60.37618525262856
-      signal_to_noise: 6.459500519420789
-      baseline_mean: 16.0
-      total_area: 2517.5
-      dynamic_range: 390.0
-    picked_peak_metrics:
-      apex_time: 34.75
-      end_time: 38.75
-      apex_intensity: 397.0
-      width: 1.0
-      area: 982.25
-      symmetry: 0.9527707808564232
-      gaussian_residuals: 0.08011044176603452
-      gaussian_fit_amplitude: 351.62791840954316
-      gaussian_fit_mean: 34.72063626844479
-      gaussian_fit_sigma: 0.9988335080770239
   chromatogram:
     times:
     - 10.25
@@ -68266,17 +69203,103 @@ peptides:
     - 16.0
     - 11.0
     - 13.0
-    peaks:
-    - apex_time: 34.75
-      end_time: 38.75
-      apex_intensity: 397.0
-      width: 1.0
-      area: 982.25
-      symmetry: 0.9527707808564232
-      gaussian_residuals: 0.08011044176603452
-      gaussian_fit_amplitude: 351.62791840954316
-      gaussian_fit_mean: 34.72063626844479
-      gaussian_fit_sigma: 0.9988335080770239
+    scaled_intensities:
+    - 27.0
+    - 20.0
+    - 11.0
+    - 13.0
+    - 20.0
+    - 21.0
+    - 26.0
+    - 33.0
+    - 26.0
+    - 35.0
+    - 69.0
+    - 55.0
+    - 85.0
+    - 82.0
+    - 50.0
+    - 45.0
+    - 23.0
+    - 15.0
+    - 21.0
+    - 13.0
+    - 15.0
+    - 15.0
+    - 16.0
+    - 6.0
+    - 10.0
+    - 6.0
+    - 14.0
+    - 13.0
+    - 17.0
+    - 23.0
+    - 33.0
+    - 29.0
+    - 27.0
+    - 18.0
+    - 21.0
+    - 27.0
+    - 36.0
+    - 44.0
+    - 48.0
+    - 62.0
+    - 56.0
+    - 42.0
+    - 35.0
+    - 36.0
+    - 44.0
+    - 55.0
+    - 92.0
+    - 144.0
+    - 216.0
+    - 286.0
+    - 219.0
+    - 153.0
+    - 50.0
+    - 43.0
+    - 24.0
+    - 24.0
+    - 28.0
+    - 20.0
+    - 23.0
+    - 19.0
+    - 24.0
+    - 18.0
+    - 20.0
+    - 17.0
+    - 7.0
+    - 19.0
+    - 13.0
+    - 3.0
+    - 16.0
+    - 18.0
+    - 10.0
+    - 18.0
+    - 19.0
+    - 13.0
+    - 17.0
+    - 20.0
+    - 16.0
+    - 16.0
+    - 20.0
+    - 27.0
+    - 39.0
+    - 35.0
+    - 30.0
+    - 33.0
+    - 27.0
+    - 24.0
+    - 20.0
+    - 14.0
+    - 17.0
+    - 13.0
+    - 15.0
+    - 7.0
+    - 8.0
+    - 10.0
+    - 6.0
+    - 10.0
 - identifier: "LeuMe-DLeuMe-Pro-Nvl-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -72929,25 +73952,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 358.0
     total_fractions: 96.0
-    identifier: "LeuMe-DLeuMe-Pro-Phe-\u03B2Homoleu"
-    retention_time: 38.25
-    chromatogram_metrics:
-      noise_level: 78.27870435537085
-      signal_to_noise: 5.914763201726815
-      baseline_mean: 14.0
-      total_area: 3006.125
-      dynamic_range: 463.0
-    picked_peak_metrics:
-      apex_time: 38.25
-      end_time: 42.75
-      apex_intensity: 469.0
-      width: 1.5
-      area: 1292.25
-      symmetry: 0.946908315565032
-      gaussian_residuals: 0.0704341432037688
-      gaussian_fit_amplitude: 449.04091243917605
-      gaussian_fit_mean: 38.34750581107615
-      gaussian_fit_sigma: 1.021892160998041
   chromatogram:
     times:
     - 10.25
@@ -73143,17 +74147,103 @@ peptides:
     - 38.0
     - 22.0
     - 38.0
-    peaks:
-    - apex_time: 38.25
-      end_time: 42.75
-      apex_intensity: 469.0
-      width: 1.5
-      area: 1292.25
-      symmetry: 0.946908315565032
-      gaussian_residuals: 0.0704341432037688
-      gaussian_fit_amplitude: 449.04091243917605
-      gaussian_fit_mean: 38.34750581107615
-      gaussian_fit_sigma: 1.021892160998041
+    scaled_intensities:
+    - 35.0
+    - 18.0
+    - 16.0
+    - 16.0
+    - 29.0
+    - 32.0
+    - 25.0
+    - 19.0
+    - 12.0
+    - 5.0
+    - 14.0
+    - 11.0
+    - 6.0
+    - 13.0
+    - 20.0
+    - 68.0
+    - 60.0
+    - 31.0
+    - 34.0
+    - 56.0
+    - 59.0
+    - 58.0
+    - 38.0
+    - 49.0
+    - 28.0
+    - 17.0
+    - 6.0
+    - 14.0
+    - 13.0
+    - 7.0
+    - 15.0
+    - 11.0
+    - 6.0
+    - 7.0
+    - 11.0
+    - 12.0
+    - 14.0
+    - 19.0
+    - 20.0
+    - 39.0
+    - 40.0
+    - 34.0
+    - 58.0
+    - 68.0
+    - 63.0
+    - 31.0
+    - 26.0
+    - 22.0
+    - 24.0
+    - 26.0
+    - 31.0
+    - 37.0
+    - 34.0
+    - 122.0
+    - 151.0
+    - 240.0
+    - 358.0
+    - 307.0
+    - 196.0
+    - 115.0
+    - 48.0
+    - 34.0
+    - 27.0
+    - 28.0
+    - 29.0
+    - 22.0
+    - 32.0
+    - 20.0
+    - 29.0
+    - 20.0
+    - 21.0
+    - 13.0
+    - 17.0
+    - 18.0
+    - 19.0
+    - 19.0
+    - 23.0
+    - 21.0
+    - 23.0
+    - 20.0
+    - 23.0
+    - 22.0
+    - 16.0
+    - 27.0
+    - 25.0
+    - 25.0
+    - 41.0
+    - 51.0
+    - 53.0
+    - 31.0
+    - 40.0
+    - 23.0
+    - 23.0
+    - 22.0
+    - 13.0
+    - 19.0
 - identifier: "LeuMe-DLeuMe-Pro-Phe-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -77806,25 +78896,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 571.0
     total_fractions: 96.0
-    identifier: LA03-Nvl-Leu-LeuMe-Pro
-    retention_time: 26.25
-    chromatogram_metrics:
-      noise_level: 120.89633235579703
-      signal_to_noise: 6.509709473103491
-      baseline_mean: 16.5
-      total_area: 4263.875
-      dynamic_range: 787.0
-    picked_peak_metrics:
-      apex_time: 26.25
-      end_time: 30.75
-      apex_intensity: 793.0
-      width: 1.0
-      area: 1590.25
-      symmetry: 0.946532156368222
-      gaussian_residuals: 0.08879115820428907
-      gaussian_fit_amplitude: 719.8041494909154
-      gaussian_fit_mean: 26.257674813491743
-      gaussian_fit_sigma: 0.7417412065663305
   chromatogram:
     times:
     - 10.25
@@ -78020,17 +79091,103 @@ peptides:
     - 16.0
     - 6.0
     - 15.0
-    peaks:
-    - apex_time: 26.25
-      end_time: 30.75
-      apex_intensity: 793.0
-      width: 1.0
-      area: 1590.25
-      symmetry: 0.946532156368222
-      gaussian_residuals: 0.08879115820428907
-      gaussian_fit_amplitude: 719.8041494909154
-      gaussian_fit_mean: 26.257674813491743
-      gaussian_fit_sigma: 0.7417412065663305
+    scaled_intensities:
+    - 53.0
+    - 48.0
+    - 58.0
+    - 56.0
+    - 40.0
+    - 38.0
+    - 27.0
+    - 21.0
+    - 46.0
+    - 81.0
+    - 163.0
+    - 86.0
+    - 42.0
+    - 54.0
+    - 54.0
+    - 65.0
+    - 85.0
+    - 97.0
+    - 150.0
+    - 88.0
+    - 66.0
+    - 182.0
+    - 233.0
+    - 218.0
+    - 188.0
+    - 156.0
+    - 98.0
+    - 61.0
+    - 70.0
+    - 78.0
+    - 213.0
+    - 377.0
+    - 571.0
+    - 409.0
+    - 166.0
+    - 116.0
+    - 91.0
+    - 78.0
+    - 56.0
+    - 61.0
+    - 50.0
+    - 48.0
+    - 36.0
+    - 40.0
+    - 46.0
+    - 47.0
+    - 41.0
+    - 23.0
+    - 32.0
+    - 30.0
+    - 22.0
+    - 27.0
+    - 16.0
+    - 25.0
+    - 30.0
+    - 34.0
+    - 25.0
+    - 35.0
+    - 14.0
+    - 20.0
+    - 26.0
+    - 18.0
+    - 8.0
+    - 19.0
+    - 32.0
+    - 38.0
+    - 41.0
+    - 22.0
+    - 25.0
+    - 19.0
+    - 14.0
+    - 16.0
+    - 21.0
+    - 6.0
+    - 14.0
+    - 10.0
+    - 12.0
+    - 13.0
+    - 17.0
+    - 14.0
+    - 13.0
+    - 12.0
+    - 9.0
+    - 9.0
+    - 6.0
+    - 6.0
+    - 7.0
+    - 15.0
+    - 10.0
+    - 7.0
+    - 10.0
+    - 5.0
+    - 14.0
+    - 11.0
+    - 5.0
+    - 9.0
 - identifier: LA03-Nvl-Leu-LeuMe-Pro
   sequence:
   - AgxNull
@@ -82683,25 +83840,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 292.0
     total_fractions: 96.0
-    identifier: LA03-Phe-Leu-LeuMe-Pro
-    retention_time: 15.25
-    chromatogram_metrics:
-      noise_level: 85.53651906495845
-      signal_to_noise: 4.524383318733173
-      baseline_mean: 24.0
-      total_area: 4478.0
-      dynamic_range: 387.0
-    picked_peak_metrics:
-      apex_time: 15.25
-      end_time: 19.75
-      apex_intensity: 371.0
-      width: 1.0
-      area: 847.5
-      symmetry: 0.8995956873315364
-      gaussian_residuals: 0.14683861672279763
-      gaussian_fit_amplitude: 347.238406008221
-      gaussian_fit_mean: 15.208211008826424
-      gaussian_fit_sigma: 0.7937975330201611
   chromatogram:
     times:
     - 10.25
@@ -82897,17 +84035,103 @@ peptides:
     - 54.0
     - 31.0
     - 33.0
-    peaks:
-    - apex_time: 15.25
-      end_time: 19.75
-      apex_intensity: 371.0
-      width: 1.0
-      area: 847.5
-      symmetry: 0.8995956873315364
-      gaussian_residuals: 0.14683861672279763
-      gaussian_fit_amplitude: 347.238406008221
-      gaussian_fit_mean: 15.208211008826424
-      gaussian_fit_sigma: 0.7937975330201611
+    scaled_intensities:
+    - 51.0
+    - 52.0
+    - 106.0
+    - 101.0
+    - 73.0
+    - 88.0
+    - 52.0
+    - 31.0
+    - 77.0
+    - 191.0
+    - 256.0
+    - 172.0
+    - 84.0
+    - 56.0
+    - 48.0
+    - 62.0
+    - 52.0
+    - 57.0
+    - 44.0
+    - 38.0
+    - 38.0
+    - 36.0
+    - 41.0
+    - 57.0
+    - 72.0
+    - 125.0
+    - 131.0
+    - 92.0
+    - 102.0
+    - 98.0
+    - 127.0
+    - 206.0
+    - 227.0
+    - 188.0
+    - 126.0
+    - 109.0
+    - 92.0
+    - 94.0
+    - 69.0
+    - 78.0
+    - 92.0
+    - 149.0
+    - 279.0
+    - 292.0
+    - 157.0
+    - 89.0
+    - 80.0
+    - 41.0
+    - 38.0
+    - 50.0
+    - 44.0
+    - 33.0
+    - 24.0
+    - 45.0
+    - 34.0
+    - 25.0
+    - 40.0
+    - 29.0
+    - 26.0
+    - 20.0
+    - 29.0
+    - 21.0
+    - 31.0
+    - 28.0
+    - 19.0
+    - 17.0
+    - 26.0
+    - 15.0
+    - 16.0
+    - 10.0
+    - 16.0
+    - 21.0
+    - 12.0
+    - 32.0
+    - 51.0
+    - 39.0
+    - 33.0
+    - 32.0
+    - 40.0
+    - 33.0
+    - 16.0
+    - 15.0
+    - 15.0
+    - 15.0
+    - 15.0
+    - 21.0
+    - 14.0
+    - 11.0
+    - 13.0
+    - 8.0
+    - 11.0
+    - 9.0
+    - 16.0
+    - 25.0
+    - 12.0
+    - 13.0
 - identifier: LA03-Phe-Leu-LeuMe-Pro
   sequence:
   - AgxNull
@@ -87560,25 +88784,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 259.0
     total_fractions: 96.0
-    identifier: LA03-Leu-LA03-Pro-Leu
-    retention_time: 28.75
-    chromatogram_metrics:
-      noise_level: 61.6339123316503
-      signal_to_noise: 5.711141588836648
-      baseline_mean: 9.5
-      total_area: 2546.5
-      dynamic_range: 352.0
-    picked_peak_metrics:
-      apex_time: 28.75
-      end_time: 32.75
-      apex_intensity: 354.0
-      width: 1.5
-      area: 916.75
-      symmetry: 0.89795197740113
-      gaussian_residuals: 0.09833828893873912
-      gaussian_fit_amplitude: 325.6964870464456
-      gaussian_fit_mean: 28.87915696150616
-      gaussian_fit_sigma: 0.9678576266801792
   chromatogram:
     times:
     - 10.25
@@ -87774,17 +88979,103 @@ peptides:
     - 11.0
     - 22.0
     - 5.0
-    peaks:
-    - apex_time: 28.75
-      end_time: 32.75
-      apex_intensity: 354.0
-      width: 1.5
-      area: 916.75
-      symmetry: 0.89795197740113
-      gaussian_residuals: 0.09833828893873912
-      gaussian_fit_amplitude: 325.6964870464456
-      gaussian_fit_mean: 28.87915696150616
-      gaussian_fit_sigma: 0.9678576266801792
+    scaled_intensities:
+    - 63.0
+    - 68.0
+    - 48.0
+    - 47.0
+    - 92.0
+    - 103.0
+    - 89.0
+    - 111.0
+    - 78.0
+    - 34.0
+    - 70.0
+    - 64.0
+    - 53.0
+    - 66.0
+    - 32.0
+    - 42.0
+    - 32.0
+    - 48.0
+    - 23.0
+    - 24.0
+    - 25.0
+    - 25.0
+    - 31.0
+    - 29.0
+    - 27.0
+    - 38.0
+    - 48.0
+    - 75.0
+    - 84.0
+    - 67.0
+    - 40.0
+    - 66.0
+    - 54.0
+    - 60.0
+    - 56.0
+    - 102.0
+    - 195.0
+    - 259.0
+    - 230.0
+    - 162.0
+    - 78.0
+    - 41.0
+    - 24.0
+    - 23.0
+    - 23.0
+    - 21.0
+    - 23.0
+    - 19.0
+    - 20.0
+    - 13.0
+    - 10.0
+    - 19.0
+    - 6.0
+    - 6.0
+    - 11.0
+    - 9.0
+    - 14.0
+    - 11.0
+    - 11.0
+    - 18.0
+    - 9.0
+    - 9.0
+    - 14.0
+    - 13.0
+    - 10.0
+    - 10.0
+    - 15.0
+    - 9.0
+    - 19.0
+    - 20.0
+    - 25.0
+    - 20.0
+    - 16.0
+    - 11.0
+    - 10.0
+    - 5.0
+    - 11.0
+    - 2.0
+    - 8.0
+    - 6.0
+    - 5.0
+    - 7.0
+    - 5.0
+    - 6.0
+    - 3.0
+    - 1.0
+    - 7.0
+    - 7.0
+    - 9.0
+    - 8.0
+    - 3.0
+    - 11.0
+    - 8.0
+    - 7.0
+    - 12.0
+    - 5.0
 - identifier: LA03-Leu-LA03-Pro-Leu
   sequence:
   - AgxNull
@@ -92437,25 +93728,6 @@ peptides:
     Peptide Size: 7.0
     max_count: 290.0
     total_fractions: 96.0
-    identifier: "LA03-Leu-LA03-Pro-\u03B2Homoleu"
-    retention_time: 28.75
-    chromatogram_metrics:
-      noise_level: 70.49058928029565
-      signal_to_noise: 5.6745163302502375
-      baseline_mean: 13.0
-      total_area: 2796.875
-      dynamic_range: 400.0
-    picked_peak_metrics:
-      apex_time: 28.75
-      end_time: 31.75
-      apex_intensity: 405.0
-      width: 1.5
-      area: 830.75
-      symmetry: 0.8271604938271605
-      gaussian_residuals: 0.04538298063275577
-      gaussian_fit_amplitude: 392.64786850204854
-      gaussian_fit_mean: 28.944459413724775
-      gaussian_fit_sigma: 0.8781264843785073
   chromatogram:
     times:
     - 10.25
@@ -92651,17 +93923,103 @@ peptides:
     - 13.0
     - 5.0
     - 13.0
-    peaks:
-    - apex_time: 28.75
-      end_time: 31.75
-      apex_intensity: 405.0
-      width: 1.5
-      area: 830.75
-      symmetry: 0.8271604938271605
-      gaussian_residuals: 0.04538298063275577
-      gaussian_fit_amplitude: 392.64786850204854
-      gaussian_fit_mean: 28.944459413724775
-      gaussian_fit_sigma: 0.8781264843785073
+    scaled_intensities:
+    - 31.0
+    - 18.0
+    - 17.0
+    - 17.0
+    - 45.0
+    - 66.0
+    - 68.0
+    - 145.0
+    - 137.0
+    - 39.0
+    - 44.0
+    - 32.0
+    - 29.0
+    - 62.0
+    - 51.0
+    - 76.0
+    - 55.0
+    - 50.0
+    - 32.0
+    - 33.0
+    - 28.0
+    - 39.0
+    - 34.0
+    - 45.0
+    - 47.0
+    - 27.0
+    - 62.0
+    - 93.0
+    - 106.0
+    - 89.0
+    - 74.0
+    - 73.0
+    - 69.0
+    - 65.0
+    - 59.0
+    - 105.0
+    - 180.0
+    - 290.0
+    - 279.0
+    - 182.0
+    - 81.0
+    - 28.0
+    - 20.0
+    - 22.0
+    - 30.0
+    - 35.0
+    - 29.0
+    - 34.0
+    - 22.0
+    - 20.0
+    - 15.0
+    - 13.0
+    - 5.0
+    - 16.0
+    - 11.0
+    - 9.0
+    - 17.0
+    - 13.0
+    - 15.0
+    - 23.0
+    - 14.0
+    - 7.0
+    - 13.0
+    - 11.0
+    - 9.0
+    - 17.0
+    - 13.0
+    - 7.0
+    - 40.0
+    - 29.0
+    - 29.0
+    - 19.0
+    - 21.0
+    - 17.0
+    - 5.0
+    - 6.0
+    - 12.0
+    - 11.0
+    - 13.0
+    - 5.0
+    - 9.0
+    - 10.0
+    - 8.0
+    - 9.0
+    - 8.0
+    - 6.0
+    - 8.0
+    - 7.0
+    - 10.0
+    - 7.0
+    - 6.0
+    - 6.0
+    - 4.0
+    - 5.0
+    - 3.0
+    - 8.0
 - identifier: "LA03-Leu-LA03-Pro-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -97314,25 +98672,6 @@ peptides:
     Peptide Size: 9.0
     max_count: 346.0
     total_fractions: 96.0
-    identifier: Val-Leu-LA03-Pro-Leu-LeuMe-Pro
-    retention_time: 29.75
-    chromatogram_metrics:
-      noise_level: 90.73890770038903
-      signal_to_noise: 5.157655209442129
-      baseline_mean: 20.0
-      total_area: 4105.625
-      dynamic_range: 468.0
-    picked_peak_metrics:
-      apex_time: 29.75
-      end_time: 34.25
-      apex_intensity: 477.0
-      width: 2.0
-      area: 1811.25
-      symmetry: 0.8729559748427673
-      gaussian_residuals: 0.09693849939435616
-      gaussian_fit_amplitude: 368.96862802217055
-      gaussian_fit_mean: 30.17763117400834
-      gaussian_fit_sigma: 1.9999999999999993
   chromatogram:
     times:
     - 10.25
@@ -97528,17 +98867,103 @@ peptides:
     - 32.0
     - 32.0
     - 12.0
-    peaks:
-    - apex_time: 29.75
-      end_time: 34.25
-      apex_intensity: 477.0
-      width: 2.0
-      area: 1811.25
-      symmetry: 0.8729559748427673
-      gaussian_residuals: 0.09693849939435616
-      gaussian_fit_amplitude: 368.96862802217055
-      gaussian_fit_mean: 30.17763117400834
-      gaussian_fit_sigma: 1.9999999999999993
+    scaled_intensities:
+    - 42.0
+    - 36.0
+    - 44.0
+    - 30.0
+    - 14.0
+    - 23.0
+    - 11.0
+    - 15.0
+    - 36.0
+    - 54.0
+    - 139.0
+    - 167.0
+    - 135.0
+    - 103.0
+    - 84.0
+    - 171.0
+    - 177.0
+    - 135.0
+    - 95.0
+    - 53.0
+    - 56.0
+    - 82.0
+    - 89.0
+    - 82.0
+    - 43.0
+    - 40.0
+    - 31.0
+    - 37.0
+    - 40.0
+    - 42.0
+    - 47.0
+    - 54.0
+    - 57.0
+    - 59.0
+    - 81.0
+    - 94.0
+    - 148.0
+    - 187.0
+    - 235.0
+    - 346.0
+    - 310.0
+    - 225.0
+    - 216.0
+    - 141.0
+    - 166.0
+    - 118.0
+    - 99.0
+    - 74.0
+    - 74.0
+    - 45.0
+    - 35.0
+    - 40.0
+    - 28.0
+    - 43.0
+    - 38.0
+    - 26.0
+    - 23.0
+    - 42.0
+    - 31.0
+    - 23.0
+    - 18.0
+    - 26.0
+    - 25.0
+    - 24.0
+    - 22.0
+    - 15.0
+    - 21.0
+    - 6.0
+    - 16.0
+    - 21.0
+    - 16.0
+    - 26.0
+    - 31.0
+    - 28.0
+    - 24.0
+    - 19.0
+    - 18.0
+    - 17.0
+    - 26.0
+    - 11.0
+    - 9.0
+    - 12.0
+    - 10.0
+    - 14.0
+    - 14.0
+    - 7.0
+    - 13.0
+    - 18.0
+    - 6.0
+    - 15.0
+    - 7.0
+    - 8.0
+    - 10.0
+    - 16.0
+    - 12.0
+    - 8.0
 - identifier: Val-Leu-LA03-Pro-Leu-LeuMe-Pro
   sequence:
   - AgxNull
@@ -102191,25 +103616,6 @@ peptides:
     Peptide Size: 9.0
     max_count: 498.0
     total_fractions: 96.0
-    identifier: LeuMe-DLeuMe-Pro-Nvl-Leu-LeuMe-Pro
-    retention_time: 38.75
-    chromatogram_metrics:
-      noise_level: 118.89330534372218
-      signal_to_noise: 5.702591899854182
-      baseline_mean: 32.5
-      total_area: 4597.75
-      dynamic_range: 678.0
-    picked_peak_metrics:
-      apex_time: 38.75
-      end_time: 42.75
-      apex_intensity: 695.0
-      width: 2.0
-      area: 1915.75
-      symmetry: 0.9371702637889688
-      gaussian_residuals: 0.05049910450328859
-      gaussian_fit_amplitude: 670.9386188979538
-      gaussian_fit_mean: 38.70331676033004
-      gaussian_fit_sigma: 1.127355009447713
   chromatogram:
     times:
     - 10.25
@@ -102405,17 +103811,103 @@ peptides:
     - 45.0
     - 48.0
     - 38.0
-    peaks:
-    - apex_time: 38.75
-      end_time: 42.75
-      apex_intensity: 695.0
-      width: 2.0
-      area: 1915.75
-      symmetry: 0.9371702637889688
-      gaussian_residuals: 0.05049910450328859
-      gaussian_fit_amplitude: 670.9386188979538
-      gaussian_fit_mean: 38.70331676033004
-      gaussian_fit_sigma: 1.127355009447713
+    scaled_intensities:
+    - 35.0
+    - 37.0
+    - 38.0
+    - 23.0
+    - 16.0
+    - 16.0
+    - 12.0
+    - 14.0
+    - 19.0
+    - 45.0
+    - 85.0
+    - 50.0
+    - 35.0
+    - 35.0
+    - 27.0
+    - 45.0
+    - 50.0
+    - 68.0
+    - 62.0
+    - 47.0
+    - 36.0
+    - 69.0
+    - 78.0
+    - 65.0
+    - 58.0
+    - 34.0
+    - 23.0
+    - 25.0
+    - 27.0
+    - 15.0
+    - 20.0
+    - 14.0
+    - 26.0
+    - 19.0
+    - 16.0
+    - 24.0
+    - 51.0
+    - 42.0
+    - 30.0
+    - 47.0
+    - 27.0
+    - 38.0
+    - 27.0
+    - 25.0
+    - 21.0
+    - 48.0
+    - 57.0
+    - 70.0
+    - 64.0
+    - 78.0
+    - 53.0
+    - 76.0
+    - 44.0
+    - 111.0
+    - 197.0
+    - 289.0
+    - 472.0
+    - 498.0
+    - 419.0
+    - 318.0
+    - 172.0
+    - 73.0
+    - 56.0
+    - 57.0
+    - 43.0
+    - 29.0
+    - 56.0
+    - 32.0
+    - 57.0
+    - 34.0
+    - 27.0
+    - 32.0
+    - 43.0
+    - 41.0
+    - 34.0
+    - 31.0
+    - 40.0
+    - 43.0
+    - 58.0
+    - 43.0
+    - 40.0
+    - 45.0
+    - 25.0
+    - 46.0
+    - 41.0
+    - 50.0
+    - 45.0
+    - 65.0
+    - 69.0
+    - 58.0
+    - 42.0
+    - 36.0
+    - 47.0
+    - 31.0
+    - 25.0
+    - 25.0
 - identifier: LeuMe-DLeuMe-Pro-Nvl-Leu-LeuMe-Pro
   sequence:
   - AgxNull
@@ -107068,25 +108560,6 @@ peptides:
     Peptide Size: 9.0
     max_count: 533.0
     total_fractions: 96.0
-    identifier: LeuMe-DLeuMe-Pro-Phe-Leu-LeuMe-Pro
-    retention_time: 42.75
-    chromatogram_metrics:
-      noise_level: 127.41598368849002
-      signal_to_noise: 6.0745910959828695
-      baseline_mean: 26.0
-      total_area: 5429.25
-      dynamic_range: 774.0
-    picked_peak_metrics:
-      apex_time: 42.75
-      end_time: 46.25
-      apex_intensity: 790.0
-      width: 1.5
-      area: 2211.25
-      symmetry: 0.9295886075949367
-      gaussian_residuals: 0.08560145930963703
-      gaussian_fit_amplitude: 678.8657396502472
-      gaussian_fit_mean: 42.645678797793224
-      gaussian_fit_sigma: 1.2443357600491027
   chromatogram:
     times:
     - 10.25
@@ -107282,17 +108755,103 @@ peptides:
     - 188.0
     - 140.0
     - 104.0
-    peaks:
-    - apex_time: 42.75
-      end_time: 46.25
-      apex_intensity: 790.0
-      width: 1.5
-      area: 2211.25
-      symmetry: 0.9295886075949367
-      gaussian_residuals: 0.08560145930963703
-      gaussian_fit_amplitude: 678.8657396502472
-      gaussian_fit_mean: 42.645678797793224
-      gaussian_fit_sigma: 1.2443357600491027
+    scaled_intensities:
+    - 42.0
+    - 43.0
+    - 31.0
+    - 26.0
+    - 18.0
+    - 16.0
+    - 16.0
+    - 12.0
+    - 15.0
+    - 34.0
+    - 102.0
+    - 74.0
+    - 41.0
+    - 29.0
+    - 29.0
+    - 32.0
+    - 37.0
+    - 20.0
+    - 19.0
+    - 17.0
+    - 16.0
+    - 24.0
+    - 18.0
+    - 28.0
+    - 30.0
+    - 53.0
+    - 67.0
+    - 37.0
+    - 31.0
+    - 32.0
+    - 43.0
+    - 57.0
+    - 55.0
+    - 51.0
+    - 49.0
+    - 64.0
+    - 61.0
+    - 48.0
+    - 34.0
+    - 35.0
+    - 18.0
+    - 20.0
+    - 15.0
+    - 23.0
+    - 20.0
+    - 23.0
+    - 21.0
+    - 18.0
+    - 31.0
+    - 58.0
+    - 53.0
+    - 64.0
+    - 42.0
+    - 88.0
+    - 71.0
+    - 72.0
+    - 54.0
+    - 37.0
+    - 51.0
+    - 52.0
+    - 69.0
+    - 107.0
+    - 250.0
+    - 384.0
+    - 456.0
+    - 533.0
+    - 443.0
+    - 182.0
+    - 220.0
+    - 102.0
+    - 94.0
+    - 91.0
+    - 68.0
+    - 70.0
+    - 72.0
+    - 69.0
+    - 87.0
+    - 83.0
+    - 60.0
+    - 51.0
+    - 65.0
+    - 62.0
+    - 38.0
+    - 71.0
+    - 57.0
+    - 73.0
+    - 69.0
+    - 57.0
+    - 58.0
+    - 55.0
+    - 42.0
+    - 44.0
+    - 74.0
+    - 101.0
+    - 70.0
+    - 58.0
 - identifier: LeuMe-DLeuMe-Pro-Phe-Leu-LeuMe-Pro
   sequence:
   - AgxNull
@@ -111945,25 +113504,6 @@ peptides:
     Peptide Size: 9.0
     max_count: 248.0
     total_fractions: 96.0
-    identifier: LeuMe-DLeuMe-Pro-Leu-LA03-Pro-Leu
-    retention_time: 41.25
-    chromatogram_metrics:
-      noise_level: 58.64051467149227
-      signal_to_noise: 5.900357490692452
-      baseline_mean: 15.5
-      total_area: 2646.75
-      dynamic_range: 346.0
-    picked_peak_metrics:
-      apex_time: 41.25
-      end_time: 43.75
-      apex_intensity: 351.0
-      width: 1.5
-      area: 942.0
-      symmetry: 0.7692307692307693
-      gaussian_residuals: 0.0817334992380951
-      gaussian_fit_amplitude: 314.0715626218999
-      gaussian_fit_mean: 40.78571703361381
-      gaussian_fit_sigma: 1.206041996080643
   chromatogram:
     times:
     - 10.25
@@ -112159,17 +113699,103 @@ peptides:
     - 38.0
     - 36.0
     - 47.0
-    peaks:
-    - apex_time: 41.25
-      end_time: 43.75
-      apex_intensity: 351.0
-      width: 1.5
-      area: 942.0
-      symmetry: 0.7692307692307693
-      gaussian_residuals: 0.0817334992380951
-      gaussian_fit_amplitude: 314.0715626218999
-      gaussian_fit_mean: 40.78571703361381
-      gaussian_fit_sigma: 1.206041996080643
+    scaled_intensities:
+    - 49.0
+    - 34.0
+    - 36.0
+    - 34.0
+    - 54.0
+    - 60.0
+    - 78.0
+    - 80.0
+    - 56.0
+    - 43.0
+    - 33.0
+    - 29.0
+    - 22.0
+    - 22.0
+    - 14.0
+    - 16.0
+    - 17.0
+    - 16.0
+    - 18.0
+    - 5.0
+    - 10.0
+    - 20.0
+    - 20.0
+    - 20.0
+    - 18.0
+    - 21.0
+    - 21.0
+    - 29.0
+    - 36.0
+    - 21.0
+    - 18.0
+    - 11.0
+    - 8.0
+    - 10.0
+    - 9.0
+    - 9.0
+    - 13.0
+    - 23.0
+    - 23.0
+    - 57.0
+    - 31.0
+    - 25.0
+    - 17.0
+    - 12.0
+    - 23.0
+    - 12.0
+    - 14.0
+    - 13.0
+    - 9.0
+    - 11.0
+    - 26.0
+    - 22.0
+    - 18.0
+    - 44.0
+    - 37.0
+    - 25.0
+    - 41.0
+    - 57.0
+    - 102.0
+    - 148.0
+    - 238.0
+    - 201.0
+    - 248.0
+    - 153.0
+    - 88.0
+    - 45.0
+    - 30.0
+    - 15.0
+    - 25.0
+    - 26.0
+    - 23.0
+    - 21.0
+    - 29.0
+    - 30.0
+    - 18.0
+    - 16.0
+    - 15.0
+    - 17.0
+    - 25.0
+    - 19.0
+    - 28.0
+    - 16.0
+    - 17.0
+    - 23.0
+    - 22.0
+    - 29.0
+    - 34.0
+    - 37.0
+    - 51.0
+    - 31.0
+    - 27.0
+    - 16.0
+    - 26.0
+    - 19.0
+    - 18.0
+    - 19.0
 - identifier: LeuMe-DLeuMe-Pro-Leu-LA03-Pro-Leu
   sequence:
   - AgxNull
@@ -116822,25 +118448,6 @@ peptides:
     Peptide Size: 9.0
     max_count: 305.0
     total_fractions: 96.0
-    identifier: "LeuMe-DLeuMe-Pro-Leu-LA03-Pro-\u03B2Homoleu"
-    retention_time: 53.75
-    chromatogram_metrics:
-      noise_level: 67.19013237737285
-      signal_to_noise: 6.652762603434505
-      baseline_mean: 18.5
-      total_area: 2982.5
-      dynamic_range: 447.0
-    picked_peak_metrics:
-      apex_time: 53.75
-      end_time: 59.5
-      apex_intensity: 127.0
-      width: 2.75
-      area: 576.5
-      symmetry: 0.6740157480314961
-      gaussian_residuals: 0.14357394104785323
-      gaussian_fit_amplitude: 101.61847117377715
-      gaussian_fit_mean: 55.046251232225096
-      gaussian_fit_sigma: 2.749999999999987
   chromatogram:
     times:
     - 10.25
@@ -117036,17 +118643,103 @@ peptides:
     - 60.0
     - 60.0
     - 38.0
-    peaks:
-    - apex_time: 53.75
-      end_time: 59.5
-      apex_intensity: 127.0
-      width: 2.75
-      area: 576.5
-      symmetry: 0.6740157480314961
-      gaussian_residuals: 0.14357394104785323
-      gaussian_fit_amplitude: 101.61847117377715
-      gaussian_fit_mean: 55.046251232225096
-      gaussian_fit_sigma: 2.749999999999987
+    scaled_intensities:
+    - 30.0
+    - 18.0
+    - 14.0
+    - 13.0
+    - 23.0
+    - 57.0
+    - 42.0
+    - 99.0
+    - 107.0
+    - 30.0
+    - 24.0
+    - 16.0
+    - 21.0
+    - 17.0
+    - 24.0
+    - 19.0
+    - 18.0
+    - 21.0
+    - 16.0
+    - 13.0
+    - 15.0
+    - 27.0
+    - 32.0
+    - 29.0
+    - 25.0
+    - 18.0
+    - 30.0
+    - 51.0
+    - 41.0
+    - 28.0
+    - 22.0
+    - 11.0
+    - 19.0
+    - 13.0
+    - 13.0
+    - 10.0
+    - 9.0
+    - 14.0
+    - 17.0
+    - 25.0
+    - 25.0
+    - 31.0
+    - 37.0
+    - 25.0
+    - 12.0
+    - 15.0
+    - 16.0
+    - 11.0
+    - 21.0
+    - 28.0
+    - 27.0
+    - 20.0
+    - 14.0
+    - 59.0
+    - 39.0
+    - 35.0
+    - 32.0
+    - 47.0
+    - 76.0
+    - 109.0
+    - 227.0
+    - 180.0
+    - 305.0
+    - 220.0
+    - 143.0
+    - 63.0
+    - 53.0
+    - 14.0
+    - 29.0
+    - 25.0
+    - 25.0
+    - 30.0
+    - 41.0
+    - 27.0
+    - 26.0
+    - 21.0
+    - 27.0
+    - 31.0
+    - 27.0
+    - 25.0
+    - 22.0
+    - 18.0
+    - 15.0
+    - 18.0
+    - 24.0
+    - 26.0
+    - 29.0
+    - 48.0
+    - 44.0
+    - 37.0
+    - 36.0
+    - 43.0
+    - 37.0
+    - 30.0
+    - 28.0
+    - 19.0
 - identifier: "LeuMe-DLeuMe-Pro-Leu-LA03-Pro-\u03B2Homoleu"
   sequence:
   - AgxNull
@@ -121699,25 +123392,6 @@ peptides:
     Peptide Size: 9.0
     max_count: 388.0
     total_fractions: 96.0
-    identifier: LA03-Leu-LA03-Pro-Leu-LeuMe-Pro
-    retention_time: 34.75
-    chromatogram_metrics:
-      noise_level: 86.93973844370434
-      signal_to_noise: 6.199696590403432
-      baseline_mean: 28.0
-      total_area: 4532.75
-      dynamic_range: 539.0
-    picked_peak_metrics:
-      apex_time: 34.75
-      end_time: 37.75
-      apex_intensity: 551.0
-      width: 1.0
-      area: 1273.5
-      symmetry: 0.9594676346037507
-      gaussian_residuals: 0.07892707199128707
-      gaussian_fit_amplitude: 490.6345001836709
-      gaussian_fit_mean: 34.76038793976013
-      gaussian_fit_sigma: 0.999999999999902
   chromatogram:
     times:
     - 10.25
@@ -121913,17 +123587,103 @@ peptides:
     - 23.0
     - 29.0
     - 34.0
-    peaks:
-    - apex_time: 34.75
-      end_time: 37.75
-      apex_intensity: 551.0
-      width: 1.0
-      area: 1273.5
-      symmetry: 0.9594676346037507
-      gaussian_residuals: 0.07892707199128707
-      gaussian_fit_amplitude: 490.6345001836709
-      gaussian_fit_mean: 34.76038793976013
-      gaussian_fit_sigma: 0.999999999999902
+    scaled_intensities:
+    - 43.0
+    - 49.0
+    - 30.0
+    - 23.0
+    - 21.0
+    - 10.0
+    - 22.0
+    - 23.0
+    - 31.0
+    - 38.0
+    - 124.0
+    - 100.0
+    - 93.0
+    - 90.0
+    - 65.0
+    - 121.0
+    - 135.0
+    - 99.0
+    - 56.0
+    - 42.0
+    - 37.0
+    - 47.0
+    - 56.0
+    - 55.0
+    - 54.0
+    - 80.0
+    - 90.0
+    - 85.0
+    - 51.0
+    - 35.0
+    - 39.0
+    - 37.0
+    - 57.0
+    - 54.0
+    - 56.0
+    - 86.0
+    - 118.0
+    - 150.0
+    - 138.0
+    - 148.0
+    - 139.0
+    - 99.0
+    - 101.0
+    - 67.0
+    - 66.0
+    - 71.0
+    - 122.0
+    - 208.0
+    - 317.0
+    - 388.0
+    - 325.0
+    - 200.0
+    - 75.0
+    - 65.0
+    - 59.0
+    - 42.0
+    - 64.0
+    - 50.0
+    - 62.0
+    - 50.0
+    - 40.0
+    - 19.0
+    - 20.0
+    - 18.0
+    - 14.0
+    - 22.0
+    - 25.0
+    - 15.0
+    - 21.0
+    - 34.0
+    - 24.0
+    - 23.0
+    - 26.0
+    - 34.0
+    - 23.0
+    - 29.0
+    - 18.0
+    - 38.0
+    - 61.0
+    - 58.0
+    - 58.0
+    - 58.0
+    - 28.0
+    - 28.0
+    - 24.0
+    - 12.0
+    - 27.0
+    - 20.0
+    - 14.0
+    - 18.0
+    - 19.0
+    - 10.0
+    - 15.0
+    - 14.0
+    - 13.0
+    - 15.0
 - identifier: LA03-Leu-LA03-Pro-Leu-LeuMe-Pro
   sequence:
   - AgxNull
@@ -126576,25 +128336,6 @@ peptides:
     Peptide Size: 11.0
     max_count: 488.0
     total_fractions: 96.0
-    identifier: LeuMe-DLeuMe-Pro-Leu-LA03-Pro-Leu-LeuMe-Pro
-    retention_time: 45.75
-    chromatogram_metrics:
-      noise_level: 122.08995600282127
-      signal_to_noise: 5.438612820735689
-      baseline_mean: 27.5
-      total_area: 5178.25
-      dynamic_range: 664.0
-    picked_peak_metrics:
-      apex_time: 45.75
-      end_time: 48.75
-      apex_intensity: 677.0
-      width: 1.5
-      area: 1950.5
-      symmetry: 0.9314201308292889
-      gaussian_residuals: 0.07786927759886936
-      gaussian_fit_amplitude: 674.8494044568305
-      gaussian_fit_mean: 45.76451690552471
-      gaussian_fit_sigma: 1.1451286106610592
   chromatogram:
     times:
     - 10.25
@@ -126790,17 +128531,103 @@ peptides:
     - 157.0
     - 144.0
     - 142.0
-    peaks:
-    - apex_time: 45.75
-      end_time: 48.75
-      apex_intensity: 677.0
-      width: 1.5
-      area: 1950.5
-      symmetry: 0.9314201308292889
-      gaussian_residuals: 0.07786927759886936
-      gaussian_fit_amplitude: 674.8494044568305
-      gaussian_fit_mean: 45.76451690552471
-      gaussian_fit_sigma: 1.1451286106610592
+    scaled_intensities:
+    - 36.0
+    - 34.0
+    - 36.0
+    - 23.0
+    - 21.0
+    - 15.0
+    - 11.0
+    - 9.0
+    - 24.0
+    - 38.0
+    - 102.0
+    - 97.0
+    - 65.0
+    - 58.0
+    - 43.0
+    - 77.0
+    - 99.0
+    - 84.0
+    - 41.0
+    - 14.0
+    - 20.0
+    - 45.0
+    - 31.0
+    - 40.0
+    - 21.0
+    - 26.0
+    - 30.0
+    - 27.0
+    - 34.0
+    - 24.0
+    - 31.0
+    - 26.0
+    - 41.0
+    - 29.0
+    - 48.0
+    - 52.0
+    - 70.0
+    - 73.0
+    - 75.0
+    - 85.0
+    - 53.0
+    - 33.0
+    - 22.0
+    - 22.0
+    - 20.0
+    - 13.0
+    - 19.0
+    - 28.0
+    - 26.0
+    - 54.0
+    - 47.0
+    - 55.0
+    - 24.0
+    - 37.0
+    - 33.0
+    - 17.0
+    - 27.0
+    - 19.0
+    - 24.0
+    - 37.0
+    - 63.0
+    - 58.0
+    - 64.0
+    - 70.0
+    - 61.0
+    - 44.0
+    - 75.0
+    - 64.0
+    - 223.0
+    - 254.0
+    - 458.0
+    - 488.0
+    - 433.0
+    - 290.0
+    - 127.0
+    - 81.0
+    - 78.0
+    - 72.0
+    - 74.0
+    - 63.0
+    - 72.0
+    - 49.0
+    - 48.0
+    - 63.0
+    - 53.0
+    - 67.0
+    - 55.0
+    - 78.0
+    - 73.0
+    - 47.0
+    - 42.0
+    - 39.0
+    - 75.0
+    - 79.0
+    - 81.0
+    - 76.0
 - identifier: LeuMe-DLeuMe-Pro-Leu-LA03-Pro-Leu-LeuMe-Pro
   sequence:
   - AgxNull
