@@ -9,7 +9,7 @@
 
 ## Overview
 
-This project is a Python-based tool for chromatographic peak picking and analysis using the modular LC-Seq pipeline framework. The framework is designed to be highly configurable and extensible, allowing for the addition of custom components, configurations, and pipelines. The built-in pipelines are designed to replicate the behavior of the original LC-Seq pipeline (see GPP and CC), as well as a Standard (basic) pipeline that can be used as-is or as a starting point for new pipelines.
+A Python-based tool for chromatographic peak picking and analysis using the modular LC-Seq pipeline framework. The framework is designed to be highly configurable and extensible, allowing for the addition of custom components, configurations, and pipelines. The built-in pipelines are designed to replicate the behavior of the original LC-Seq pipeline (see GPP and CC), as well as a Standard (basic) pipeline that can be used as-is or as a starting point for new pipelines.
 
 ---
 
